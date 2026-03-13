@@ -23,6 +23,17 @@ async function ensureAuthSchema() {
       );
     }
 
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS password_reset_tokens (
+        id int AUTO_INCREMENT PRIMARY KEY,
+        userId int NOT NULL,
+        tokenHash varchar(128) NOT NULL UNIQUE,
+        expiresAt timestamp NOT NULL,
+        usedAt timestamp NULL,
+        createdAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     _schemaEnsured = true;
   } finally {
     await connection.end();

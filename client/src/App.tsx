@@ -14,6 +14,7 @@ import NewListing from "./pages/advertiser/NewListing";
 import AdminDashboard from "./pages/admin/Dashboard";
 import FavoritesPage from "./pages/Favorites";
 import LoginPage from "./pages/Login";
+import ResetPasswordPage from "./pages/ResetPassword";
 import HowItWorksPage from "./pages/HowItWorks";
 import TermsPage from "./pages/Terms";
 import PrivacyPage from "./pages/Privacy";
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/entrar" component={LoginPage} />
       <Route path="/login" component={LoginPage} />
       <Route path="/cadastro" component={LoginPage} />
+      <Route path="/redefinir-senha" component={ResetPasswordPage} />
       <Route path="/busca" component={SearchPage} />
       <Route path="/anuncio/:id" component={ListingDetailPage} />
       <Route path="/categoria/:slug" component={CategoryPage} />

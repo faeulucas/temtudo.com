@@ -146,6 +146,15 @@ export const favorites = mysqlTable("favorites", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
+export const passwordResetTokens = mysqlTable("password_reset_tokens", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  tokenHash: varchar("tokenHash", { length: 128 }).notNull().unique(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  usedAt: timestamp("usedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
 // ─── Reviews ──────────────────────────────────────────────────────────────────
 export const reviews = mysqlTable("reviews", {
   id: int("id").autoincrement().primaryKey(),
@@ -191,6 +200,7 @@ export type Listing = typeof listings.$inferSelect;
 export type ListingImage = typeof listingImages.$inferSelect;
 export type Booster = typeof boosters.$inferSelect;
 export type Favorite = typeof favorites.$inferSelect;
+export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
 export type Review = typeof reviews.$inferSelect;
 export type Report = typeof reports.$inferSelect;
 export type Banner = typeof banners.$inferSelect;

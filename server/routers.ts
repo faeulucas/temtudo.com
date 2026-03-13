@@ -1,10 +1,11 @@
 import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
-import { normalizeAuthEmail, hashPassword, toLocalOpenId, verifyPassword } from "./_core/localAuth";
+import { notifyOwner } from "./_core/notification";
+import { generatePasswordResetToken, hashResetToken, normalizeAuthEmail, hashPassword, toLocalOpenId, verifyPassword } from "./_core/localAuth";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { getDb } from "./db";
-import { listings, categories, cities, plans, listingImages, boosters, favorites, users } from "../drizzle/schema";
+import { listings, categories, cities, plans, listingImages, boosters, favorites, users, passwordResetTokens } from "../drizzle/schema";
 import { eq, desc, and, like, gte, lte, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
@@ -91,6 +92,85 @@ export const appRouter = router({
       ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
 
       await db.update(users).set({ lastSignedIn: new Date() }).where(eq(users.id, user.id));
+
+      return { success: true as const };
+    }),
+    requestPasswordReset: publicProcedure.input(z.object({
+      email: z.string().email(),
+    })).mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+      const email = normalizeAuthEmail(input.email);
+      const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+
+      if (user && user.passwordHash) {
+        const rawToken = generatePasswordResetToken();
+        const tokenHash = hashResetToken(rawToken);
+        const expiresAt = new Date(Date.now() + 1000 * 60 * 30);
+
+        await db.delete(passwordResetTokens).where(eq(passwordResetTokens.userId, user.id));
+        await db.insert(passwordResetTokens).values({
+          userId: user.id,
+          tokenHash,
+          expiresAt,
+        });
+
+        const origin = ctx.req.headers.origin;
+        const baseUrl =
+          (typeof origin === "string" && origin) ||
+          ctx.req.headers.referer?.split("/").slice(0, 3).join("/") ||
+          "http://localhost:3000";
+        const resetLink = `${baseUrl.replace(/\/+$/, "")}/redefinir-senha?token=${rawToken}`;
+
+        try {
+          await notifyOwner({
+            title: "Pedido de recuperacao de senha",
+            content: `Conta: ${email}\nLink temporario: ${resetLink}\nExpira em 30 minutos.`,
+          });
+        } catch (error) {
+          console.warn("[Auth] Failed to notify owner about password reset:", error);
+        }
+
+        console.info(`[Auth] Password reset requested for ${email}. Link: ${resetLink}`);
+      }
+
+      return {
+        success: true as const,
+        message: "Se existir uma conta com este email, as instrucoes de recuperacao foram geradas.",
+      };
+    }),
+    resetPassword: publicProcedure.input(z.object({
+      token: z.string().min(20),
+      password: z.string().min(6).max(100),
+    })).mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+      const tokenHash = hashResetToken(input.token);
+      const now = new Date();
+      const [resetToken] = await db
+        .select()
+        .from(passwordResetTokens)
+        .where(eq(passwordResetTokens.tokenHash, tokenHash))
+        .limit(1);
+
+      if (!resetToken || resetToken.usedAt || resetToken.expiresAt < now) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Token de recuperacao invalido ou expirado." });
+      }
+
+      await db
+        .update(users)
+        .set({
+          passwordHash: hashPassword(input.password),
+          updatedAt: now,
+        })
+        .where(eq(users.id, resetToken.userId));
+
+      await db
+        .update(passwordResetTokens)
+        .set({ usedAt: now })
+        .where(eq(passwordResetTokens.id, resetToken.id));
 
       return { success: true as const };
     }),

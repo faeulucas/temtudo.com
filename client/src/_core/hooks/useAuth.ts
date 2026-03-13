@@ -1,4 +1,4 @@
-import { LOGIN_ROUTE, hasOAuthConfig } from "@/const";
+import { LOGIN_ROUTE } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { TRPCClientError } from "@trpc/client";
 import { useCallback, useEffect, useMemo } from "react";
@@ -65,7 +65,6 @@ export function useAuth(options?: UseAuthOptions) {
     if (meQuery.isLoading || logoutMutation.isPending) return;
     if (state.user) return;
     if (typeof window === "undefined") return;
-    if (!hasOAuthConfig()) return;
     if (window.location.pathname === redirectPath) return;
 
     window.location.href = redirectPath

@@ -1,5 +1,6 @@
-import { COOKIE_NAME } from "@shared/const";
+import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
+import { normalizeAuthEmail, hashPassword, toLocalOpenId, verifyPassword } from "./_core/localAuth";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { getDb } from "./db";
@@ -18,7 +19,81 @@ import {
 export const appRouter = router({
   system: systemRouter,
   auth: router({
-    me: publicProcedure.query(opts => opts.ctx.user),
+    me: publicProcedure.query(opts => {
+      if (!opts.ctx.user) return null;
+      const { passwordHash: _passwordHash, ...safeUser } = opts.ctx.user;
+      return safeUser;
+    }),
+    register: publicProcedure.input(z.object({
+      name: z.string().min(2).max(120),
+      email: z.string().email(),
+      password: z.string().min(6).max(100),
+    })).mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+      const email = normalizeAuthEmail(input.email);
+      const [existingUser] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+
+      if (existingUser) {
+        throw new TRPCError({ code: "CONFLICT", message: "Este email ja esta cadastrado." });
+      }
+
+      const openId = toLocalOpenId(email);
+      const now = new Date();
+      const trialStartedAt = new Date();
+
+      const [result] = await db.insert(users).values({
+        openId,
+        name: input.name.trim(),
+        email,
+        passwordHash: hashPassword(input.password),
+        loginMethod: "local",
+        role: "advertiser",
+        trialStartedAt,
+        trialUsed: false,
+        lastSignedIn: now,
+      });
+
+      const sessionToken = await sdk.createSessionToken(openId, {
+        name: input.name.trim(),
+      });
+      const cookieOptions = getSessionCookieOptions(ctx.req);
+      ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+
+      return {
+        success: true as const,
+        userId: (result as any).insertId,
+      };
+    }),
+    login: publicProcedure.input(z.object({
+      email: z.string().email(),
+      password: z.string().min(6).max(100),
+    })).mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+      const email = normalizeAuthEmail(input.email);
+      const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+
+      if (!user || !verifyPassword(input.password, user.passwordHash)) {
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "Email ou senha invalidos." });
+      }
+
+      if (user.isBanned) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Sua conta foi bloqueada." });
+      }
+
+      const sessionToken = await sdk.createSessionToken(user.openId, {
+        name: user.name || "Usuario",
+      });
+      const cookieOptions = getSessionCookieOptions(ctx.req);
+      ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+
+      await db.update(users).set({ lastSignedIn: new Date() }).where(eq(users.id, user.id));
+
+      return { success: true as const };
+    }),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
@@ -383,7 +458,37 @@ export const appRouter = router({
       if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
       const db = await getDb();
       if (!db) return [];
-      return db.select().from(users).orderBy(desc(users.createdAt)).limit(input.limit).offset((input.page - 1) * input.limit);
+      return db
+        .select({
+          id: users.id,
+          openId: users.openId,
+          name: users.name,
+          email: users.email,
+          loginMethod: users.loginMethod,
+          role: users.role,
+          phone: users.phone,
+          whatsapp: users.whatsapp,
+          avatar: users.avatar,
+          bio: users.bio,
+          personType: users.personType,
+          cpfCnpj: users.cpfCnpj,
+          companyName: users.companyName,
+          cityId: users.cityId,
+          neighborhood: users.neighborhood,
+          planId: users.planId,
+          planExpiresAt: users.planExpiresAt,
+          trialStartedAt: users.trialStartedAt,
+          trialUsed: users.trialUsed,
+          isVerified: users.isVerified,
+          isBanned: users.isBanned,
+          createdAt: users.createdAt,
+          updatedAt: users.updatedAt,
+          lastSignedIn: users.lastSignedIn,
+        })
+        .from(users)
+        .orderBy(desc(users.createdAt))
+        .limit(input.limit)
+        .offset((input.page - 1) * input.limit);
     }),
     allListings: protectedProcedure.input(z.object({ page: z.number().default(1), status: z.string().optional() })).query(async ({ ctx, input }) => {
       if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });

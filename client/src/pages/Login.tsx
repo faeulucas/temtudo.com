@@ -1,18 +1,69 @@
-import { getLoginUrl, hasOAuthConfig } from "@/const";
+import { useState } from "react";
+import { Link, useLocation } from "wouter";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, LogIn, Shield, Zap } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { trpc } from "@/lib/trpc";
+import { CheckCircle, LogIn, Shield, UserPlus, Zap } from "lucide-react";
 
 const BENEFITS = [
-  "Publique seus anúncios em poucos minutos",
+  "Publique seus anuncios em poucos minutos",
   "Gerencie favoritos, contatos e painel do anunciante",
   "Acompanhe desempenho e destaque com Booster",
 ];
 
+type Mode = "login" | "register";
+
 export default function LoginPage() {
-  const loginUrl = getLoginUrl();
-  const oauthReady = hasOAuthConfig();
+  const [, navigate] = useLocation();
+  const utils = trpc.useUtils();
+  const [mode, setMode] = useState<Mode>("login");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const loginMutation = trpc.auth.login.useMutation({
+    onSuccess: async () => {
+      await utils.auth.me.invalidate();
+      navigate("/anunciante");
+    },
+    onError: error => {
+      setErrorMessage(error.message);
+    },
+  });
+
+  const registerMutation = trpc.auth.register.useMutation({
+    onSuccess: async () => {
+      await utils.auth.me.invalidate();
+      navigate("/anunciante");
+    },
+    onError: error => {
+      setErrorMessage(error.message);
+    },
+  });
+
+  const isPending = loginMutation.isPending || registerMutation.isPending;
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setErrorMessage("");
+
+    if (mode === "register") {
+      await registerMutation.mutateAsync({
+        name,
+        email,
+        password,
+      });
+      return;
+    }
+
+    await loginMutation.mutateAsync({
+      email,
+      password,
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -43,38 +94,94 @@ export default function LoginPage() {
 
           <section className="rounded-[28px] border border-gray-100 bg-white p-8 shadow-sm">
             <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-gradient text-white">
-              <LogIn className="h-7 w-7" />
+              {mode === "login" ? <LogIn className="h-7 w-7" /> : <UserPlus className="h-7 w-7" />}
             </div>
             <h2 className="font-display text-2xl font-bold text-gray-900">
-              Login e cadastro
+              {mode === "login" ? "Login com email" : "Criar conta"}
             </h2>
             <p className="mt-2 text-sm text-gray-500">
-              O acesso é feito por autenticação externa. Após o login, você volta automaticamente para o site.
+              {mode === "login"
+                ? "Entre com seu email e senha para acessar o painel."
+                : "Cadastre sua conta e comece a anunciar no mesmo instante."}
             </p>
 
-            <div className="mt-6 space-y-3">
-              <a href={oauthReady ? loginUrl : "#"}>
-                <Button
-                  className="w-full rounded-2xl bg-brand-gradient py-6 text-base font-bold text-white hover:opacity-90"
-                  disabled={!oauthReady}
-                >
-                  <LogIn className="mr-2 h-5 w-5" />
-                  Entrar ou criar conta
-                </Button>
-              </a>
-              <a href="/anunciar">
+            <div className="mt-6 grid grid-cols-2 gap-2 rounded-2xl bg-gray-100 p-1">
+              <button
+                type="button"
+                onClick={() => setMode("login")}
+                className={`rounded-2xl px-4 py-3 text-sm font-semibold transition-colors ${mode === "login" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500"}`}
+              >
+                Entrar
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode("register")}
+                className={`rounded-2xl px-4 py-3 text-sm font-semibold transition-colors ${mode === "register" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500"}`}
+              >
+                Criar conta
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+              {mode === "register" && (
+                <div>
+                  <label className="mb-1.5 block text-sm font-semibold text-gray-700">Nome</label>
+                  <Input
+                    value={name}
+                    onChange={event => setName(event.target.value)}
+                    placeholder="Seu nome completo"
+                    required
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-gray-700">Email</label>
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={event => setEmail(event.target.value)}
+                  placeholder="voce@email.com"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-gray-700">Senha</label>
+                <Input
+                  type="password"
+                  value={password}
+                  onChange={event => setPassword(event.target.value)}
+                  placeholder="Minimo de 6 caracteres"
+                  minLength={6}
+                  required
+                />
+              </div>
+
+              {errorMessage && (
+                <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                  {errorMessage}
+                </div>
+              )}
+
+              <Button
+                type="submit"
+                className="w-full rounded-2xl bg-brand-gradient py-6 text-base font-bold text-white hover:opacity-90"
+                disabled={isPending}
+              >
+                {mode === "login" ? <LogIn className="mr-2 h-5 w-5" /> : <UserPlus className="mr-2 h-5 w-5" />}
+                {isPending ? "Processando..." : mode === "login" ? "Entrar" : "Criar conta"}
+              </Button>
+            </form>
+
+            <div className="mt-4">
+              <Link href="/anunciar">
                 <Button variant="outline" className="w-full rounded-2xl py-6 text-base font-semibold">
                   <Zap className="mr-2 h-5 w-5" />
                   Quero anunciar
                 </Button>
-              </a>
+              </Link>
             </div>
-
-            {!oauthReady && (
-              <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-                As variáveis de autenticação ainda não foram configuradas neste ambiente.
-              </div>
-            )}
           </section>
         </div>
       </main>

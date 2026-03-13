@@ -172,10 +172,11 @@ class SDKServer {
     openId: string,
     options: { expiresInMs?: number; name?: string } = {}
   ): Promise<string> {
+    const appId = ENV.appId || "norte-vivo-local";
     return this.signSession(
       {
         openId,
-        appId: ENV.appId,
+        appId,
         name: options.name || "",
       },
       options
@@ -276,6 +277,10 @@ class SDKServer {
 
     // If user not in DB, sync from OAuth server automatically
     if (!user) {
+      if (session.openId.startsWith("local:") || !ENV.oAuthServerUrl) {
+        throw ForbiddenError("User not found");
+      }
+
       try {
         const userInfo = await this.getUserInfoWithJwt(sessionCookie ?? "");
         await db.upsertUser({

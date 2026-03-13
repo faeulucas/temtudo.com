@@ -19,7 +19,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { LOGIN_ROUTE, hasOAuthConfig } from "@/const";
+import { LOGIN_ROUTE } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
 import { LayoutDashboard, LogOut, PanelLeft, Users } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
@@ -70,14 +70,12 @@ export default function DashboardLayout({
           </div>
           <Button
             onClick={() => {
-              if (!hasOAuthConfig()) return;
               window.location.href = LOGIN_ROUTE;
             }}
             size="lg"
             className="w-full shadow-lg hover:shadow-xl transition-all"
-            disabled={!hasOAuthConfig()}
           >
-            {hasOAuthConfig() ? "Sign in" : "OAuth unavailable"}
+            Sign in
           </Button>
         </div>
       </div>

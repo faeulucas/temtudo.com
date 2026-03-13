@@ -1,15 +1,40 @@
+import mysql from "mysql2/promise";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
+let _schemaEnsured = false;
+
+async function ensureAuthSchema() {
+  if (_schemaEnsured || !process.env.DATABASE_URL) return;
+
+  const connection = await mysql.createConnection(process.env.DATABASE_URL);
+
+  try {
+    const [columns] = await connection.query(
+      "SHOW COLUMNS FROM users LIKE 'passwordHash'"
+    );
+
+    if (Array.isArray(columns) && columns.length === 0) {
+      await connection.query(
+        "ALTER TABLE users ADD COLUMN passwordHash varchar(255) NULL AFTER email"
+      );
+    }
+
+    _schemaEnsured = true;
+  } finally {
+    await connection.end();
+  }
+}
 
 // Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
       _db = drizzle(process.env.DATABASE_URL);
+      await ensureAuthSchema();
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
       _db = null;
@@ -35,7 +60,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     };
     const updateSet: Record<string, unknown> = {};
 
-    const textFields = ["name", "email", "loginMethod"] as const;
+    const textFields = ["name", "email", "passwordHash", "loginMethod"] as const;
     type TextField = (typeof textFields)[number];
 
     const assignNullable = (field: TextField) => {

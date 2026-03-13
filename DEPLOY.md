@@ -3,7 +3,7 @@
 ## Architecture
 
 - `Vercel`: static frontend built from Vite
-- `Railway`: Node/Express backend, OAuth callback, tRPC API, database access
+- `Railway`: Node/Express backend, local auth, tRPC API, database access
 
 ## Required environment variables
 
@@ -11,19 +11,15 @@
 
 - `DATABASE_URL`
 - `JWT_SECRET`
-- `OAUTH_SERVER_URL`
-- `OWNER_OPEN_ID`
+- `APP_ID` (`norte-vivo-local` works)
 - `BUILT_IN_FORGE_API_URL`
 - `BUILT_IN_FORGE_API_KEY`
-- `VITE_APP_ID`
 - `FRONTEND_URL`
 - `PUBLIC_API_URL`
 - `PORT`
 
 ### Vercel
 
-- `VITE_APP_ID`
-- `VITE_OAUTH_PORTAL_URL`
 - `VITE_API_BASE_URL`
 - `VITE_FRONTEND_FORGE_API_KEY`
 - `VITE_FRONTEND_FORGE_API_URL`
@@ -71,4 +67,4 @@ GET /api/health
 3. Run `pnpm db:push`.
 4. Run `pnpm db:seed`.
 5. Deploy Vercel frontend.
-6. Test login, search, category, listing details and new listing flows.
+6. Test signup/login, search, category, listing details and new listing flows.

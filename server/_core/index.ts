@@ -42,10 +42,13 @@ function isAllowedOrigin(origin: string) {
     ) {
       const frontendProject = frontendUrl.hostname.replace(".vercel.app", "");
       const requestProject = requestUrl.hostname.replace(".vercel.app", "");
+      const frontendBaseProject = frontendProject.split("-").slice(0, 4).join("-");
+      const requestBaseProject = requestProject.split("-").slice(0, 4).join("-");
 
       return (
         requestProject === frontendProject ||
-        requestProject.startsWith(`${frontendProject}-`)
+        requestProject.startsWith(`${frontendProject}-`) ||
+        requestBaseProject === frontendBaseProject
       );
     }
   } catch {

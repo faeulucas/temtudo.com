@@ -45,7 +45,7 @@ export const appRouter = router({
       const now = new Date();
       const trialStartedAt = new Date();
 
-      const [result] = await db.insert(users).values({
+      const result = await db.insert(users).values({
         openId,
         name: input.name.trim(),
         email,
@@ -367,7 +367,7 @@ export const appRouter = router({
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 30);
-      const [result] = await db.insert(listings).values({
+      const result = await db.insert(listings).values({
         ...input,
         userId: ctx.user.id,
         price: input.price ? String(input.price) : undefined,

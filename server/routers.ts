@@ -406,7 +406,20 @@ export const appRouter = router({
       const [listing] = await db.select().from(listings).where(eq(listings.id, input.id)).limit(1);
       if (!listing) return null;
       const images = await db.select().from(listingImages).where(eq(listingImages.listingId, input.id)).orderBy(listingImages.sortOrder);
-      const [seller] = await db.select({ id: users.id, name: users.name, avatar: users.avatar, whatsapp: users.whatsapp, isVerified: users.isVerified, createdAt: users.createdAt }).from(users).where(eq(users.id, listing.userId)).limit(1);
+      const [seller] = await db
+        .select({
+          id: users.id,
+          name: users.name,
+          personType: users.personType,
+          companyName: users.companyName,
+          avatar: users.avatar,
+          whatsapp: users.whatsapp,
+          isVerified: users.isVerified,
+          createdAt: users.createdAt,
+        })
+        .from(users)
+        .where(eq(users.id, listing.userId))
+        .limit(1);
       await db.update(listings).set({ viewCount: sql`${listings.viewCount} + 1` }).where(eq(listings.id, input.id));
       return { ...listing, images, seller };
     }),

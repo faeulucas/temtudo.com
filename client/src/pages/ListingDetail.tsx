@@ -74,6 +74,15 @@ export default function ListingDetailPage() {
   }
 
   const images = listing.images || [];
+  const sellerPersonType =
+    listing.seller && "personType" in listing.seller ? listing.seller.personType : undefined;
+  const sellerCompanyName =
+    listing.seller && "companyName" in listing.seller ? listing.seller.companyName : undefined;
+  const sellerDisplayName =
+    sellerPersonType === "pj"
+      ? sellerCompanyName || listing.seller?.name || "Loja"
+      : listing.seller?.name || "Anunciante";
+  const sellerInitial = sellerDisplayName.charAt(0)?.toUpperCase() || "?";
 
   const formatPrice = () => {
     if (!listing.price || listing.priceType === "free") return "Gratis";
@@ -291,17 +300,17 @@ export default function ListingDetailPage() {
                     {listing.seller.avatar ? (
                       <img
                         src={listing.seller.avatar}
-                        alt={listing.seller.name || "Anunciante"}
+                        alt={sellerDisplayName}
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      listing.seller.name?.charAt(0)?.toUpperCase() || "?"
+                      sellerInitial
                     )}
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-1">
                       <span className="font-bold text-gray-900">
-                        {listing.seller.name || "Anunciante"}
+                        {sellerDisplayName}
                       </span>
                       {listing.seller.isVerified && (
                         <BadgeCheck className="h-4 w-4 text-blue-500" />

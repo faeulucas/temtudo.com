@@ -34,6 +34,9 @@ export default function Header({ selectedCity, onCityChange, onSearch }: HeaderP
   const [, navigate] = useLocation();
   const [searchQ, setSearchQ] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
+  const displayName =
+    user?.personType === "pj" ? user?.companyName || user?.name || "Loja" : user?.name || "Usuário";
+  const displayInitial = displayName.charAt(0)?.toUpperCase() || "U";
 
   const { data: cities } = trpc.public.cities.useQuery();
 
@@ -125,9 +128,9 @@ export default function Header({ selectedCity, onCityChange, onSearch }: HeaderP
                     <Button variant="ghost" className="flex items-center gap-2 px-2">
                       <div className="w-8 h-8 rounded-full bg-brand-gradient flex items-center justify-center overflow-hidden text-white text-sm font-bold">
                         {user?.avatar ? (
-                          <img src={user.avatar} alt={user.name || "Perfil"} className="w-full h-full object-cover" />
+                          <img src={user.avatar} alt={displayName} className="w-full h-full object-cover" />
                         ) : (
-                          user?.name?.charAt(0)?.toUpperCase() || "U"
+                          displayInitial
                         )}
                       </div>
                       <ChevronDown className="w-3 h-3 text-gray-500 hidden sm:block" />
@@ -135,7 +138,7 @@ export default function Header({ selectedCity, onCityChange, onSearch }: HeaderP
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
                     <div className="px-3 py-2">
-                      <p className="font-semibold text-sm text-gray-900">{user?.name || "Usuário"}</p>
+                      <p className="font-semibold text-sm text-gray-900">{displayName}</p>
                       <p className="text-xs text-gray-500">{user?.email}</p>
                     </div>
                     <DropdownMenuSeparator />

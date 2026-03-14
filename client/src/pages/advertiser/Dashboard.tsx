@@ -170,6 +170,9 @@ export default function AdvertiserDashboard() {
   const segment = getSegmentFromCategorySlug(primaryCategory?.slug);
   const segmentContent = SEGMENT_CONTENT[segment];
   const SegmentIcon = SEGMENT_ICON[segment];
+  const displayName =
+    personType === "pj" ? companyName || user?.companyName || user?.name : profileName || user?.name;
+  const displayInitial = displayName?.charAt(0)?.toUpperCase() || "U";
   const trialDaysLeft = user?.trialStartedAt
     ? Math.max(0, 30 - Math.floor((Date.now() - new Date(user.trialStartedAt).getTime()) / 86400000))
     : 30;
@@ -211,7 +214,7 @@ export default function AdvertiserDashboard() {
                 {segmentContent.dashboardTitle}
               </h1>
               <p className="mt-2 max-w-2xl text-gray-500">
-                {user?.name ? `Ola, ${user.name.split(" ")[0]}. ` : ""}
+                {displayName ? `Ola, ${displayName.split(" ")[0]}. ` : ""}
                 {segmentContent.dashboardSubtitle}
               </p>
             </div>
@@ -490,17 +493,20 @@ export default function AdvertiserDashboard() {
                   {user?.avatar ? (
                     <img
                       src={user.avatar}
-                      alt={user.name || "Perfil"}
+                      alt={displayName || "Perfil"}
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    (user?.name?.charAt(0)?.toUpperCase() || "U")
+                    displayInitial
                   )}
                 </div>
                 <div className="flex-1">
                   <p className="font-semibold text-gray-900">Foto de perfil</p>
                   <p className="mt-1 text-sm text-gray-500">
                     Essa imagem aparece no seu painel e na apresentacao da conta.
+                  </p>
+                  <p className="mt-1 text-xs text-gray-400">
+                    Ao tocar em trocar foto, voce escolhe uma imagem da galeria ou biblioteca do aparelho.
                   </p>
                 </div>
                 <label className="cursor-pointer">
@@ -519,7 +525,7 @@ export default function AdvertiserDashboard() {
                     <Camera className="mr-2 h-4 w-4" />
                     {avatarUploading || uploadAvatarMutation.isPending
                       ? "Enviando..."
-                      : "Trocar foto"}
+                      : "Escolher foto"}
                   </Button>
                 </label>
               </div>
@@ -529,6 +535,12 @@ export default function AdvertiserDashboard() {
                   <span>Tipo atual</span>
                   <span className="rounded-full bg-white px-3 py-1 font-semibold text-gray-900">
                     {personType === "pj" ? "Pessoa juridica" : "Pessoa fisica"}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>{personType === "pj" ? "Empresa exibida" : "Nome exibido"}</span>
+                  <span className="rounded-full bg-white px-3 py-1 font-semibold text-gray-900">
+                    {displayName || "Nao informado"}
                   </span>
                 </div>
                 <p>

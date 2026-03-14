@@ -15,6 +15,13 @@
       "when": 1773182015054,
       "tag": "0001_luxuriant_lady_vermin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1773445732444,
+      "tag": "0002_swift_gamma_corps",
+      "breakpoints": true
     }
   ]
 }

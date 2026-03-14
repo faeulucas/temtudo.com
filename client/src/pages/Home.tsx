@@ -71,6 +71,8 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   Wrench,
   Cross,
   Zap,
+  Shield,
+  MapPin,
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -92,6 +94,10 @@ const CATEGORY_COLORS: Record<string, string> = {
   empregos: "bg-indigo-50 text-indigo-600 hover:bg-indigo-100",
   eventos: "bg-fuchsia-50 text-fuchsia-600 hover:bg-fuchsia-100",
   classificados: "bg-slate-50 text-slate-600 hover:bg-slate-100",
+  saude: "bg-emerald-50 text-emerald-700 hover:bg-emerald-100",
+  educacao: "bg-orange-50 text-orange-700 hover:bg-orange-100",
+  seguranca: "bg-blue-50 text-blue-700 hover:bg-blue-100",
+  "utilidade-publica": "bg-teal-50 text-teal-700 hover:bg-teal-100",
 };
 
 type HomeHighlightListing = {

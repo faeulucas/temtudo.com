@@ -12,7 +12,7 @@ import {
 import { sdk } from "./_core/sdk";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
-import { getDb } from "./db";
+import { getDb, getUserByOpenId } from "./db";
 import {
   listings,
   categories,
@@ -136,6 +136,34 @@ const defaultCategoryCatalog = [
     color: "#06b6d4",
     sortOrder: 5,
   },
+  {
+    name: "Saude",
+    slug: "saude",
+    icon: "Cross",
+    color: "#10b981",
+    sortOrder: 6,
+  },
+  {
+    name: "Educacao",
+    slug: "educacao",
+    icon: "Building2",
+    color: "#f97316",
+    sortOrder: 7,
+  },
+  {
+    name: "Seguranca",
+    slug: "seguranca",
+    icon: "Shield",
+    color: "#2563eb",
+    sortOrder: 8,
+  },
+  {
+    name: "Utilidade Publica",
+    slug: "utilidade-publica",
+    icon: "MapPin",
+    color: "#0f766e",
+    sortOrder: 9,
+  },
 ];
 
 async function ensureDefaultCategories(
@@ -157,6 +185,337 @@ async function ensureDefaultCategories(
         isActive = true,
         sortOrder = VALUES(sortOrder)
     `);
+  }
+}
+
+const IBAITI_DIRECTORY_OPEN_ID = "directory:ibaiti-public";
+const IBAITI_DIRECTORY_NAME = "Guia Publico de Ibaiti";
+const IBAITI_DIRECTORY_COMPANY = "Servicos Essenciais de Ibaiti";
+const DIRECTORY_LISTING_EXPIRY = new Date("2035-12-31T23:59:59.000Z");
+
+const ibaitiInstitutionCatalog = [
+  {
+    title: "Hospital Municipal de Ibaiti",
+    categorySlug: "saude",
+    subcategory: "Hospital",
+    neighborhood: "Centro",
+    phone: "4335467480",
+    description:
+      "Fundacao Hospitalar de Saude de Ibaiti. Atendimento hospitalar municipal. Telefones uteis divulgados pela Prefeitura: (43) 3546-7480 e (43) 3546-6145.",
+  },
+  {
+    title: "SAMU de Ibaiti",
+    categorySlug: "saude",
+    subcategory: "Emergencia",
+    neighborhood: "Centro",
+    phone: "192",
+    description:
+      "Servico de Atendimento Movel de Urgencia para emergencias. Acionamento pelo telefone 192.",
+  },
+  {
+    title: "UBS Centro de Ibaiti",
+    categorySlug: "saude",
+    subcategory: "Posto de saude",
+    neighborhood: "Centro",
+    phone: "4335467481",
+    description:
+      "Unidade Basica de Saude da regiao central de Ibaiti. Telefone util divulgado pela Prefeitura: (43) 3546-7481.",
+  },
+  {
+    title: "UBS Cohapar de Ibaiti",
+    categorySlug: "saude",
+    subcategory: "Posto de saude",
+    neighborhood: "Cohapar",
+    phone: "4335467482",
+    description:
+      "Unidade Basica de Saude da Cohapar. Telefone util divulgado pela Prefeitura: (43) 3546-7482.",
+  },
+  {
+    title: "UBS Gralha Azul de Ibaiti",
+    categorySlug: "saude",
+    subcategory: "Posto de saude",
+    neighborhood: "Gralha Azul",
+    phone: "4335467483",
+    description:
+      "Unidade Basica de Saude do bairro Gralha Azul. Telefone util divulgado pela Prefeitura: (43) 3546-7483.",
+  },
+  {
+    title: "UBS Jardim Paineiras de Ibaiti",
+    categorySlug: "saude",
+    subcategory: "Posto de saude",
+    neighborhood: "Jardim Paineiras",
+    phone: "4335467485",
+    description:
+      "Unidade Basica de Saude do Jardim Paineiras. Telefone util divulgado pela Prefeitura: (43) 3546-7485.",
+  },
+  {
+    title: "UBS Vila Guay de Ibaiti",
+    categorySlug: "saude",
+    subcategory: "Posto de saude",
+    neighborhood: "Vila Guay",
+    phone: "4335467488",
+    description:
+      "Unidade Basica de Saude da Vila Guay. Telefone util divulgado pela Prefeitura: (43) 3546-7488.",
+  },
+  {
+    title: "UBS Sao Judas Tadeu de Ibaiti",
+    categorySlug: "saude",
+    subcategory: "Posto de saude",
+    neighborhood: "Sao Judas Tadeu",
+    phone: "4335467490",
+    description:
+      "Unidade Basica de Saude do bairro Sao Judas Tadeu. Telefone util divulgado pela Prefeitura: (43) 3546-7490.",
+  },
+  {
+    title: "Escola Municipal Monteiro Lobato",
+    categorySlug: "educacao",
+    subcategory: "Escola municipal",
+    neighborhood: "Ibaiti",
+    phone: "4335467478",
+    description:
+      "Escola municipal de Ibaiti. Telefone util divulgado pela Prefeitura: (43) 3546-7478.",
+  },
+  {
+    title: "Escola Municipal Jose Goncalves Dias",
+    categorySlug: "educacao",
+    subcategory: "Escola municipal",
+    neighborhood: "Ibaiti",
+    phone: "4335467472",
+    description:
+      "Escola municipal de Ibaiti. Telefone util divulgado pela Prefeitura: (43) 3546-7472.",
+  },
+  {
+    title: "Escola Municipal Clovete Fadel de Melo Bueno",
+    categorySlug: "educacao",
+    subcategory: "Escola municipal",
+    neighborhood: "Ibaiti",
+    phone: "4335467468",
+    description:
+      "Escola municipal de Ibaiti. Telefone util divulgado pela Prefeitura: (43) 3546-7468.",
+  },
+  {
+    title: "Escola Municipal Daigles Aparecida de Carvalho",
+    categorySlug: "educacao",
+    subcategory: "Escola municipal",
+    neighborhood: "Vila Guay",
+    phone: "4335467469",
+    description:
+      "Escola municipal de Ibaiti. Telefone util divulgado pela Prefeitura: (43) 3546-7469.",
+  },
+  {
+    title: "Escola Municipal Dom Pedro I",
+    categorySlug: "educacao",
+    subcategory: "Escola municipal",
+    neighborhood: "Amorinha",
+    phone: "4335467470",
+    description:
+      "Escola municipal de Ibaiti. Telefone util divulgado pela Prefeitura: (43) 3546-7470.",
+  },
+  {
+    title: "Escola Municipal Joao Severino",
+    categorySlug: "educacao",
+    subcategory: "Escola municipal",
+    neighborhood: "Campinho",
+    phone: "4335467494",
+    description:
+      "Escola municipal de Ibaiti. Telefone util divulgado pela Prefeitura: (43) 3546-7494.",
+  },
+  {
+    title: "Polo UAB Ibaiti",
+    categorySlug: "educacao",
+    subcategory: "Universidade",
+    neighborhood: "Centro",
+    phone: "4335467460",
+    description:
+      "Polo de apoio presencial da Universidade Aberta do Brasil em Ibaiti. Vinculado a Secretaria Municipal de Educacao. Telefone: (43) 3546-7460.",
+  },
+  {
+    title: "FEATI - Faculdade de Ibaiti",
+    categorySlug: "educacao",
+    subcategory: "Universidade",
+    neighborhood: "Flamenguinho",
+    phone: "4335461263",
+    description:
+      "Faculdade de Educacao, Administracao e Tecnologia de Ibaiti. Endereco: Av. Tertuliano de Moura Bueno, 1400 - Flamenguinho. Telefones: (43) 3546-1263 e (43) 3141-1101.",
+  },
+  {
+    title: "Policia Civil de Ibaiti",
+    categorySlug: "seguranca",
+    subcategory: "Policia civil",
+    neighborhood: "Centro",
+    phone: "4335468450",
+    description:
+      "Delegacia de Policia Civil de Ibaiti para registro e atendimento policial. Endereco publico em documento estadual: Rua Antonio Moura Bueno, 869 - Centro. Telefone: (43) 3546-8450.",
+  },
+  {
+    title: "Policia Militar de Ibaiti",
+    categorySlug: "seguranca",
+    subcategory: "Policia militar",
+    neighborhood: "Centro",
+    phone: "4335462318",
+    description:
+      "1o Pelotao da 3a Companhia do 2o BPM em Ibaiti. Telefone divulgado pela PMPR: (43) 3546-4441 e (43) 3546-2318.",
+  },
+  {
+    title: "Rodoviaria de Ibaiti",
+    categorySlug: "utilidade-publica",
+    subcategory: "Rodoviaria",
+    neighborhood: "Centro",
+    phone: "4335467499",
+    description:
+      "Terminal rodoviario e informacoes de transporte urbano. Telefone util divulgado pela Prefeitura: (43) 3546-7499.",
+  },
+] as const;
+
+async function ensureIbaitiInstitutionDirectory(
+  db: NonNullable<Awaited<ReturnType<typeof getDb>>>
+) {
+  await ensureDefaultCategories(db);
+
+  await db.execute(sql`
+    INSERT INTO cities (name, state, slug, isActive)
+    VALUES ('Ibaiti', 'PR', 'ibaiti', true)
+    ON DUPLICATE KEY UPDATE
+      name = VALUES(name),
+      state = VALUES(state),
+      isActive = true
+  `);
+
+  const [ibaitiCity] = await db
+    .select({ id: cities.id })
+    .from(cities)
+    .where(eq(cities.slug, "ibaiti"))
+    .limit(1);
+
+  if (!ibaitiCity) {
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: "Nao foi possivel localizar a cidade de Ibaiti.",
+    });
+  }
+
+  await db.execute(sql`
+    INSERT INTO users (
+      openId,
+      name,
+      role,
+      personType,
+      companyName,
+      bio,
+      cityId,
+      neighborhood,
+      isVerified,
+      loginMethod,
+      createdAt,
+      updatedAt,
+      lastSignedIn
+    )
+    VALUES (
+      ${IBAITI_DIRECTORY_OPEN_ID},
+      ${IBAITI_DIRECTORY_NAME},
+      'advertiser',
+      'pj',
+      ${IBAITI_DIRECTORY_COMPANY},
+      'Perfil criado pelo portal para reunir hospitais, escolas, seguranca e servicos essenciais de Ibaiti.',
+      ${ibaitiCity.id},
+      'Centro',
+      true,
+      'system',
+      now(),
+      now(),
+      now()
+    )
+    ON DUPLICATE KEY UPDATE
+      name = VALUES(name),
+      role = 'advertiser',
+      personType = 'pj',
+      companyName = VALUES(companyName),
+      bio = VALUES(bio),
+      cityId = VALUES(cityId),
+      neighborhood = VALUES(neighborhood),
+      isVerified = true,
+      loginMethod = 'system',
+      updatedAt = now(),
+      lastSignedIn = now()
+  `);
+
+  const directoryUser = await getUserByOpenId(IBAITI_DIRECTORY_OPEN_ID);
+  if (!directoryUser) {
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: "Nao foi possivel preparar o perfil publico de Ibaiti.",
+    });
+  }
+
+  const categoryRows = await db
+    .select({ id: categories.id, slug: categories.slug })
+    .from(categories)
+    .where(
+      inArray(
+        categories.slug,
+        ibaitiInstitutionCatalog.map(item => item.categorySlug)
+      )
+    );
+
+  const categoryIdBySlug = new Map(
+    categoryRows.map(item => [item.slug, item.id] as const)
+  );
+
+  for (const entry of ibaitiInstitutionCatalog) {
+    const categoryId = categoryIdBySlug.get(entry.categorySlug);
+    if (!categoryId) continue;
+
+    const [existingListing] = await db
+      .select({ id: listings.id })
+      .from(listings)
+      .where(
+        and(
+          eq(listings.userId, directoryUser.id),
+          eq(listings.title, entry.title)
+        )
+      )
+      .limit(1);
+
+    if (existingListing) {
+      await db
+        .update(listings)
+        .set({
+          categoryId,
+          subcategory: entry.subcategory,
+          cityId: ibaitiCity.id,
+          title: entry.title,
+          description: entry.description,
+          price: null,
+          priceType: "on_request",
+          type: "service",
+          neighborhood: entry.neighborhood,
+          whatsapp: null,
+          status: "active",
+          isBoosted: false,
+          isFeatured: false,
+          expiresAt: DIRECTORY_LISTING_EXPIRY,
+        })
+        .where(eq(listings.id, existingListing.id));
+      continue;
+    }
+
+    await db.insert(listings).values({
+      userId: directoryUser.id,
+      categoryId,
+      subcategory: entry.subcategory,
+      cityId: ibaitiCity.id,
+      title: entry.title,
+      description: entry.description,
+      price: null,
+      priceType: "on_request",
+      type: "service",
+      neighborhood: entry.neighborhood,
+      whatsapp: null,
+      status: "active",
+      isBoosted: false,
+      isFeatured: false,
+      expiresAt: DIRECTORY_LISTING_EXPIRY,
+    });
   }
 }
 
@@ -559,7 +918,7 @@ export const appRouter = router({
     categories: publicProcedure.query(async () => {
       const db = await getDb();
       if (!db) return mockCategories;
-      await ensureDefaultCategories(db);
+      await ensureIbaitiInstitutionDirectory(db);
       return db
         .select()
         .from(categories)
@@ -580,7 +939,7 @@ export const appRouter = router({
             .slice(0, input.limit);
         }
 
-        await ensureDefaultCategories(db);
+        await ensureIbaitiInstitutionDirectory(db);
 
         return db
           .select()
@@ -637,6 +996,8 @@ export const appRouter = router({
               .slice(0, input.limit)
           );
         }
+        await ensureIbaitiInstitutionDirectory(db);
+
         const conditions = [
           eq(listings.status, "active"),
           eq(listings.isBoosted, true),
@@ -674,6 +1035,8 @@ export const appRouter = router({
               .slice(0, input.limit)
           );
         }
+        await ensureIbaitiInstitutionDirectory(db);
+
         const conditions: ReturnType<typeof eq>[] = [
           eq(listings.status, "active"),
         ];
@@ -741,6 +1104,8 @@ export const appRouter = router({
             total: filtered.length,
           };
         }
+        await ensureIbaitiInstitutionDirectory(db);
+
         const conditions: any[] = [eq(listings.status, "active")];
         if (input.q) conditions.push(like(listings.title, `%${input.q}%`));
         if (input.categoryId)
@@ -769,6 +1134,7 @@ export const appRouter = router({
       .query(async ({ input }) => {
         const db = await getDb();
         if (!db) return getMockListingById(input.id);
+        await ensureIbaitiInstitutionDirectory(db);
         const [listing] = await db
           .select()
           .from(listings)
@@ -808,6 +1174,8 @@ export const appRouter = router({
         if (!db) {
           return getMockSellerProfile(input.sellerId);
         }
+
+        await ensureIbaitiInstitutionDirectory(db);
 
         const [seller] = await db
           .select({
@@ -868,6 +1236,8 @@ export const appRouter = router({
             .slice(0, input.limit);
         }
 
+        await ensureIbaitiInstitutionDirectory(db);
+
         const conditions = [
           eq(listings.status, "active"),
           eq(listings.userId, input.sellerId),
@@ -924,6 +1294,8 @@ export const appRouter = router({
             )
             .slice(0, input.limit);
         }
+
+        await ensureIbaitiInstitutionDirectory(db);
 
         const strictConditions = [
           eq(listings.status, "active"),
@@ -983,6 +1355,8 @@ export const appRouter = router({
             )
             .slice(0, input.limit);
         }
+        await ensureIbaitiInstitutionDirectory(db);
+
         const [cat] = await db
           .select()
           .from(categories)

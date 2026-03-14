@@ -23,6 +23,7 @@ import {
   Hammer,
   Car,
   Building2,
+  MessageCircle,
   Briefcase,
   HardHat,
   Heart,
@@ -90,6 +91,17 @@ const CATEGORY_COLORS: Record<string, string> = {
   classificados: "bg-slate-50 text-slate-600 hover:bg-slate-100",
 };
 
+type HomeHighlightListing = {
+  id: number;
+  title: string;
+  cityId?: number | null;
+  categoryId?: number | null;
+  subcategory?: string | null;
+  whatsapp?: string | null;
+  images?: { url: string; isPrimary?: boolean | null }[];
+  seller?: { name?: string | null } | null;
+};
+
 export default function Home() {
   const { isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
@@ -122,6 +134,27 @@ export default function Home() {
   const featuredCategories = topCategories?.length
     ? topCategories
     : categories?.slice(0, 10);
+  const companySource = (
+    featured?.length ? featured : (recent ?? [])
+  ) as HomeHighlightListing[];
+  const companyHighlights = companySource
+    .slice(0, 12)
+    .reduce<HomeHighlightListing[]>((acc, item) => {
+      const displayName = item.seller?.name?.trim() || item.title.trim();
+      const alreadyIncluded = acc.some(
+        existing =>
+          (
+            existing.seller?.name?.trim() || existing.title.trim()
+          ).toLowerCase() === displayName.toLowerCase()
+      );
+
+      if (!alreadyIncluded) {
+        acc.push(item);
+      }
+
+      return acc;
+    }, [])
+    .slice(0, 3);
   const quickLinks = [
     {
       label: "Guia local",
@@ -217,6 +250,131 @@ export default function Home() {
             </div>
           </div>
         </div>
+      </section>
+
+      <section className="container py-8">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h2 className="section-heading">Empresas em destaque</h2>
+            <p className="text-sm text-gray-500">
+              Conheca negocios da regiao e ganhe mais visibilidade para sua
+              marca dentro do portal.
+            </p>
+          </div>
+          <Link
+            href={isAuthenticated ? "/anunciante/novo" : LOGIN_ROUTE}
+            className="text-sm font-medium text-orange-600 hover:underline"
+          >
+            Cadastrar empresa
+          </Link>
+        </div>
+
+        {companyHighlights.length > 0 ? (
+          <div className="grid gap-4 md:grid-cols-3">
+            {companyHighlights.map(item => {
+              const cover =
+                item.images?.find(image => image.isPrimary) ?? item.images?.[0];
+              const displayName = item.seller?.name?.trim() || item.title;
+              const subtitle =
+                categories?.find(category => category.id === item.categoryId)
+                  ?.name ||
+                item.subcategory ||
+                "Negocio local";
+              const whatsappHref = item.whatsapp
+                ? `https://wa.me/55${item.whatsapp.replace(/\D/g, "")}`
+                : null;
+
+              return (
+                <article
+                  key={item.id}
+                  className="overflow-hidden rounded-[24px] border border-gray-100 bg-white shadow-sm"
+                >
+                  <Link href={`/anuncio/${item.id}`} className="block">
+                    <div className="relative h-36 overflow-hidden bg-gray-100">
+                      {cover ? (
+                        <img
+                          src={cover.url}
+                          alt={displayName}
+                          className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200">
+                          <span className="font-display text-3xl font-black text-blue-700">
+                            {displayName.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+
+                  <div className="relative px-5 pb-5">
+                    <div className="-mt-7 flex justify-center">
+                      <div className="flex h-14 w-14 items-center justify-center rounded-2xl border-4 border-white bg-white text-lg font-black text-blue-700 shadow-md">
+                        {displayName.charAt(0).toUpperCase()}
+                      </div>
+                    </div>
+
+                    <div className="mt-3 text-center">
+                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-400">
+                        Destaque local
+                      </p>
+                      <h3 className="mt-2 font-display text-lg font-bold text-gray-900">
+                        {displayName}
+                      </h3>
+                      <p className="mt-1 text-sm text-gray-500">{subtitle}</p>
+                      <p className="mt-1 text-xs text-gray-400">
+                        {cities?.find(city => city.id === item.cityId)?.name ||
+                          "Norte Pioneiro"}
+                      </p>
+                    </div>
+
+                    <div className="mt-4 flex items-center justify-center gap-2">
+                      <Link href={`/anuncio/${item.id}`}>
+                        <Button
+                          size="sm"
+                          className="rounded-xl bg-brand-gradient text-white hover:opacity-90"
+                        >
+                          Ver vitrine
+                        </Button>
+                      </Link>
+                      {whatsappHref && (
+                        <a
+                          href={whatsappHref}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Button
+                            size="sm"
+                            className="rounded-xl bg-green-500 text-white hover:bg-green-600"
+                          >
+                            <MessageCircle className="mr-1 h-4 w-4" />
+                            WhatsApp
+                          </Button>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="rounded-[24px] border border-dashed border-gray-200 bg-white p-10 text-center">
+            <Building2 className="mx-auto h-10 w-10 text-blue-200" />
+            <h3 className="mt-4 font-display text-xl font-bold text-gray-900">
+              Sua empresa pode aparecer aqui
+            </h3>
+            <p className="mt-2 text-sm text-gray-500">
+              Cadastre sua vitrine, publique seus produtos e entre para os
+              destaques do portal.
+            </p>
+            <Link href={isAuthenticated ? "/anunciante/novo" : LOGIN_ROUTE}>
+              <Button className="mt-5 rounded-2xl bg-orange-gradient text-white hover:opacity-90">
+                Entrar para os destaques
+              </Button>
+            </Link>
+          </div>
+        )}
       </section>
 
       <section className="container py-12">

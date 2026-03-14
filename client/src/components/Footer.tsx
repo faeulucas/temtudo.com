@@ -3,10 +3,10 @@ import { Facebook, Instagram, MapPin, MessageCircle, Zap } from "lucide-react";
 
 const footerCategories = [
   { label: "Delivery", slug: "delivery" },
-  { label: "Veículos", slug: "veiculos" },
-  { label: "Imóveis", slug: "imoveis" },
-  { label: "Serviços Gerais", slug: "servicos-gerais" },
-  { label: "Moda e Acessórios", slug: "moda-acessorios" },
+  { label: "Veiculos", slug: "veiculos" },
+  { label: "Imoveis", slug: "imoveis" },
+  { label: "Servicos Gerais", slug: "servicos-gerais" },
+  { label: "Moda e Acessorios", slug: "moda-acessorios" },
   { label: "Agro e Rural", slug: "agro-rural" },
   { label: "Empregos", slug: "empregos" },
 ];
@@ -14,7 +14,7 @@ const footerCategories = [
 const footerCities = [
   { label: "Ibaiti", slug: "ibaiti" },
   { label: "Japira", slug: "japira" },
-  { label: "Pinhalão", slug: "pinhalao" },
+  { label: "Pinhalao", slug: "pinhalao" },
   { label: "Jaboti", slug: "jaboti" },
   { label: "Tomazina", slug: "tomazina" },
   { label: "Wenceslau Braz", slug: "wenceslau-braz" },
@@ -28,15 +28,15 @@ export default function Footer() {
       <div className="bg-brand-gradient px-4 py-10">
         <div className="container text-center">
           <h2 className="mb-3 font-display text-2xl font-black text-white md:text-3xl">
-            Comece a anunciar agora: é grátis
+            Coloque sua loja no portal da regiao
           </h2>
           <p className="mx-auto mb-6 max-w-xl text-blue-100">
-            Teste o Norte Vivo, publique seus anúncios e alcance a região com um
-            fluxo simples.
+            Crie sua vitrine, publique produtos e seja encontrado por quem
+            busca perto de voce.
           </p>
           <Link href="/anunciar">
             <button className="rounded-xl bg-white px-8 py-3 font-bold text-blue-700 shadow-lg transition-colors hover:bg-blue-50">
-              Anunciar grátis
+              Comecar gratis
             </button>
           </Link>
         </div>
@@ -55,12 +55,12 @@ export default function Footer() {
               </span>
             </div>
             <p className="mb-4 text-sm leading-relaxed text-gray-400">
-              O portal local do Norte Pioneiro do Paraná para encontrar lojas,
-              serviços, produtos e oportunidades da região em um só lugar.
+              O portal local para descobrir lojas, servicos, produtos e
+              oportunidades do Norte Pioneiro em um so lugar.
             </p>
             <div className="flex items-center gap-1 text-sm text-gray-400">
               <MapPin className="h-4 w-4 text-blue-400" />
-              <span>Ibaiti e região, PR</span>
+              <span>Ibaiti e regiao, PR</span>
             </div>
           </div>
 
@@ -108,7 +108,7 @@ export default function Footer() {
                   href="/planos"
                   className="transition-colors hover:text-white"
                 >
-                  Planos e preços
+                  Planos e precos
                 </Link>
               </li>
               <li>
@@ -176,11 +176,8 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-gray-800 pt-6 text-xs text-gray-500 md:flex-row">
-          <p>
-            © {new Date().getFullYear()} Norte Vivo. Todos os direitos
-            reservados.
-          </p>
-          <p>Feito para o Norte Pioneiro do Paraná.</p>
+          <p>© {new Date().getFullYear()} Norte Vivo. Todos os direitos reservados.</p>
+          <p>Feito para conectar clientes e negocios da regiao.</p>
         </div>
       </div>
     </footer>

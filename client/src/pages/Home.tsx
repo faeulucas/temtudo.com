@@ -328,8 +328,8 @@ export default function Home() {
           <div className="min-w-0">
             <h2 className="section-heading">Empresas em destaque</h2>
             <p className="text-sm text-gray-500">
-              Conheca negocios da regiao e ganhe mais visibilidade para sua
-              marca dentro do portal.
+              Descubra lojas da regiao que ja usam o portal para mostrar sua
+              marca, seus produtos e seus contatos.
             </p>
           </div>
           <Link
@@ -451,12 +451,12 @@ export default function Home() {
               Sua empresa pode aparecer aqui
             </h3>
             <p className="mt-2 text-sm text-gray-500">
-              Cadastre sua vitrine, publique seus produtos e entre para os
-              destaques do portal.
+              Crie sua vitrine digital, publique seus produtos e entre para os
+              destaques do portal local.
             </p>
             <Link href={isAuthenticated ? "/anunciante/novo" : LOGIN_ROUTE}>
               <Button className="mt-5 rounded-2xl bg-orange-gradient text-white hover:opacity-90">
-                Entrar para os destaques
+                Criar minha vitrine
               </Button>
             </Link>
           </div>
@@ -469,17 +469,17 @@ export default function Home() {
             {
               icon: SearchCheck,
               title: "Encontre perto de voce",
-              desc: "Busque lojas, produtos e servicos da regiao em um so lugar.",
+              desc: "Ache o que voce precisa na sua cidade sem depender de varios sites diferentes.",
             },
             {
               icon: StoreIcon,
               title: "Cada loja com sua vitrine",
-              desc: "Perfis comerciais com banner, produtos, contato e descoberta local.",
+              desc: "Cada negocio pode mostrar banner, produtos, contatos e informacoes em um perfil publico.",
             },
             {
               icon: Globe,
               title: "Presenca digital regional",
-              desc: "Uma forma simples de sua empresa ser vista no portal e nas buscas.",
+              desc: "Uma forma simples de sua empresa aparecer no portal e ser descoberta por novos clientes.",
             },
           ].map(item => {
             const IconComp = item.icon;
@@ -510,8 +510,8 @@ export default function Home() {
               Categorias que movimentam o portal
             </h2>
             <p className="text-sm text-gray-500">
-              Explore os segmentos com mais procura e descubra vitrines que
-              fazem parte da rotina da regiao.
+              Explore os segmentos que mais fazem parte da rotina da regiao e
+              descubra novas vitrines locais.
             </p>
           </div>
           <Link
@@ -595,12 +595,12 @@ export default function Home() {
             <div className="text-center py-12 bg-white rounded-2xl">
               <ShoppingBag className="w-12 h-12 text-orange-200 mx-auto mb-3" />
               <p className="text-gray-500 mb-4">
-                Nenhuma loja desta categoria apareceu ainda. Seja a primeira
-                vitrine ativa daqui!
+                Essa categoria ainda nao tem vitrines publicadas. Seja a
+                primeira empresa a aparecer aqui.
               </p>
               <Link href={isAuthenticated ? "/anunciante/novo" : LOGIN_ROUTE}>
                 <Button className="bg-orange-500 text-white rounded-xl hover:bg-orange-600">
-                  Anunciar Grátis
+                  Publicar agora
                 </Button>
               </Link>
             </div>
@@ -651,11 +651,11 @@ export default function Home() {
               Nada publicado ainda
             </h3>
             <p className="text-gray-500 mb-6">
-              Seja a primeira loja ou anunciante a aparecer no portal!
+              Seja a primeira loja ou anunciante a marcar presenca no portal.
             </p>
             <Link href={isAuthenticated ? "/anunciante/novo" : LOGIN_ROUTE}>
               <Button className="bg-brand-gradient text-white rounded-xl px-8">
-                <Zap className="w-4 h-4 mr-2" /> Anunciar Grátis
+                <Zap className="w-4 h-4 mr-2" /> Criar vitrine
               </Button>
             </Link>
           </div>
@@ -669,8 +669,8 @@ export default function Home() {
             Cidades e negocios da regiao
           </h2>
           <p className="text-gray-500 text-center mb-8">
-            Um portal local pensado para conectar moradores, clientes e empresas
-            do Norte Pioneiro do Parana
+            Um portal feito para ligar moradores, clientes e negocios do Norte
+            Pioneiro em um so lugar.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             {cities?.map(city => (
@@ -691,8 +691,8 @@ export default function Home() {
           Como sua loja entra para o portal
         </h2>
         <p className="text-gray-500 text-center mb-10">
-          Sem mudar sua rotina: voce cria presenca, exibe seus produtos e comeca
-          a ser encontrado
+          Em poucos passos, sua loja cria presenca digital, monta a vitrine e
+          passa a ser encontrada por quem busca na regiao.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
@@ -700,21 +700,21 @@ export default function Home() {
               step: "01",
               icon: Users,
               title: "Crie sua conta",
-              desc: "Cadastre sua empresa ou seu perfil em poucos minutos para fazer parte do portal local.",
+              desc: "Cadastre sua loja ou seu perfil em poucos minutos para entrar no portal.",
               color: "bg-blue-500",
             },
             {
               step: "02",
               icon: Zap,
               title: "Monte sua vitrine",
-              desc: "Publique produtos, servicos, fotos, descricao e informacoes para sua loja ser encontrada.",
+              desc: "Publique produtos, servicos, fotos e contatos para mostrar o que voce oferece.",
               color: "bg-orange-500",
             },
             {
               step: "03",
               icon: TrendingUp,
               title: "Ganhe visibilidade",
-              desc: "Apareca para quem busca no site e fortaleça sua presenca regional com mais alcance.",
+              desc: "Apareca para quem busca no portal e fortaleça sua presenca na regiao.",
               color: "bg-green-500",
             },
           ].map(item => {
@@ -750,9 +750,9 @@ export default function Home() {
                 Sua loja precisa estar onde as pessoas procuram
               </h2>
               <p className="mt-3 text-gray-600">
-                Crie sua presenca no portal, monte sua vitrine digital e
-                publique produtos, servicos e contatos para ser encontrado por
-                quem busca na sua cidade e na regiao.
+                Monte sua vitrine digital, publique produtos, servicos e
+                contatos e ganhe mais chances de ser visto por quem procura na
+                sua cidade e em toda a regiao.
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -760,7 +760,7 @@ export default function Home() {
                 "Perfil publico da loja",
                 "Vitrine com produtos e banner",
                 "Contato rapido por WhatsApp",
-                "Mais chances de descoberta local",
+                "Mais descoberta nas buscas locais",
               ].map(item => (
                 <div
                   key={item}
@@ -781,8 +781,8 @@ export default function Home() {
             Planos e presença digital
           </h2>
           <p className="text-gray-400 text-center mb-10">
-            Comece gratis, apareca no portal e cresca sua vitrine com mais
-            destaque
+            Comece gratis, entre no portal e evolua sua vitrine com mais
+            alcance e destaque.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {[
@@ -889,8 +889,8 @@ export default function Home() {
               Turbine sua vitrine com o Booster!
             </h2>
             <p className="text-orange-100 text-lg mb-6 max-w-xl mx-auto">
-              Apareca no topo das buscas, ganhe destaque dentro do portal e
-              aumente as chances de novos contatos e vendas.
+              Coloque sua vitrine em evidencia, apareca no topo e aumente suas
+              chances de contato e descoberta.
             </p>
             <Link href={isAuthenticated ? "/anunciante" : LOGIN_ROUTE}>
               <Button className="bg-white text-orange-600 font-black px-10 py-4 text-lg rounded-2xl hover:bg-orange-50 shadow-xl">
@@ -910,22 +910,22 @@ export default function Home() {
               {
                 icon: Shield,
                 title: "Portal confiavel",
-                desc: "Um ambiente pensado para reunir negocios reais da regiao",
+                desc: "Um ambiente pensado para reunir negocios reais da regiao.",
               },
               {
                 icon: Zap,
                 title: "Vitrine rapida",
-                desc: "Sua loja ou anuncio pode entrar no ar em poucos minutos",
+                desc: "Sua loja ou anuncio pode entrar no ar em poucos minutos.",
               },
               {
                 icon: MapPin,
                 title: "Presenca regional",
-                desc: "Foco total em quem compra, vende e procura por perto",
+                desc: "Foco em quem compra, vende e procura por perto.",
               },
               {
                 icon: BadgeCheck,
                 title: "Mais descoberta",
-                desc: "Produtos, perfis e servicos organizados para serem encontrados",
+                desc: "Produtos, perfis e servicos organizados para serem encontrados.",
               },
             ].map(item => {
               const IconComp = item.icon;

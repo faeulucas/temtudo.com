@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CASHBACK_RULES } from "@/lib/cashback";
+import { getSegmentFromCategorySlug, SEGMENT_CONTENT } from "@/lib/segments";
 import { toast } from "sonner";
 import {
   Camera,
@@ -65,6 +66,7 @@ export default function AdvertiserDashboard() {
     enabled: isAuthenticated,
   });
   const { data: cities } = trpc.public.cities.useQuery();
+  const { data: categories } = trpc.public.categories.useQuery();
 
   useEffect(() => {
     if (!user) return;
@@ -150,6 +152,11 @@ export default function AdvertiserDashboard() {
   const listings = stats?.listings ?? [];
   const topListing = stats?.topListing ?? null;
   const cashbackHighlights = CASHBACK_RULES.slice(0, 4);
+  const primaryCategory = categories?.find(category =>
+    listings.some(listing => listing.categoryId === category.id)
+  );
+  const segment = getSegmentFromCategorySlug(primaryCategory?.slug);
+  const segmentContent = SEGMENT_CONTENT[segment];
   const trialDaysLeft = user?.trialStartedAt
     ? Math.max(0, 30 - Math.floor((Date.now() - new Date(user.trialStartedAt).getTime()) / 86400000))
     : 30;
@@ -372,6 +379,33 @@ export default function AdvertiserDashboard() {
           </div>
 
           <div className="space-y-6">
+            <section className="rounded-[28px] bg-gradient-to-r from-slate-900 to-slate-700 p-6 text-white shadow-xl">
+              <div className="mb-4 inline-flex rounded-full bg-white/15 px-3 py-1 text-xs font-black uppercase tracking-[0.2em] text-white/90">
+                {segmentContent.badge}
+              </div>
+              <h2 className="font-display text-2xl font-black">
+                {segmentContent.title}
+              </h2>
+              <p className="mt-2 text-sm text-slate-200">
+                {segmentContent.description}
+              </p>
+              <div className="mt-5 space-y-3">
+                {segmentContent.highlights.map(item => (
+                  <div
+                    key={item}
+                    className="rounded-2xl bg-white/10 px-4 py-3 text-sm font-medium backdrop-blur-sm"
+                  >
+                    {item}
+                  </div>
+                ))}
+              </div>
+              {primaryCategory && (
+                <p className="mt-4 text-xs text-slate-300">
+                  Segmento principal detectado: {primaryCategory.name}
+                </p>
+              )}
+            </section>
+
             <section className="rounded-[28px] border border-gray-100 bg-white p-6 shadow-sm">
               <div className="mb-4 flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">

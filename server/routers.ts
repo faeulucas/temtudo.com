@@ -46,6 +46,31 @@ async function attachImagesToListings<T extends { id: number }>(
   }));
 }
 
+async function resolveInsertId(
+  db: NonNullable<Awaited<ReturnType<typeof getDb>>>,
+  result: unknown
+) {
+  const directInsertId =
+    (result as any)?.insertId ??
+    (Array.isArray(result) ? (result[0] as any)?.insertId : undefined);
+
+  if (typeof directInsertId === "number" && Number.isFinite(directInsertId)) {
+    return directInsertId;
+  }
+
+  const fallbackRows = await db.execute(sql`select last_insert_id() as id`);
+  const fallbackId = Number((fallbackRows as any)?.[0]?.id ?? (fallbackRows as any)?.rows?.[0]?.id);
+
+  if (Number.isFinite(fallbackId) && fallbackId > 0) {
+    return fallbackId;
+  }
+
+  throw new TRPCError({
+    code: "INTERNAL_SERVER_ERROR",
+    message: "Nao foi possivel identificar o ID do registro criado.",
+  });
+}
+
 export const appRouter = router({
   system: systemRouter,
   auth: router({
@@ -101,7 +126,7 @@ export const appRouter = router({
 
       return {
         success: true as const,
-        userId: (result as any).insertId,
+        userId: await resolveInsertId(db, result),
       };
     }),
     login: publicProcedure.input(z.object({
@@ -496,7 +521,7 @@ export const appRouter = router({
         status: "active",
         expiresAt,
       });
-      return { id: (result as any).insertId };
+      return { id: await resolveInsertId(db, result) };
     }),
     updateListing: protectedProcedure.input(z.object({
       id: z.number(),

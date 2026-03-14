@@ -143,6 +143,10 @@ export default function NewListing() {
   };
 
   const uploadPendingImages = async (listingId: number) => {
+    if (!Number.isFinite(listingId) || listingId <= 0) {
+      throw new Error("Nao foi possivel identificar o anuncio criado para enviar as imagens.");
+    }
+
     const pendingImages = images.filter(image => image.file);
     if (pendingImages.length === 0) return;
 
@@ -211,6 +215,10 @@ export default function NewListing() {
 
     try {
       const data = await createMutation.mutateAsync(payload);
+      if (!data?.id) {
+        throw new Error("O anuncio foi criado sem retornar um identificador valido.");
+      }
+
       await uploadPendingImages(data.id);
       await utils.advertiser.stats.invalidate();
       toast.success("Anuncio criado com sucesso!");

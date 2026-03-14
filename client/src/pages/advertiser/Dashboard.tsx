@@ -124,6 +124,10 @@ export default function AdvertiserDashboard() {
   const isFoodSegment = segment === "food";
   const displayName =
     user?.personType === "pj" ? user?.companyName || user?.name : user?.name;
+  const boostableListings = listings.filter(
+    listing => listing.status === "active" && !listing.isBoosted
+  );
+  const boostSuggestionListing = boostableListings[0] ?? null;
   const trialDaysLeft = user?.trialStartedAt
     ? Math.max(0, 30 - Math.floor((Date.now() - new Date(user.trialStartedAt).getTime()) / 86400000))
     : 30;
@@ -181,6 +185,41 @@ export default function AdvertiserDashboard() {
                 Fazer upgrade
               </Button>
             </Link>
+          </section>
+        )}
+
+        {boostSuggestionListing && (
+          <section className="mt-4 flex flex-col gap-3 rounded-[22px] border border-blue-100 bg-blue-50/80 p-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-blue-700 shadow-sm">
+                <Zap className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-blue-900">
+                  {boostableListings.length === 1
+                    ? "Voce tem 1 anuncio pronto para impulsionar."
+                    : `Voce tem ${boostableListings.length} anuncios prontos para impulsionar.`}
+                </p>
+                <p className="mt-1 text-sm text-blue-700">
+                  {boostSuggestionListing.title} pode ganhar mais alcance com um booster de 24h ou 7 dias.
+                </p>
+              </div>
+            </div>
+            <Button
+              size="sm"
+              className="rounded-xl bg-blue-600 text-white hover:bg-blue-700"
+              onClick={() =>
+                boostMutation.mutate({
+                  listingId: boostSuggestionListing.id,
+                  type: "featured",
+                  durationDays: 1,
+                })
+              }
+              disabled={boostMutation.isPending}
+            >
+              <Zap className="mr-2 h-4 w-4" />
+              Impulsionar agora
+            </Button>
           </section>
         )}
 
@@ -320,6 +359,11 @@ export default function AdvertiserDashboard() {
                           {listing.isBoosted && (
                             <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-bold text-amber-700">
                               Boost ativo
+                            </span>
+                          )}
+                          {!listing.isBoosted && listing.status === "active" && (
+                            <span className="rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-semibold text-blue-700">
+                              Pode impulsionar
                             </span>
                           )}
                         </div>

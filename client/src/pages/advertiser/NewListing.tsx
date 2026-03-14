@@ -288,7 +288,7 @@ export default function NewListing() {
                   placeholder={
                     isFoodListing
                       ? "Ex: X-Salada especial, Combo casal, Marmita executiva..."
-                      : "Ex: Honda CG 160 2020, Apartamento 2 quartos, Servico de pintura..."
+                      : "Ex: Nome claro e direto do que voce esta anunciando..."
                   }
                   maxLength={200}
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 focus:bg-white transition-all"

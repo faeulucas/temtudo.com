@@ -39,7 +39,6 @@ import {
   Shirt,
   Star,
   Trash2,
-  Trophy,
   CarFront,
   Zap,
 } from "lucide-react";
@@ -163,7 +162,7 @@ export default function AdvertiserDashboard() {
 
   const listings = stats?.listings ?? [];
   const topListing = stats?.topListing ?? null;
-  const cashbackHighlights = CASHBACK_RULES.slice(0, 4);
+  const cashbackHighlights = CASHBACK_RULES.slice(0, 2);
   const primaryCategory = categories?.find(category =>
     listings.some(listing => listing.categoryId === category.id)
   );
@@ -294,7 +293,7 @@ export default function AdvertiserDashboard() {
           })}
         </section>
 
-        <section className="mt-6 grid gap-4 xl:grid-cols-[1.1fr_0.9fr_0.9fr]">
+        <section className="mt-6 grid gap-4 xl:grid-cols-[1.25fr_0.75fr]">
           <article className="rounded-[28px] bg-gradient-to-r from-slate-900 to-slate-700 p-6 text-white shadow-xl">
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -329,22 +328,35 @@ export default function AdvertiserDashboard() {
             )}
           </article>
 
-          {segmentContent.modules.map(module => (
-            <article
-              key={module.title}
-              className="rounded-[28px] border border-gray-100 bg-white p-6 shadow-sm"
-            >
-              <div className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${module.accent}`}>
-                Modulo sugerido
+          <div className="rounded-[28px] border border-gray-100 bg-white p-6 shadow-sm">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
+                <SegmentIcon className="h-5 w-5" />
               </div>
-              <h3 className="mt-4 font-display text-xl font-bold text-gray-900">
-                {module.title}
-              </h3>
-              <p className="mt-2 text-sm leading-6 text-gray-600">
-                {module.description}
-              </p>
-            </article>
-          ))}
+              <div>
+                <h2 className="font-display text-xl font-bold text-gray-900">
+                  Prioridades do segmento
+                </h2>
+                <p className="text-sm text-gray-500">
+                  O painel vai seguir essa linha para sua categoria principal.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {segmentContent.modules.map(module => (
+                <div key={module.title} className="rounded-[22px] bg-gray-50 p-4">
+                  <div className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${module.accent}`}>
+                    Modulo sugerido
+                  </div>
+                  <h3 className="mt-3 font-semibold text-gray-900">{module.title}</h3>
+                  <p className="mt-1 text-sm leading-6 text-gray-600">
+                    {module.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
         </section>
 
         <section className="mt-6 grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
@@ -506,7 +518,7 @@ export default function AdvertiserDashboard() {
                     Essa imagem aparece no seu painel e na apresentacao da conta.
                   </p>
                   <p className="mt-1 text-xs text-gray-400">
-                    Ao tocar em trocar foto, voce escolhe uma imagem da galeria ou biblioteca do aparelho.
+                    Ao tocar no botao abaixo, voce escolhe uma imagem da galeria ou biblioteca do aparelho.
                   </p>
                 </div>
                 <label className="cursor-pointer">
@@ -674,93 +686,45 @@ export default function AdvertiserDashboard() {
             <section className="rounded-[28px] border border-gray-100 bg-white p-6 shadow-sm">
               <div className="mb-4 flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
-                  <Trophy className="h-5 w-5" />
+                  <Eye className="h-5 w-5" />
                 </div>
                 <div>
-                  <h2 className="font-display text-xl font-bold text-gray-900">
-                    Cashback Norte Vivo
-                  </h2>
+                  <h2 className="font-display text-xl font-bold text-gray-900">Visao rapida</h2>
                   <p className="text-sm text-gray-500">
-                    Recompensa pensada para categorias com recompra frequente.
+                    Um resumo menor do que mais importa para a conta.
                   </p>
                 </div>
               </div>
 
-              <div className="space-y-3">
-                {cashbackHighlights.map(rule => (
-                  <div
-                    key={rule.slug}
-                    className="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3"
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <div className="text-sm font-semibold text-gray-900">
-                          {rule.label}
-                        </div>
-                        <div className="text-xs text-gray-600">{rule.description}</div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl bg-gray-50 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-400">
+                    Melhor anuncio
+                  </p>
+                  <p className="mt-2 font-semibold text-gray-900">
+                    {topListing?.title || "Sem destaque ainda"}
+                  </p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    {topListing
+                      ? `${topListing.viewCount ?? 0} visualizacoes e ${topListing.contactCount ?? 0} contatos`
+                      : "Assim que houver movimento, o melhor desempenho aparece aqui."}
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-gray-50 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-400">
+                    Recompra
+                  </p>
+                  <div className="mt-2 space-y-2">
+                    {cashbackHighlights.map(rule => (
+                      <div key={rule.slug} className="flex items-center justify-between text-sm">
+                        <span className="font-medium text-gray-700">{rule.label}</span>
+                        <span className="rounded-full bg-white px-2.5 py-1 font-bold text-emerald-700">
+                          {rule.rate}%
+                        </span>
                       </div>
-                      <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-emerald-700">
-                        ate {rule.rate}% de cashback
-                      </span>
-                    </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-
-              <p className="mt-4 text-xs text-gray-500">
-                Para comecar, o cashback vale melhor em categorias recorrentes,
-                como alimentacao, delivery, pet, saude e beleza.
-              </p>
-            </section>
-
-            <section className="rounded-[28px] border border-gray-100 bg-white p-6 shadow-sm">
-              <div className="mb-4 flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
-                  <Trophy className="h-5 w-5" />
                 </div>
-                <div>
-                  <h2 className="font-display text-xl font-bold text-gray-900">Melhor desempenho</h2>
-                  <p className="text-sm text-gray-500">Seu anuncio com maior alcance.</p>
-                </div>
-              </div>
-              {topListing ? (
-                <div className="rounded-[22px] bg-gray-50 p-4">
-                  <p className="font-semibold text-gray-900">{topListing.title}</p>
-                  <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
-                    <div className="rounded-2xl bg-white p-3">
-                      <div className="text-xs text-gray-500">Visualizacoes</div>
-                      <div className="mt-1 font-black text-gray-900">{topListing.viewCount ?? 0}</div>
-                    </div>
-                    <div className="rounded-2xl bg-white p-3">
-                      <div className="text-xs text-gray-500">Contatos</div>
-                      <div className="mt-1 font-black text-gray-900">{topListing.contactCount ?? 0}</div>
-                    </div>
-                  </div>
-                  <Link href={`/anuncio/${topListing.id}`}>
-                    <Button variant="outline" className="mt-4 w-full rounded-2xl">Ver anuncio</Button>
-                  </Link>
-                </div>
-              ) : (
-                <div className="rounded-[22px] bg-gray-50 p-4 text-sm text-gray-500">
-                  Assim que houver desempenho suficiente, o anuncio destaque aparece aqui.
-                </div>
-              )}
-            </section>
-
-            <section className="rounded-[28px] border border-gray-100 bg-white p-6 shadow-sm">
-              <h2 className="font-display text-xl font-bold text-gray-900">Resumo rapido</h2>
-              <div className="mt-4 space-y-3">
-                {[
-                  { label: "Ativos", value: stats?.statusBreakdown.active ?? 0, tone: "bg-emerald-50 text-emerald-700" },
-                  { label: "Pausados", value: stats?.statusBreakdown.paused ?? 0, tone: "bg-gray-100 text-gray-700" },
-                  { label: "Vendidos", value: stats?.statusBreakdown.sold ?? 0, tone: "bg-blue-50 text-blue-700" },
-                  { label: "Pendentes", value: stats?.statusBreakdown.pending ?? 0, tone: "bg-amber-50 text-amber-700" },
-                ].map(item => (
-                  <div key={item.label} className="flex items-center justify-between rounded-2xl bg-gray-50 px-4 py-3">
-                    <span className="text-sm font-medium text-gray-700">{item.label}</span>
-                    <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${item.tone}`}>{item.value}</span>
-                  </div>
-                ))}
               </div>
             </section>
 

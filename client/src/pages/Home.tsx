@@ -226,7 +226,7 @@ export default function Home() {
               sua regiao. Aqui cada negocio pode ter perfil, vitrine e mais
               chances de ser encontrado.
             </p>
-            <div className="mx-auto mt-6 grid max-w-5xl gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mx-auto mt-6 grid max-w-5xl grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {quickLinks.map(item => {
                 const Icon = item.icon;
 
@@ -234,19 +234,19 @@ export default function Home() {
                   <Link
                     key={item.label}
                     href={item.href}
-                    className="group rounded-[22px] bg-orange-gradient px-4 py-4 text-white shadow-lg transition-all hover:-translate-y-0.5 hover:opacity-95"
+                    className="group rounded-[20px] bg-orange-gradient px-4 py-3 text-white shadow-lg transition-all hover:-translate-y-0.5 hover:opacity-95 sm:rounded-[22px] sm:px-4 sm:py-4"
                   >
                     <div className="flex flex-col items-center text-center">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/20 text-white shadow-sm">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/20 text-white shadow-sm sm:h-11 sm:w-11">
                         <Icon className="h-4 w-4" />
                       </div>
-                      <p className="mt-3 font-semibold text-white">
+                      <p className="mt-2 text-base font-semibold text-white sm:mt-3 sm:text-base">
                         {item.label}
                       </p>
-                      <p className="mt-1 text-sm text-orange-50/90">
+                      <p className="mt-1 hidden text-sm leading-snug text-orange-50/90 sm:block">
                         {item.description}
                       </p>
-                      <div className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-white">
+                      <div className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-white sm:mt-3">
                         Acessar
                         <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                       </div>

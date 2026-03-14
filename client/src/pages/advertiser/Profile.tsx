@@ -50,6 +50,13 @@ export default function AdvertiserProfile() {
   const updateProfileMutation = trpc.auth.updateProfile.useMutation({
     onSuccess: async () => {
       await utils.auth.me.invalidate();
+      await Promise.all([
+        utils.public.featuredListings.invalidate(),
+        utils.public.recentListings.invalidate(),
+        user?.id
+          ? utils.public.sellerProfile.invalidate({ sellerId: user.id })
+          : Promise.resolve(),
+      ]);
       toast.success("Perfil atualizado.");
     },
     onError: error => {
@@ -58,8 +65,19 @@ export default function AdvertiserProfile() {
   });
 
   const uploadAvatarMutation = trpc.auth.uploadAvatar.useMutation({
-    onSuccess: async () => {
-      await utils.auth.me.invalidate();
+    onSuccess: async ({ url }) => {
+      utils.auth.me.setData(undefined, currentUser =>
+        currentUser ? { ...currentUser, avatar: url } : currentUser
+      );
+      await Promise.all([
+        utils.auth.me.invalidate(),
+        utils.public.featuredListings.invalidate(),
+        utils.public.recentListings.invalidate(),
+        utils.public.listingById.invalidate(),
+        user?.id
+          ? utils.public.sellerProfile.invalidate({ sellerId: user.id })
+          : Promise.resolve(),
+      ]);
       toast.success("Foto de perfil atualizada.");
     },
     onError: error => {
@@ -68,8 +86,19 @@ export default function AdvertiserProfile() {
   });
 
   const uploadBannerMutation = trpc.auth.uploadBanner.useMutation({
-    onSuccess: async () => {
-      await utils.auth.me.invalidate();
+    onSuccess: async ({ url }) => {
+      utils.auth.me.setData(undefined, currentUser =>
+        currentUser ? { ...currentUser, bannerUrl: url } : currentUser
+      );
+      await Promise.all([
+        utils.auth.me.invalidate(),
+        utils.public.featuredListings.invalidate(),
+        utils.public.recentListings.invalidate(),
+        utils.public.listingById.invalidate(),
+        user?.id
+          ? utils.public.sellerProfile.invalidate({ sellerId: user.id })
+          : Promise.resolve(),
+      ]);
       toast.success("Banner da loja atualizado.");
     },
     onError: error => {
@@ -119,6 +148,7 @@ export default function AdvertiserProfile() {
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+    event.target.value = "";
 
     const reader = new FileReader();
     reader.onload = async readerEvent => {
@@ -141,6 +171,7 @@ export default function AdvertiserProfile() {
   const handleBannerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+    event.target.value = "";
 
     const reader = new FileReader();
     reader.onload = async readerEvent => {

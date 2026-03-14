@@ -71,6 +71,7 @@ export default function NewListing() {
   const [type, setType] = useState("product");
   const [categoryId, setCategoryId] = useState("");
   const [subcategory, setSubcategory] = useState("");
+  const [itemCondition, setItemCondition] = useState("");
   const [cityId, setCityId] = useState("");
   const [neighborhood, setNeighborhood] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
@@ -96,6 +97,7 @@ export default function NewListing() {
     setType(listing.type ?? "product");
     setCategoryId(String(listing.categoryId ?? ""));
     setSubcategory(listing.subcategory ?? "");
+    setItemCondition(listing.itemCondition ?? "");
     setCityId(listing.cityId ? String(listing.cityId) : "");
     setNeighborhood(listing.neighborhood ?? "");
     setWhatsapp(listing.whatsapp ?? "");
@@ -116,6 +118,8 @@ export default function NewListing() {
     category => String(category.id) === categoryId
   );
   const subcategoryOptions = getSubcategoryOptionsBySlug(selectedCategory?.slug);
+  const vehicleConditionOptions = ["Novo", "Usado"];
+  const showVehicleCondition = type === "vehicle";
 
   const isFoodListing = type === "food";
 
@@ -205,6 +209,10 @@ export default function NewListing() {
       toast.error("Selecione uma subcategoria");
       return;
     }
+    if (showVehicleCondition && !itemCondition) {
+      toast.error("Selecione se o veiculo e novo ou usado");
+      return;
+    }
 
     const payload = {
       title: title.trim(),
@@ -214,6 +222,7 @@ export default function NewListing() {
       type: type as any,
       categoryId: Number(categoryId),
       subcategory: subcategory || undefined,
+      itemCondition: itemCondition || undefined,
       cityId: cityId ? Number(cityId) : undefined,
       neighborhood: neighborhood || undefined,
       whatsapp: whatsapp || undefined,
@@ -405,6 +414,29 @@ export default function NewListing() {
                     {selectedCategory?.slug === "eletronicos"
                       ? "Ex.: fone, cabo, carregador, celular ou notebook."
                       : "Escolha o tipo mais proximo do item que voce esta anunciando."}
+                  </p>
+                </div>
+              )}
+
+              {showVehicleCondition && (
+                <div>
+                  <label className="text-sm font-semibold text-gray-700 mb-1.5 block">
+                    Condicao do veiculo *
+                  </label>
+                  <Select value={itemCondition} onValueChange={setItemCondition}>
+                    <SelectTrigger className="rounded-xl bg-gray-50">
+                      <SelectValue placeholder="Selecionar..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {vehicleConditionOptions.map(option => (
+                        <SelectItem key={option} value={option}>
+                          {option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="mt-1 text-xs text-gray-400">
+                    Informe se o carro ou a moto anunciada e nova ou usada.
                   </p>
                 </div>
               )}

@@ -33,6 +33,16 @@ async function ensureAppSchema() {
       );
     }
 
+    const [listingConditionColumns] = await connection.query(
+      "SHOW COLUMNS FROM listings LIKE 'itemCondition'"
+    );
+
+    if (Array.isArray(listingConditionColumns) && listingConditionColumns.length === 0) {
+      await connection.query(
+        "ALTER TABLE listings ADD COLUMN itemCondition varchar(30) NULL AFTER subcategory"
+      );
+    }
+
     await connection.query(`
       CREATE TABLE IF NOT EXISTS password_reset_tokens (
         id int AUTO_INCREMENT PRIMARY KEY,

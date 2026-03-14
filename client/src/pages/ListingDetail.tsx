@@ -79,6 +79,7 @@ export default function ListingDetailPage() {
   const sellerCompanyName =
     listing.seller && "companyName" in listing.seller ? listing.seller.companyName : undefined;
   const listingSubcategory = "subcategory" in listing ? listing.subcategory : undefined;
+  const listingCondition = "itemCondition" in listing ? listing.itemCondition : undefined;
   const sellerDisplayName =
     sellerPersonType === "pj"
       ? sellerCompanyName || listing.seller?.name || "Loja"
@@ -228,7 +229,7 @@ export default function ListingDetailPage() {
             <div className="rounded-2xl bg-white p-6 shadow-sm">
               <div className="mb-4 flex items-start justify-between gap-4">
                 <div className="flex-1">
-                  {(listing.type || listingSubcategory) && (
+                  {(listing.type || listingSubcategory || listingCondition) && (
                     <div className="mb-2 flex flex-wrap gap-2">
                       {listing.type && (
                         <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
@@ -248,6 +249,11 @@ export default function ListingDetailPage() {
                       {listingSubcategory && (
                         <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
                           {listingSubcategory}
+                        </span>
+                      )}
+                      {listingCondition && (
+                        <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                          {listingCondition}
                         </span>
                       )}
                     </div>

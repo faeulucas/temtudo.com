@@ -1,6 +1,7 @@
 export const CATEGORY_SUBCATEGORY_OPTIONS: Record<string, string[]> = {
   eletronicos: [
     "Celular",
+    "TV",
     "Fone",
     "Cabo",
     "Carregador",

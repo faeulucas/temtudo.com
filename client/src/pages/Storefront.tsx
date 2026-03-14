@@ -170,7 +170,7 @@ export default function StorefrontPage() {
 
           <div className="relative px-5 pb-6 sm:px-8">
             <div className="-mt-14 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
+              <div className="flex flex-col gap-4">
                 <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-[28px] border-4 border-white bg-white text-3xl font-black text-blue-700 shadow-lg">
                   {storefrontSeller.avatar ? (
                     <img
@@ -182,7 +182,7 @@ export default function StorefrontPage() {
                     sellerInitial
                   )}
                 </div>
-                <div className="min-w-0 rounded-[24px] bg-white/95 px-1 py-1 sm:px-0 sm:py-2">
+                <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <h1 className="break-words font-display text-2xl font-black text-gray-900 sm:text-3xl">
                       {displayName}

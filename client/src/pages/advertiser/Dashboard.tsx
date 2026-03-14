@@ -169,6 +169,7 @@ export default function AdvertiserDashboard() {
   const segment = getSegmentFromCategorySlug(primaryCategory?.slug);
   const segmentContent = SEGMENT_CONTENT[segment];
   const SegmentIcon = SEGMENT_ICON[segment];
+  const isFoodSegment = segment === "food";
   const displayName =
     personType === "pj" ? companyName || user?.companyName || user?.name : profileName || user?.name;
   const displayInitial = displayName?.charAt(0)?.toUpperCase() || "U";
@@ -221,7 +222,7 @@ export default function AdvertiserDashboard() {
               <Link href="/anunciar">
                 <Button className="rounded-2xl bg-orange-gradient px-6 py-6 font-bold text-white hover:opacity-90">
                   <Plus className="mr-2 h-5 w-5" />
-                  Novo anuncio
+                  {isFoodSegment ? "Novo item do cardapio" : "Novo anuncio"}
                 </Button>
               </Link>
               <Link href="/planos">
@@ -363,8 +364,14 @@ export default function AdvertiserDashboard() {
           <div className="rounded-[28px] border border-gray-100 bg-white p-6 shadow-sm">
             <div className="mb-5 flex items-center justify-between">
               <div>
-                <h2 className="font-display text-2xl font-bold text-gray-900">Seus produtos</h2>
-                <p className="text-sm text-gray-500">Lista completa do que voce publicou.</p>
+                <h2 className="font-display text-2xl font-bold text-gray-900">
+                  {isFoodSegment ? "Itens do cardapio" : "Seus produtos"}
+                </h2>
+                <p className="text-sm text-gray-500">
+                  {isFoodSegment
+                    ? "Cadastre cada lanche, bebida, combo ou promocao como um item separado."
+                    : "Lista completa do que voce publicou."}
+                </p>
               </div>
               <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600">
                 {listings.length} item(ns)
@@ -374,12 +381,18 @@ export default function AdvertiserDashboard() {
             {listings.length === 0 ? (
               <div className="rounded-[24px] bg-gray-50 p-12 text-center">
                 <Package className="mx-auto mb-4 h-14 w-14 text-gray-200" />
-                <h3 className="font-display text-xl font-bold text-gray-800">Nenhum anuncio ainda</h3>
-                <p className="mt-2 text-gray-500">Crie seu primeiro produto e acompanhe tudo por aqui.</p>
+                <h3 className="font-display text-xl font-bold text-gray-800">
+                  {isFoodSegment ? "Nenhum item do cardapio ainda" : "Nenhum anuncio ainda"}
+                </h3>
+                <p className="mt-2 text-gray-500">
+                  {isFoodSegment
+                    ? "Comece cadastrando os lanches, porcoes, bebidas e combos da sua loja."
+                    : "Crie seu primeiro produto e acompanhe tudo por aqui."}
+                </p>
                 <Link href="/anunciar">
                   <Button className="mt-6 rounded-2xl bg-brand-gradient px-6 text-white">
                     <Plus className="mr-2 h-4 w-4" />
-                    Criar anuncio
+                    {isFoodSegment ? "Cadastrar item" : "Criar anuncio"}
                   </Button>
                 </Link>
               </div>

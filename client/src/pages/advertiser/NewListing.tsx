@@ -22,6 +22,18 @@ type ListingImageDraft = {
   persisted?: boolean;
 };
 
+const CATEGORY_BLOCKLIST = new Set(["onde-comer"]);
+
+const TYPE_CATEGORY_MATCHERS: Record<string, (slug: string) => boolean> = {
+  service: slug => slug === "servicos-gerais",
+  vehicle: slug => ["veiculos", "motos", "carros", "autopecas"].includes(slug),
+  property: slug => slug === "imoveis",
+  food: slug => slug === "delivery",
+  job: slug => slug === "empregos",
+  product: slug =>
+    !["servicos-gerais", "veiculos", "motos", "carros", "autopecas", "imoveis", "delivery", "onde-comer", "empregos"].includes(slug),
+};
+
 function formatCurrencyFromCents(cents: number) {
   return (cents / 100).toLocaleString("pt-BR", {
     minimumFractionDigits: 2,
@@ -91,6 +103,26 @@ export default function NewListing() {
     );
     setDidHydrateForm(true);
   }, [didHydrateForm, isEditing, listingForEditQuery.data]);
+
+  const filteredCategories = (categories ?? []).filter(category => {
+    if (CATEGORY_BLOCKLIST.has(category.slug)) return false;
+    const matcher = TYPE_CATEGORY_MATCHERS[type];
+    return matcher ? matcher(category.slug) : true;
+  });
+
+  const isFoodListing = type === "food";
+
+  useEffect(() => {
+    if (!filteredCategories.length) {
+      setCategoryId("");
+      return;
+    }
+
+    const hasCurrentCategory = filteredCategories.some(category => String(category.id) === categoryId);
+    if (hasCurrentCategory) return;
+
+    setCategoryId(String(filteredCategories[0].id));
+  }, [categoryId, filteredCategories]);
 
   const createMutation = trpc.advertiser.createListing.useMutation();
 
@@ -221,12 +253,20 @@ export default function NewListing() {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="bg-hero-gradient p-6 text-white">
             <h1 className="font-display text-2xl font-bold mb-1">
-              {isEditing ? "Editar Anuncio" : "Criar Novo Anuncio"}
+              {isFoodListing
+                ? isEditing
+                  ? "Editar Item do Cardapio"
+                  : "Cadastrar Item do Cardapio"
+                : isEditing
+                  ? "Editar Anuncio"
+                  : "Criar Novo Anuncio"}
             </h1>
             <p className="text-blue-100 text-sm">
-              {isEditing
-                ? "Atualize as informacoes do seu produto ou servico"
-                : "Preencha as informacoes do seu produto ou servico"}
+              {isFoodListing
+                ? "Cadastre cada lanche, bebida, combo ou promocao como um item separado da sua loja."
+                : isEditing
+                  ? "Atualize as informacoes do seu produto ou servico"
+                  : "Preencha as informacoes do seu produto ou servico"}
             </p>
           </div>
 
@@ -238,12 +278,18 @@ export default function NewListing() {
               </h2>
 
               <div>
-                <label className="text-sm font-semibold text-gray-700 mb-1.5 block">Titulo do anuncio *</label>
+                <label className="text-sm font-semibold text-gray-700 mb-1.5 block">
+                  {isFoodListing ? "Nome do item *" : "Titulo do anuncio *"}
+                </label>
                 <input
                   type="text"
                   value={title}
                   onChange={event => setTitle(event.target.value)}
-                  placeholder="Ex: Honda CG 160 2020, Apartamento 2 quartos, Servico de pintura..."
+                  placeholder={
+                    isFoodListing
+                      ? "Ex: X-Salada especial, Combo casal, Marmita executiva..."
+                      : "Ex: Honda CG 160 2020, Apartamento 2 quartos, Servico de pintura..."
+                  }
                   maxLength={200}
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 focus:bg-white transition-all"
                 />
@@ -251,11 +297,17 @@ export default function NewListing() {
               </div>
 
               <div>
-                <label className="text-sm font-semibold text-gray-700 mb-1.5 block">Descricao</label>
+                <label className="text-sm font-semibold text-gray-700 mb-1.5 block">
+                  {isFoodListing ? "Descricao do item" : "Descricao"}
+                </label>
                 <textarea
                   value={description}
                   onChange={event => setDescription(event.target.value)}
-                  placeholder="Descreva seu produto ou servico com detalhes..."
+                  placeholder={
+                    isFoodListing
+                      ? "Ingredientes, tamanho, acompanhamentos, observacoes e diferenciais..."
+                      : "Descreva seu produto ou servico com detalhes..."
+                  }
                   rows={4}
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 focus:bg-white transition-all resize-none"
                 />
@@ -286,13 +338,18 @@ export default function NewListing() {
                       <SelectValue placeholder="Selecionar..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {categories?.map(category => (
+                      {filteredCategories.map(category => (
                         <SelectItem key={category.id} value={String(category.id)}>
                           {category.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                  <p className="mt-1 text-xs text-gray-400">
+                    {isFoodListing
+                      ? "Para alimentacao, cada item do cardapio e cadastrado separadamente dentro de Delivery."
+                      : "As categorias mudam conforme o tipo de anuncio escolhido."}
+                  </p>
                 </div>
               </div>
             </div>
@@ -321,7 +378,9 @@ export default function NewListing() {
 
                 {priceType !== "free" && priceType !== "on_request" && (
                   <div>
-                    <label className="text-sm font-semibold text-gray-700 mb-1.5 block">Valor (R$)</label>
+                    <label className="text-sm font-semibold text-gray-700 mb-1.5 block">
+                      {isFoodListing ? "Preco do item (R$)" : "Valor (R$)"}
+                    </label>
                     <input
                       type="text"
                       inputMode="numeric"

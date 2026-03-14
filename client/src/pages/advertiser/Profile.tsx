@@ -30,6 +30,8 @@ export default function AdvertiserProfile() {
   const [bio, setBio] = useState("");
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [bannerUploading, setBannerUploading] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
   const bannerInputRef = useRef<HTMLInputElement | null>(null);
   const utils = trpc.useUtils();
@@ -45,6 +47,8 @@ export default function AdvertiserProfile() {
     setCityId(user.cityId ? String(user.cityId) : "none");
     setNeighborhood(user.neighborhood ?? "");
     setBio(user.bio ?? "");
+    setAvatarPreview(user.avatar ?? null);
+    setBannerPreview(user.bannerUrl ?? null);
   }, [user]);
 
   const updateProfileMutation = trpc.auth.updateProfile.useMutation({
@@ -66,11 +70,11 @@ export default function AdvertiserProfile() {
 
   const uploadAvatarMutation = trpc.auth.uploadAvatar.useMutation({
     onSuccess: async ({ url }) => {
+      setAvatarPreview(url);
       utils.auth.me.setData(undefined, currentUser =>
         currentUser ? { ...currentUser, avatar: url } : currentUser
       );
       await Promise.all([
-        utils.auth.me.invalidate(),
         utils.public.featuredListings.invalidate(),
         utils.public.recentListings.invalidate(),
         utils.public.listingById.invalidate(),
@@ -87,11 +91,11 @@ export default function AdvertiserProfile() {
 
   const uploadBannerMutation = trpc.auth.uploadBanner.useMutation({
     onSuccess: async ({ url }) => {
+      setBannerPreview(url);
       utils.auth.me.setData(undefined, currentUser =>
         currentUser ? { ...currentUser, bannerUrl: url } : currentUser
       );
       await Promise.all([
-        utils.auth.me.invalidate(),
         utils.public.featuredListings.invalidate(),
         utils.public.recentListings.invalidate(),
         utils.public.listingById.invalidate(),
@@ -226,9 +230,9 @@ export default function AdvertiserProfile() {
 
           <div className="mb-6 flex flex-col gap-4 rounded-[24px] bg-gray-50 p-4 sm:flex-row sm:items-center sm:p-5">
             <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-3xl bg-brand-gradient text-3xl font-black text-white">
-              {user?.avatar ? (
+              {avatarPreview ? (
                 <img
-                  src={user.avatar}
+                  src={avatarPreview}
                   alt={displayName || "Perfil"}
                   className="h-full w-full object-cover"
                 />
@@ -272,9 +276,9 @@ export default function AdvertiserProfile() {
 
           <div className="mb-6 overflow-hidden rounded-[24px] border border-gray-100 bg-white">
             <div className="relative h-44 bg-gray-100 sm:h-52">
-              {user?.bannerUrl ? (
+              {bannerPreview ? (
                 <img
-                  src={user.bannerUrl}
+                  src={bannerPreview}
                   alt={displayName || "Banner da loja"}
                   className="h-full w-full object-cover"
                 />

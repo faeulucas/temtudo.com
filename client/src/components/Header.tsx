@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/select";
 import {
   MapPin, Search, Bell, Plus, User, LogOut, LayoutDashboard,
-  Shield, Heart, Menu, X, ChevronDown, Zap
+  Shield, Heart, Menu, X, ChevronDown, Zap, Settings
 } from "lucide-react";
 
 interface HeaderProps {
@@ -144,6 +144,9 @@ export default function Header({ selectedCity, onCityChange, onSearch }: HeaderP
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => navigate("/anunciante")}>
                       <LayoutDashboard className="w-4 h-4 mr-2" /> Meu Painel
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate("/anunciante/meus-dados")}>
+                      <Settings className="w-4 h-4 mr-2" /> Meus dados
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate("/favoritos")}>
                       <Heart className="w-4 h-4 mr-2" /> Favoritos

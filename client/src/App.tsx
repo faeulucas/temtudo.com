@@ -11,6 +11,7 @@ import ListingDetailPage from "./pages/ListingDetail";
 import CategoryPage from "./pages/Category";
 import PlansPage from "./pages/Plans";
 import AdvertiserDashboard from "./pages/advertiser/Dashboard";
+import AdvertiserProfile from "./pages/advertiser/Profile";
 import NewListing from "./pages/advertiser/NewListing";
 import AdminDashboard from "./pages/admin/Dashboard";
 import FavoritesPage from "./pages/Favorites";
@@ -48,6 +49,7 @@ function Router() {
       <Route path="/termos" component={TermsPage} />
       <Route path="/privacidade" component={PrivacyPage} />
       <Route path="/anunciante" component={AdvertiserDashboard} />
+      <Route path="/anunciante/meus-dados" component={AdvertiserProfile} />
       <Route path="/painel" component={AdvertiserDashboard} />
       <Route path="/cliente" component={AdvertiserDashboard} />
       <Route path="/anunciante/novo" component={NewListing} />

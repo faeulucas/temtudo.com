@@ -6,19 +6,10 @@ import { trpc } from "@/lib/trpc";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { CASHBACK_RULES } from "@/lib/cashback";
 import { getSegmentFromCategorySlug, SEGMENT_CONTENT } from "@/lib/segments";
 import { toast } from "sonner";
 import {
-  Camera,
   AlertCircle,
   ChevronRight,
   Clock3,
@@ -35,9 +26,9 @@ import {
   Pause,
   Play,
   Plus,
-  Save,
   Shirt,
   Star,
+  Settings,
   Trash2,
   CarFront,
   Zap,
@@ -64,31 +55,11 @@ const SEGMENT_ICON = {
 export default function AdvertiserDashboard() {
   const { user, isAuthenticated, loading } = useAuth();
   const [deletingId, setDeletingId] = useState<number | null>(null);
-  const [profileName, setProfileName] = useState("");
-  const [personType, setPersonType] = useState<"pf" | "pj">("pf");
-  const [companyName, setCompanyName] = useState("");
-  const [cpfCnpj, setCpfCnpj] = useState("");
-  const [whatsapp, setWhatsapp] = useState("");
-  const [cityId, setCityId] = useState<string>("none");
-  const [neighborhood, setNeighborhood] = useState("");
-  const [avatarUploading, setAvatarUploading] = useState(false);
   const utils = trpc.useUtils();
   const { data: stats } = trpc.advertiser.stats.useQuery(undefined, {
     enabled: isAuthenticated,
   });
-  const { data: cities } = trpc.public.cities.useQuery();
   const { data: categories } = trpc.public.categories.useQuery();
-
-  useEffect(() => {
-    if (!user) return;
-    setProfileName(user.name ?? "");
-    setPersonType((user.personType as "pf" | "pj") ?? "pf");
-    setCompanyName(user.companyName ?? "");
-    setCpfCnpj(user.cpfCnpj ?? "");
-    setWhatsapp(user.whatsapp ?? "");
-    setCityId(user.cityId ? String(user.cityId) : "none");
-    setNeighborhood(user.neighborhood ?? "");
-  }, [user]);
 
   const updateMutation = trpc.advertiser.updateListing.useMutation({
     onSuccess: async () => {
@@ -109,25 +80,6 @@ export default function AdvertiserDashboard() {
     onSuccess: async () => {
       await utils.advertiser.stats.invalidate();
       toast.success("Booster ativado.");
-    },
-  });
-
-  const updateProfileMutation = trpc.auth.updateProfile.useMutation({
-    onSuccess: async () => {
-      await utils.auth.me.invalidate();
-      toast.success("Perfil atualizado.");
-    },
-    onError: error => {
-      toast.error(error.message);
-    },
-  });
-  const uploadAvatarMutation = trpc.auth.uploadAvatar.useMutation({
-    onSuccess: async () => {
-      await utils.auth.me.invalidate();
-      toast.success("Foto de perfil atualizada.");
-    },
-    onError: error => {
-      toast.error(error.message);
     },
   });
 
@@ -171,33 +123,10 @@ export default function AdvertiserDashboard() {
   const SegmentIcon = SEGMENT_ICON[segment];
   const isFoodSegment = segment === "food";
   const displayName =
-    personType === "pj" ? companyName || user?.companyName || user?.name : profileName || user?.name;
-  const displayInitial = displayName?.charAt(0)?.toUpperCase() || "U";
+    user?.personType === "pj" ? user?.companyName || user?.name : user?.name;
   const trialDaysLeft = user?.trialStartedAt
     ? Math.max(0, 30 - Math.floor((Date.now() - new Date(user.trialStartedAt).getTime()) / 86400000))
     : 30;
-
-  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = async readerEvent => {
-      const result = readerEvent.target?.result;
-      if (typeof result !== "string") return;
-
-      setAvatarUploading(true);
-      try {
-        await uploadAvatarMutation.mutateAsync({
-          base64: result,
-          mimeType: file.type || "image/jpeg",
-        });
-      } finally {
-        setAvatarUploading(false);
-      }
-    };
-    reader.readAsDataURL(file);
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -223,6 +152,12 @@ export default function AdvertiserDashboard() {
                 <Button className="rounded-2xl bg-orange-gradient px-6 py-6 font-bold text-white hover:opacity-90">
                   <Plus className="mr-2 h-5 w-5" />
                   {isFoodSegment ? "Novo item do cardapio" : "Novo anuncio"}
+                </Button>
+              </Link>
+              <Link href="/anunciante/meus-dados">
+                <Button variant="outline" className="rounded-2xl px-6 py-6 font-semibold">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Meus dados
                 </Button>
               </Link>
               <Link href="/planos">
@@ -294,70 +229,37 @@ export default function AdvertiserDashboard() {
           })}
         </section>
 
-        <section className="mt-6 grid gap-4 xl:grid-cols-[1.25fr_0.75fr]">
-          <article className="rounded-[28px] bg-gradient-to-r from-slate-900 to-slate-700 p-6 text-white shadow-xl">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <div className="mb-3 inline-flex rounded-full bg-white/15 px-3 py-1 text-xs font-black uppercase tracking-[0.2em] text-white/90">
-                  {segmentContent.badge}
+        <section className="mt-6">
+          <article className="rounded-[24px] border border-slate-800 bg-slate-900 p-5 text-white shadow-lg">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex items-start gap-3">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/10">
+                  <SegmentIcon className="h-6 w-6 text-white" />
                 </div>
-                <h2 className="font-display text-2xl font-black">
-                  {segmentContent.title}
-                </h2>
-                <p className="mt-2 text-sm text-slate-200">
-                  {segmentContent.description}
-                </p>
-              </div>
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-3xl bg-white/10">
-                <SegmentIcon className="h-7 w-7 text-white" />
-              </div>
-            </div>
-            <div className="mt-5 space-y-3">
-              {segmentContent.highlights.map(item => (
-                <div
-                  key={item}
-                  className="rounded-2xl bg-white/10 px-4 py-3 text-sm font-medium backdrop-blur-sm"
-                >
-                  {item}
+                <div>
+                  <div className="inline-flex rounded-full bg-white/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-white/80">
+                    {segmentContent.badge}
+                  </div>
+                  <h2 className="mt-2 font-display text-xl font-black">{segmentContent.title}</h2>
+                  <p className="mt-1 text-sm text-slate-200">{segmentContent.description}</p>
                 </div>
-              ))}
+              </div>
+
+              <div className="grid gap-2 sm:grid-cols-3 lg:min-w-[520px]">
+                {segmentContent.modules.map(module => (
+                  <div key={module.title} className="rounded-2xl bg-white/10 px-4 py-3">
+                    <div className="text-sm font-semibold text-white">{module.title}</div>
+                    <div className="mt-1 text-xs text-slate-200">{module.description}</div>
+                  </div>
+                ))}
+              </div>
             </div>
             {primaryCategory && (
-              <p className="mt-4 text-xs text-slate-300">
+              <p className="mt-3 text-xs text-slate-300">
                 Segmento principal detectado: {primaryCategory.name}
               </p>
             )}
           </article>
-
-          <div className="rounded-[28px] border border-gray-100 bg-white p-6 shadow-sm">
-            <div className="mb-4 flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
-                <SegmentIcon className="h-5 w-5" />
-              </div>
-              <div>
-                <h2 className="font-display text-xl font-bold text-gray-900">
-                  Prioridades do segmento
-                </h2>
-                <p className="text-sm text-gray-500">
-                  O painel vai seguir essa linha para sua categoria principal.
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              {segmentContent.modules.map(module => (
-                <div key={module.title} className="rounded-[22px] bg-gray-50 p-4">
-                  <div className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${module.accent}`}>
-                    Modulo sugerido
-                  </div>
-                  <h3 className="mt-3 font-semibold text-gray-900">{module.title}</h3>
-                  <p className="mt-1 text-sm leading-6 text-gray-600">
-                    {module.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
         </section>
 
         <section className="mt-6 grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
@@ -498,203 +400,6 @@ export default function AdvertiserDashboard() {
           </div>
 
           <div className="space-y-6">
-            <section className="rounded-[28px] border border-gray-100 bg-white p-6 shadow-sm">
-              <div className="mb-4 flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
-                  <Store className="h-5 w-5" />
-                </div>
-                <div>
-                  <h2 className="font-display text-xl font-bold text-gray-900">
-                    Perfil da conta
-                  </h2>
-                  <p className="text-sm text-gray-500">
-                    Defina se sua conta opera como pessoa fisica ou juridica.
-                  </p>
-                </div>
-              </div>
-
-              <div className="mb-4 flex items-center gap-4 rounded-[22px] bg-gray-50 p-4">
-                <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-3xl bg-brand-gradient text-2xl font-black text-white">
-                  {user?.avatar ? (
-                    <img
-                      src={user.avatar}
-                      alt={displayName || "Perfil"}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    displayInitial
-                  )}
-                </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-gray-900">Foto de perfil</p>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Essa imagem aparece no seu painel e na apresentacao da conta.
-                  </p>
-                  <p className="mt-1 text-xs text-gray-400">
-                    Ao tocar no botao abaixo, voce escolhe uma imagem da galeria ou biblioteca do aparelho.
-                  </p>
-                </div>
-                <label className="cursor-pointer">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleAvatarChange}
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="rounded-2xl"
-                    disabled={avatarUploading || uploadAvatarMutation.isPending}
-                  >
-                    <Camera className="mr-2 h-4 w-4" />
-                    {avatarUploading || uploadAvatarMutation.isPending
-                      ? "Enviando..."
-                      : "Escolher foto"}
-                  </Button>
-                </label>
-              </div>
-
-              <div className="mb-4 grid gap-3 rounded-[22px] bg-gray-50 p-4 text-sm text-gray-600">
-                <div className="flex items-center justify-between">
-                  <span>Tipo atual</span>
-                  <span className="rounded-full bg-white px-3 py-1 font-semibold text-gray-900">
-                    {personType === "pj" ? "Pessoa juridica" : "Pessoa fisica"}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>{personType === "pj" ? "Empresa exibida" : "Nome exibido"}</span>
-                  <span className="rounded-full bg-white px-3 py-1 font-semibold text-gray-900">
-                    {displayName || "Nao informado"}
-                  </span>
-                </div>
-                <p>
-                  Os valores continuam os mesmos por enquanto, mas a comunicacao,
-                  beneficios e recursos podem variar por perfil em breve.
-                </p>
-              </div>
-
-              <form
-                className="space-y-4"
-                onSubmit={event => {
-                  event.preventDefault();
-                  updateProfileMutation.mutate({
-                    name: profileName || undefined,
-                    personType,
-                    companyName: personType === "pj" ? companyName || undefined : undefined,
-                    cpfCnpj: cpfCnpj || undefined,
-                    whatsapp: whatsapp || undefined,
-                    cityId: cityId !== "none" ? Number(cityId) : undefined,
-                    neighborhood: neighborhood || undefined,
-                  });
-                }}
-              >
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <label className="mb-1.5 block text-sm font-semibold text-gray-700">
-                      Tipo de conta
-                    </label>
-                    <Select
-                      value={personType}
-                      onValueChange={value => setPersonType(value as "pf" | "pj")}
-                    >
-                      <SelectTrigger className="rounded-xl">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pf">Pessoa fisica</SelectItem>
-                        <SelectItem value="pj">Pessoa juridica</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <label className="mb-1.5 block text-sm font-semibold text-gray-700">
-                      WhatsApp
-                    </label>
-                    <Input
-                      value={whatsapp}
-                      onChange={event => setWhatsapp(event.target.value)}
-                      placeholder="(43) 99999-9999"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-gray-700">
-                    {personType === "pj" ? "Nome do responsavel" : "Nome"}
-                  </label>
-                  <Input
-                    value={profileName}
-                    onChange={event => setProfileName(event.target.value)}
-                    placeholder="Seu nome"
-                  />
-                </div>
-
-                {personType === "pj" && (
-                  <div>
-                    <label className="mb-1.5 block text-sm font-semibold text-gray-700">
-                      Empresa
-                    </label>
-                    <Input
-                      value={companyName}
-                      onChange={event => setCompanyName(event.target.value)}
-                      placeholder="Nome fantasia ou razao social"
-                    />
-                  </div>
-                )}
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <label className="mb-1.5 block text-sm font-semibold text-gray-700">
-                      {personType === "pj" ? "CNPJ" : "CPF"}
-                    </label>
-                    <Input
-                      value={cpfCnpj}
-                      onChange={event => setCpfCnpj(event.target.value)}
-                      placeholder={personType === "pj" ? "00.000.000/0000-00" : "000.000.000-00"}
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1.5 block text-sm font-semibold text-gray-700">
-                      Cidade
-                    </label>
-                    <Select value={cityId} onValueChange={setCityId}>
-                      <SelectTrigger className="rounded-xl">
-                        <SelectValue placeholder="Selecione" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">Nao informar</SelectItem>
-                        {cities?.map(city => (
-                          <SelectItem key={city.id} value={String(city.id)}>
-                            {city.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="mb-1.5 block text-sm font-semibold text-gray-700">
-                    Bairro
-                  </label>
-                  <Input
-                    value={neighborhood}
-                    onChange={event => setNeighborhood(event.target.value)}
-                    placeholder="Centro, Vila Nova..."
-                  />
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={updateProfileMutation.isPending}
-                  className="w-full rounded-2xl bg-brand-gradient font-bold text-white hover:opacity-90"
-                >
-                  <Save className="mr-2 h-4 w-4" />
-                  {updateProfileMutation.isPending ? "Salvando..." : "Salvar perfil"}
-                </Button>
-              </form>
-            </section>
 
             <section className="rounded-[28px] border border-gray-100 bg-white p-6 shadow-sm">
               <div className="mb-4 flex items-center gap-3">

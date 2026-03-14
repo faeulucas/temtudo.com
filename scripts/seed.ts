@@ -20,6 +20,7 @@ const categories = [
   { name: "Servicos Gerais", slug: "servicos-gerais", icon: "Wrench", color: "#8b5cf6", sortOrder: 3 },
   { name: "Veiculos", slug: "veiculos", icon: "Car", color: "#2563eb", sortOrder: 4 },
   { name: "Imoveis", slug: "imoveis", icon: "HomeIcon", color: "#0f766e", sortOrder: 5 },
+  { name: "Eletronicos", slug: "eletronicos", icon: "Smartphone", color: "#06b6d4", sortOrder: 6 },
 ];
 
 const plans = [

@@ -13,6 +13,7 @@ export const mockCategories = [
   { id: 3, name: "Servicos Gerais", slug: "servicos-gerais", icon: "Wrench", color: "#8b5cf6", parentId: null, isActive: true, sortOrder: 3, viewCount: 41, createdAt: new Date("2025-01-01") },
   { id: 4, name: "Veiculos", slug: "veiculos", icon: "Car", color: "#2563eb", parentId: null, isActive: true, sortOrder: 4, viewCount: 88, createdAt: new Date("2025-01-01") },
   { id: 5, name: "Imoveis", slug: "imoveis", icon: "HomeIcon", color: "#0f766e", parentId: null, isActive: true, sortOrder: 5, viewCount: 62, createdAt: new Date("2025-01-01") },
+  { id: 6, name: "Eletronicos", slug: "eletronicos", icon: "Smartphone", color: "#06b6d4", parentId: null, isActive: true, sortOrder: 6, viewCount: 56, createdAt: new Date("2025-01-01") },
 ];
 
 export const mockPlans = [

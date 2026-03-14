@@ -8,7 +8,16 @@ import App from "./App";
 import { LOGIN_ROUTE } from "./const";
 import "./index.css";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 0,
+      refetchOnMount: true,
+      refetchOnReconnect: true,
+      refetchOnWindowFocus: true,
+    },
+  },
+});
 const apiBaseUrl = import.meta.env.PROD
   ? ""
   : ((import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(

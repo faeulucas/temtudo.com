@@ -1,4 +1,4 @@
-const CACHE_NAME = "norte-vivo-pwa-v2";
+const CACHE_NAME = "norte-vivo-pwa-v3";
 const APP_SHELL = [
   "/",
   "/manifest.webmanifest",
@@ -39,6 +39,7 @@ self.addEventListener("fetch", event => {
 
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
+  if (url.pathname.startsWith("/api/")) return;
 
   if (request.mode === "navigate") {
     event.respondWith(

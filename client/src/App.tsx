@@ -4,6 +4,7 @@ import NotFound from "@/pages/NotFound";
 import { useEffect } from "react";
 import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
+import PwaInstallPrompt from "./components/PwaInstallPrompt";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import HomePage from "./pages/Home";
 import SearchPage from "./pages/Search";
@@ -71,6 +72,7 @@ function App() {
         <TooltipProvider>
           <ScrollToTop />
           <Toaster />
+          <PwaInstallPrompt />
           <Router />
         </TooltipProvider>
       </ThemeProvider>

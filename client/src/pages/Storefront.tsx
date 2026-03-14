@@ -226,42 +226,6 @@ export default function StorefrontPage() {
                 </Button>
               </div>
             </div>
-
-            <div className="mt-6 grid gap-4 lg:grid-cols-3">
-              <div className="rounded-[24px] bg-gray-50 p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-600">
-                  Sobre a loja
-                </p>
-                <p className="mt-3 text-sm leading-relaxed text-gray-600">
-                  {storefrontSeller.bio?.trim() ||
-                    "Esta loja faz parte do portal Norte Vivo e usa esta vitrine para mostrar seus produtos, servicos e oportunidades da regiao."}
-                </p>
-              </div>
-              <div className="rounded-[24px] bg-blue-50 p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-600">
-                  Presenca no portal
-                </p>
-                <div className="mt-3 space-y-2 text-sm text-gray-700">
-                  <p>{listings.length} item(ns) publicado(s)</p>
-                  <p>
-                    Membro desde{" "}
-                    {new Date(storefrontSeller.createdAt).getFullYear()}
-                  </p>
-                  <p>Perfil publico da loja ativo</p>
-                </div>
-              </div>
-              <div className="rounded-[24px] bg-orange-50 p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-orange-600">
-                  Atendimento
-                </p>
-                <div className="mt-3 space-y-2 text-sm text-gray-700">
-                  <p>Contato rapido pelo WhatsApp</p>
-                  <p>Produtos organizados por categoria</p>
-                  <p>Vitrine publica para descoberta local</p>
-                </div>
-              </div>
-            </div>
-
             <div className="mt-6 border-t border-gray-100 pt-5">
               <div className="flex flex-wrap gap-2">
                 {[

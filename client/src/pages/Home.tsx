@@ -122,6 +122,32 @@ export default function Home() {
   const featuredCategories = topCategories?.length
     ? topCategories
     : categories?.slice(0, 10);
+  const quickLinks = [
+    {
+      label: "Guia local",
+      description: "Descubra negocios e servicos da regiao",
+      href: "/busca",
+      icon: MapPin,
+    },
+    {
+      label: "Compra e venda",
+      description: "Anuncie produtos e comece a vender",
+      href: isAuthenticated ? "/anunciante/novo" : LOGIN_ROUTE,
+      icon: ShoppingCart,
+    },
+    {
+      label: "Vitrine digital",
+      description: "Veja vitrines e ofertas publicadas",
+      href: "/busca?q=lojas",
+      icon: ShoppingBag,
+    },
+    {
+      label: "Perfil da loja",
+      description: "Encontre perfis comerciais e contatos",
+      href: "/busca?q=perfil%20de%20loja",
+      icon: Building2,
+    },
+  ];
 
   useEffect(() => {
     if (!categoryCarouselApi || !featuredCategories?.length) return;
@@ -160,19 +186,35 @@ export default function Home() {
               sua regiao. No Norte Vivo, cada negocio pode ter seu perfil, sua
               vitrine e seus produtos em um portal pensado para ser encontrado.
             </p>
-            <div className="mt-5 flex flex-wrap gap-3 text-sm text-gray-600">
-              <span className="rounded-full bg-gray-100 px-3 py-1.5 font-medium">
-                Guia local
-              </span>
-              <span className="rounded-full bg-gray-100 px-3 py-1.5 font-medium">
-                Compra e venda
-              </span>
-              <span className="rounded-full bg-gray-100 px-3 py-1.5 font-medium">
-                Vitrine digital
-              </span>
-              <span className="rounded-full bg-gray-100 px-3 py-1.5 font-medium">
-                Perfil da loja
-              </span>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:max-w-4xl">
+              {quickLinks.map(item => {
+                const Icon = item.icon;
+
+                return (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className="group rounded-[22px] border border-gray-100 bg-gray-50 px-4 py-3 transition-all hover:-translate-y-0.5 hover:border-blue-200 hover:bg-white hover:shadow-sm"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-blue-700 shadow-sm transition-colors group-hover:bg-blue-50">
+                        <Icon className="h-4 w-4" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="font-semibold text-gray-900">
+                            {item.label}
+                          </p>
+                          <ArrowRight className="h-4 w-4 shrink-0 text-gray-400 transition-transform group-hover:translate-x-0.5 group-hover:text-blue-600" />
+                        </div>
+                        <p className="mt-1 text-sm text-gray-500">
+                          {item.description}
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </div>

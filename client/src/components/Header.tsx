@@ -123,8 +123,12 @@ export default function Header({ selectedCity, onCityChange, onSearch }: HeaderP
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="flex items-center gap-2 px-2">
-                      <div className="w-8 h-8 rounded-full bg-brand-gradient flex items-center justify-center text-white text-sm font-bold">
-                        {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                      <div className="w-8 h-8 rounded-full bg-brand-gradient flex items-center justify-center overflow-hidden text-white text-sm font-bold">
+                        {user?.avatar ? (
+                          <img src={user.avatar} alt={user.name || "Perfil"} className="w-full h-full object-cover" />
+                        ) : (
+                          user?.name?.charAt(0)?.toUpperCase() || "U"
+                        )}
                       </div>
                       <ChevronDown className="w-3 h-3 text-gray-500 hidden sm:block" />
                     </Button>

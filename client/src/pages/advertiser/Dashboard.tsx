@@ -17,6 +17,7 @@ import {
 import { CASHBACK_RULES } from "@/lib/cashback";
 import { toast } from "sonner";
 import {
+  Camera,
   AlertCircle,
   ChevronRight,
   Clock3,
@@ -58,6 +59,7 @@ export default function AdvertiserDashboard() {
   const [whatsapp, setWhatsapp] = useState("");
   const [cityId, setCityId] = useState<string>("none");
   const [neighborhood, setNeighborhood] = useState("");
+  const [avatarUploading, setAvatarUploading] = useState(false);
   const utils = trpc.useUtils();
   const { data: stats } = trpc.advertiser.stats.useQuery(undefined, {
     enabled: isAuthenticated,
@@ -106,6 +108,15 @@ export default function AdvertiserDashboard() {
       toast.error(error.message);
     },
   });
+  const uploadAvatarMutation = trpc.auth.uploadAvatar.useMutation({
+    onSuccess: async () => {
+      await utils.auth.me.invalidate();
+      toast.success("Foto de perfil atualizada.");
+    },
+    onError: error => {
+      toast.error(error.message);
+    },
+  });
 
   if (loading) {
     return (
@@ -142,6 +153,28 @@ export default function AdvertiserDashboard() {
   const trialDaysLeft = user?.trialStartedAt
     ? Math.max(0, 30 - Math.floor((Date.now() - new Date(user.trialStartedAt).getTime()) / 86400000))
     : 30;
+
+  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async readerEvent => {
+      const result = readerEvent.target?.result;
+      if (typeof result !== "string") return;
+
+      setAvatarUploading(true);
+      try {
+        await uploadAvatarMutation.mutateAsync({
+          base64: result,
+          mimeType: file.type || "image/jpeg",
+        });
+      } finally {
+        setAvatarUploading(false);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -352,6 +385,45 @@ export default function AdvertiserDashboard() {
                     Defina se sua conta opera como pessoa fisica ou juridica.
                   </p>
                 </div>
+              </div>
+
+              <div className="mb-4 flex items-center gap-4 rounded-[22px] bg-gray-50 p-4">
+                <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-3xl bg-brand-gradient text-2xl font-black text-white">
+                  {user?.avatar ? (
+                    <img
+                      src={user.avatar}
+                      alt={user.name || "Perfil"}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    (user?.name?.charAt(0)?.toUpperCase() || "U")
+                  )}
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold text-gray-900">Foto de perfil</p>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Essa imagem aparece no seu painel e na apresentacao da conta.
+                  </p>
+                </div>
+                <label className="cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleAvatarChange}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="rounded-2xl"
+                    disabled={avatarUploading || uploadAvatarMutation.isPending}
+                  >
+                    <Camera className="mr-2 h-4 w-4" />
+                    {avatarUploading || uploadAvatarMutation.isPending
+                      ? "Enviando..."
+                      : "Trocar foto"}
+                  </Button>
+                </label>
               </div>
 
               <div className="mb-4 grid gap-3 rounded-[22px] bg-gray-50 p-4 text-sm text-gray-600">

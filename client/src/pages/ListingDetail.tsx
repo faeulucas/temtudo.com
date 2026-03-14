@@ -287,8 +287,16 @@ export default function ListingDetailPage() {
             <div className="sticky top-24 rounded-2xl bg-white p-6 shadow-sm">
               {listing.seller && (
                 <div className="mb-6 flex items-center gap-3 border-b border-gray-100 pb-6">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-gradient text-xl font-black text-white">
-                    {listing.seller.name?.charAt(0)?.toUpperCase() || "?"}
+                  <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-brand-gradient text-xl font-black text-white">
+                    {listing.seller.avatar ? (
+                      <img
+                        src={listing.seller.avatar}
+                        alt={listing.seller.name || "Anunciante"}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      listing.seller.name?.charAt(0)?.toUpperCase() || "?"
+                    )}
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-1">

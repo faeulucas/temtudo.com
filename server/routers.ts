@@ -232,6 +232,37 @@ export const appRouter = router({
       await db.update(users).set({ ...input, updatedAt: new Date() }).where(eq(users.id, ctx.user.id));
       return { success: true };
     }),
+    uploadAvatar: protectedProcedure.input(z.object({
+      base64: z.string(),
+      mimeType: z.string().default("image/jpeg"),
+    })).mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+      const { storagePut } = await import("./storage");
+      const buffer = Buffer.from(
+        input.base64.replace(/^data:[^;]+;base64,/, ""),
+        "base64"
+      );
+      const extension =
+        input.mimeType === "image/png"
+          ? "png"
+          : input.mimeType === "image/webp"
+            ? "webp"
+            : "jpg";
+      const key = `avatars/${ctx.user.id}/profile-${Date.now()}.${extension}`;
+      const { url } = await storagePut(key, buffer, input.mimeType);
+
+      await db
+        .update(users)
+        .set({
+          avatar: url,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, ctx.user.id));
+
+      return { success: true as const, url };
+    }),
   }),
 
   // ─── Public Data ────────────────────────────────────────────────────────────

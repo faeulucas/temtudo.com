@@ -102,7 +102,7 @@ export default function LoginPage() {
       <Header />
       <main className="container py-10">
         <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <section className="rounded-[28px] bg-hero-gradient p-8 text-white shadow-xl">
+          <section className="hidden rounded-[28px] bg-hero-gradient p-8 text-white shadow-xl lg:block">
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold">
               <Shield className="h-4 w-4" />
               Acesso seguro

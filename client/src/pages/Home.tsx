@@ -400,8 +400,8 @@ export default function Home() {
       </section>
 
       <section className="container py-12">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
             <h2 className="section-heading">
               Categorias que movimentam o portal
             </h2>
@@ -412,7 +412,7 @@ export default function Home() {
           </div>
           <Link
             href="/como-funciona"
-            className="text-sm font-medium text-emerald-600 hover:underline"
+            className="text-sm font-medium text-emerald-600 hover:underline sm:shrink-0"
           >
             Como funciona
           </Link>
@@ -439,7 +439,7 @@ export default function Home() {
       {/* ─── DELIVERY ─────────────────────────────────────────────────────── */}
       <section className="bg-orange-50 py-10">
         <div className="container">
-          <div className="flex items-center justify-between mb-6">
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-orange-500 rounded-xl flex items-center justify-center">
                 <ShoppingBag className="w-4 h-4 text-white" />
@@ -450,7 +450,7 @@ export default function Home() {
             </div>
             <Link
               href="/categoria/delivery"
-              className="text-sm text-orange-600 font-medium flex items-center gap-1 hover:gap-2 transition-all"
+              className="flex items-center gap-1 text-sm font-medium text-orange-600 transition-all hover:gap-2 sm:shrink-0"
             >
               Ver todos <ChevronRight className="w-4 h-4" />
             </Link>
@@ -484,7 +484,7 @@ export default function Home() {
 
       {/* ─── RECENT LISTINGS ──────────────────────────────────────────────── */}
       <section className="container py-10">
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-brand-gradient rounded-xl flex items-center justify-center">
               <TrendingUp className="w-4 h-4 text-white" />
@@ -498,7 +498,7 @@ export default function Home() {
           </div>
           <Link
             href="/busca"
-            className="text-sm text-blue-600 font-medium flex items-center gap-1 hover:gap-2 transition-all"
+            className="flex items-center gap-1 text-sm font-medium text-blue-600 transition-all hover:gap-2 sm:shrink-0"
           >
             Ver todos <ChevronRight className="w-4 h-4" />
           </Link>

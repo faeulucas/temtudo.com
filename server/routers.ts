@@ -482,6 +482,90 @@ export const appRouter = router({
       await db.update(listings).set({ viewCount: sql`${listings.viewCount} + 1` }).where(eq(listings.id, input.id));
       return { ...listing, images, seller };
     }),
+    sellerListings: publicProcedure
+      .input(z.object({ sellerId: z.number(), excludeId: z.number().optional(), limit: z.number().default(6) }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) {
+          return mockListings
+            .filter(item => item.status === "active" && item.userId === input.sellerId)
+            .filter(item => !input.excludeId || item.id !== input.excludeId)
+            .slice(0, input.limit);
+        }
+
+        const conditions = [eq(listings.status, "active"), eq(listings.userId, input.sellerId)];
+        if (input.excludeId) conditions.push(sql`${listings.id} <> ${input.excludeId}` as any);
+
+        const items = await db
+          .select()
+          .from(listings)
+          .where(and(...conditions))
+          .orderBy(desc(listings.isBoosted), desc(listings.createdAt))
+          .limit(input.limit);
+
+        return attachImagesToListings(db, items);
+      }),
+    relatedListings: publicProcedure
+      .input(
+        z.object({
+          listingId: z.number(),
+          categoryId: z.number(),
+          subcategory: z.string().optional(),
+          cityId: z.number().optional(),
+          limit: z.number().default(8),
+        })
+      )
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) {
+          const related = mockListings
+            .filter(item => item.status === "active" && item.id !== input.listingId)
+            .filter(item => item.categoryId === input.categoryId)
+            .filter(item => !input.subcategory || ("subcategory" in item ? item.subcategory === input.subcategory : false))
+            .filter(item => !input.cityId || item.cityId === input.cityId);
+
+          if (related.length > 0) {
+            return related.slice(0, input.limit);
+          }
+
+          return mockListings
+            .filter(item => item.status === "active" && item.id !== input.listingId && item.categoryId === input.categoryId)
+            .slice(0, input.limit);
+        }
+
+        const strictConditions = [
+          eq(listings.status, "active"),
+          eq(listings.categoryId, input.categoryId),
+          sql`${listings.id} <> ${input.listingId}` as any,
+        ];
+
+        if (input.subcategory) strictConditions.push(eq(listings.subcategory, input.subcategory));
+        if (input.cityId) strictConditions.push(eq(listings.cityId, input.cityId));
+
+        let items = await db
+          .select()
+          .from(listings)
+          .where(and(...strictConditions))
+          .orderBy(desc(listings.isBoosted), desc(listings.createdAt))
+          .limit(input.limit);
+
+        if (items.length === 0) {
+          items = await db
+            .select()
+            .from(listings)
+            .where(
+              and(
+                eq(listings.status, "active"),
+                eq(listings.categoryId, input.categoryId),
+                sql`${listings.id} <> ${input.listingId}` as any
+              )
+            )
+            .orderBy(desc(listings.isBoosted), desc(listings.createdAt))
+            .limit(input.limit);
+        }
+
+        return attachImagesToListings(db, items);
+      }),
     listingsByCategory: publicProcedure.input(z.object({ categorySlug: z.string(), limit: z.number().default(12) })).query(async ({ input }) => {
       const db = await getDb();
       if (!db) {

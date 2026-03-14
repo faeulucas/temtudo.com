@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link } from "wouter";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -15,22 +15,45 @@ import {
   Zap,
   Star,
   Flag,
+  Bell,
+  Store,
 } from "lucide-react";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ListingCard from "@/components/ListingCard";
 import { Button } from "@/components/ui/button";
 
 export default function ListingDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { isAuthenticated } = useAuth();
   const [currentImage, setCurrentImage] = useState(0);
+  const [isFollowingSeller, setIsFollowingSeller] = useState(false);
+  const [hasPriceAlert, setHasPriceAlert] = useState(false);
 
   const { data: listing, isLoading } = trpc.public.listingById.useQuery({
     id: Number(id),
   });
+  const { data: sellerListings } = trpc.public.sellerListings.useQuery(
+    {
+      sellerId: listing?.seller?.id ?? 0,
+      excludeId: listing?.id,
+      limit: 4,
+    },
+    { enabled: Boolean(listing?.seller?.id) }
+  );
+  const { data: relatedListings } = trpc.public.relatedListings.useQuery(
+    {
+      listingId: listing?.id ?? 0,
+      categoryId: listing?.categoryId ?? 0,
+      subcategory: "subcategory" in (listing ?? {}) ? listing?.subcategory ?? undefined : undefined,
+      cityId: listing?.cityId ?? undefined,
+      limit: 8,
+    },
+    { enabled: Boolean(listing?.id && listing?.categoryId) }
+  );
   const favMutation = trpc.advertiser.toggleFavorite.useMutation({
     onSuccess: data =>
       toast.success(
@@ -85,6 +108,16 @@ export default function ListingDetailPage() {
       ? sellerCompanyName || listing.seller?.name || "Loja"
       : listing.seller?.name || "Anunciante";
   const sellerInitial = sellerDisplayName.charAt(0)?.toUpperCase() || "?";
+  const sellerStorageKey = listing.seller?.id ? `norte-vivo:follow-seller:${listing.seller.id}` : "";
+  const priceAlertKey = `norte-vivo:price-alert:${listing.id}`;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (sellerStorageKey) {
+      setIsFollowingSeller(window.localStorage.getItem(sellerStorageKey) === "1");
+    }
+    setHasPriceAlert(window.localStorage.getItem(priceAlertKey) === "1");
+  }, [priceAlertKey, sellerStorageKey]);
 
   const formatPrice = () => {
     if (!listing.price || listing.priceType === "free") return "Gratis";
@@ -125,6 +158,36 @@ export default function ListingDetailPage() {
     }
 
     window.open(whatsappShareUrl, "_blank", "noopener,noreferrer");
+  };
+
+  const toggleFollowSeller = () => {
+    if (!isAuthenticated) {
+      toast.info("Faca login para seguir esta loja.");
+      return;
+    }
+    if (!sellerStorageKey || typeof window === "undefined") return;
+
+    const nextValue = !isFollowingSeller;
+    window.localStorage.setItem(sellerStorageKey, nextValue ? "1" : "0");
+    setIsFollowingSeller(nextValue);
+    toast.success(nextValue ? "Loja seguida com sucesso." : "Voce deixou de seguir esta loja.");
+  };
+
+  const togglePriceAlert = () => {
+    if (!isAuthenticated) {
+      toast.info("Faca login para salvar alerta de preco.");
+      return;
+    }
+    if (typeof window === "undefined") return;
+
+    const nextValue = !hasPriceAlert;
+    window.localStorage.setItem(priceAlertKey, nextValue ? "1" : "0");
+    setHasPriceAlert(nextValue);
+    toast.success(
+      nextValue
+        ? "Aviso de queda de preco ativado para este item."
+        : "Aviso de queda de preco removido."
+    );
   };
 
   return (
@@ -383,6 +446,24 @@ export default function ListingDetailPage() {
                   <Share2 className="mr-2 h-5 w-5" />
                   Compartilhar no WhatsApp
                 </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={toggleFollowSeller}
+                  className="w-full rounded-xl border-gray-200 py-6 text-base font-semibold text-gray-800 hover:bg-gray-50"
+                >
+                  <Store className="mr-2 h-5 w-5" />
+                  {isFollowingSeller ? "Seguindo loja" : "Seguir loja"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={togglePriceAlert}
+                  className="w-full rounded-xl border-gray-200 py-6 text-base font-semibold text-gray-800 hover:bg-gray-50"
+                >
+                  <Bell className="mr-2 h-5 w-5" />
+                  {hasPriceAlert ? "Aviso de preco ativo" : "Avisar queda de preco"}
+                </Button>
               </div>
 
               <div className="mt-4 rounded-xl bg-amber-50 p-3">
@@ -398,6 +479,50 @@ export default function ListingDetailPage() {
             </div>
           </div>
         </div>
+
+        {(sellerListings?.length || relatedListings?.length) && (
+          <div className="mt-8 space-y-8">
+            {sellerListings && sellerListings.length > 0 && (
+              <section>
+                <div className="mb-4 flex items-center justify-between">
+                  <div>
+                    <h2 className="font-display text-2xl font-bold text-gray-900">
+                      Mais da mesma loja
+                    </h2>
+                    <p className="text-sm text-gray-500">
+                      Outros itens publicados por {sellerDisplayName}.
+                    </p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                  {sellerListings.map(item => (
+                    <ListingCard key={item.id} {...item} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {relatedListings && relatedListings.length > 0 && (
+              <section>
+                <div className="mb-4 flex items-center justify-between">
+                  <div>
+                    <h2 className="font-display text-2xl font-bold text-gray-900">
+                      Anuncios parecidos
+                    </h2>
+                    <p className="text-sm text-gray-500">
+                      Itens da mesma categoria para comparar melhor antes de falar com o anunciante.
+                    </p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                  {relatedListings.map(item => (
+                    <ListingCard key={item.id} {...item} />
+                  ))}
+                </div>
+              </section>
+            )}
+          </div>
+        )}
       </div>
 
       <Footer />

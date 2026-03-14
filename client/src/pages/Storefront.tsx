@@ -290,7 +290,7 @@ export default function StorefrontPage() {
 
           {activeTab === "inicio" && (
             <div className="grid gap-4 lg:grid-cols-[0.28fr_0.72fr]">
-              <aside className="rounded-[24px] bg-white p-5 shadow-sm">
+              <aside className="hidden rounded-[24px] bg-white p-5 shadow-sm lg:block">
                 <div className="mb-4 flex items-center gap-2">
                   <Filter className="h-4 w-4 text-blue-600" />
                   <p className="font-semibold text-gray-900">Categoria</p>

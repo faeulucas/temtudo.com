@@ -14,7 +14,6 @@ import {
   Briefcase,
   Building2,
   Car,
-  CircleUserRound,
   HeartHandshake,
   Home as HomeIcon,
   LayoutGrid,
@@ -809,7 +808,7 @@ export default function Home() {
           <Link
             href="/"
             className={`flex flex-col items-center gap-1 px-2 py-1 text-xs font-medium ${
-              location === "/" ? "text-violet-600" : "text-slate-700"
+              location === "/" ? "text-orange-500" : "text-slate-700"
             }`}
           >
             <HomeIcon className="h-5 w-5" />
@@ -819,7 +818,7 @@ export default function Home() {
             type="button"
             onClick={() => navigate("/busca")}
             className={`flex flex-col items-center gap-1 px-2 py-1 text-xs font-medium ${
-              location.startsWith("/busca") ? "text-violet-600" : "text-slate-700"
+              location.startsWith("/busca") ? "text-orange-500" : "text-slate-700"
             }`}
           >
             <Search className="h-5 w-5" />
@@ -829,7 +828,7 @@ export default function Home() {
             href={isAuthenticated ? "/anunciante/novo" : LOGIN_ROUTE}
             className={`flex flex-col items-center gap-1 px-2 py-1 text-xs font-medium ${
               location.startsWith("/anunciante/novo") || location.startsWith("/anunciar")
-                ? "text-violet-600"
+                ? "text-orange-500"
                 : "text-slate-700"
             }`}
           >
@@ -840,7 +839,7 @@ export default function Home() {
             href={isAuthenticated ? "/anunciante" : LOGIN_ROUTE}
             className={`flex flex-col items-center gap-1 px-2 py-1 text-xs font-medium ${
               location.startsWith("/anunciante") || location.startsWith("/entrar")
-                ? "text-violet-600"
+                ? "text-orange-500"
                 : "text-slate-700"
             }`}
           >
@@ -851,7 +850,7 @@ export default function Home() {
             type="button"
             onClick={() => setMobileMenuOpen(current => !current)}
             className={`flex flex-col items-center gap-1 px-2 py-1 text-xs font-medium ${
-              mobileMenuOpen ? "text-violet-600" : "text-slate-700"
+              mobileMenuOpen ? "text-orange-500" : "text-slate-700"
             }`}
           >
             <Menu className="h-5 w-5" />

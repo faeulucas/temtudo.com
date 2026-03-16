@@ -231,11 +231,15 @@ export default function Header({
 
         <div className="space-y-3 py-3 xl:hidden">
           <div className="flex items-center gap-3">
-            <Link href="/" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl">
-              <div className="font-display text-3xl font-black tracking-tight">
-                <span className="text-violet-600">o</span>
-                <span className="text-indigo-500">l</span>
-                <span className="text-amber-500">x</span>
+            <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-gradient shadow-md">
+                <Zap className="h-5 w-5 text-white" />
+              </div>
+              <div className="min-w-0">
+                <p className="font-display text-lg font-black leading-none text-gray-900">
+                  Norte
+                  <span style={{ color: "oklch(0.68 0.19 45)" }}>Vivo</span>
+                </p>
               </div>
             </Link>
 

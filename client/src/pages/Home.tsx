@@ -265,7 +265,7 @@ export default function Home() {
                   })}
                 </div>
 
-                <div className="mt-4 grid grid-cols-2 gap-3 lg:hidden">
+                <div className="mt-4 hidden grid-cols-2 gap-3 lg:hidden">
                   <div className="rounded-[22px] bg-white/10 p-4 backdrop-blur-sm">
                     <p className="text-2xl font-black text-white">
                       {featuredListings.length || recentListings.length}

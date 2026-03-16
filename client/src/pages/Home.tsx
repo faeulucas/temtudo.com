@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -7,98 +7,28 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ListingCard from "@/components/ListingCard";
 import { Button } from "@/components/ui/button";
-import { CASHBACK_RULES } from "@/lib/cashback";
 import {
-  Carousel,
-  CarouselApi,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
-import {
-  Utensils,
-  ShoppingBag,
-  ShoppingCart,
-  Shirt,
-  Home as HomeIcon,
-  Hammer,
-  Car,
-  Building2,
-  MessageCircle,
-  Briefcase,
-  HardHat,
-  Heart,
-  PawPrint,
-  Tractor,
-  Smartphone,
-  Users,
-  Calendar,
-  Tag,
-  Wrench,
-  Cross,
-  Zap,
+  Ambulance,
   ArrowRight,
-  Star,
-  TrendingUp,
-  Shield,
-  CheckCircle,
-  ChevronRight,
-  MapPin,
   BadgeCheck,
-  BarChart3,
-  Store as StoreIcon,
-  Globe,
-  SearchCheck,
-} from "lucide-react";
-
-const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
-  Utensils,
+  Briefcase,
+  Building2,
+  Car,
+  CircleUserRound,
+  Cross,
+  HeartHandshake,
+  Home as HomeIcon,
+  LayoutGrid,
+  MapPin,
+  Search,
+  Shield,
   ShoppingBag,
   ShoppingCart,
-  Shirt,
-  HomeIcon,
-  Hammer,
-  Car,
-  Building2,
-  Briefcase,
-  HardHat,
-  Heart,
-  PawPrint,
-  Tractor,
-  Smartphone,
-  Users,
-  Calendar,
-  Tag,
+  Store,
+  Stethoscope,
   Wrench,
-  Cross,
   Zap,
-  Shield,
-  MapPin,
-};
-
-const CATEGORY_COLORS: Record<string, string> = {
-  delivery: "bg-orange-50 text-orange-600 hover:bg-orange-100",
-  mercados: "bg-emerald-50 text-emerald-600 hover:bg-emerald-100",
-  farmacia: "bg-blue-50 text-blue-600 hover:bg-blue-100",
-  "moda-acessorios": "bg-pink-50 text-pink-600 hover:bg-pink-100",
-  "casa-moveis": "bg-purple-50 text-purple-600 hover:bg-purple-100",
-  construcao: "bg-amber-50 text-amber-600 hover:bg-amber-100",
-  autopecas: "bg-gray-50 text-gray-600 hover:bg-gray-100",
-  veiculos: "bg-blue-50 text-blue-700 hover:bg-blue-100",
-  imoveis: "bg-teal-50 text-teal-600 hover:bg-teal-100",
-  "servicos-gerais": "bg-violet-50 text-violet-600 hover:bg-violet-100",
-  "mao-de-obra": "bg-yellow-50 text-yellow-700 hover:bg-yellow-100",
-  "saude-beleza": "bg-rose-50 text-rose-600 hover:bg-rose-100",
-  pets: "bg-green-50 text-green-600 hover:bg-green-100",
-  "agro-rural": "bg-lime-50 text-lime-700 hover:bg-lime-100",
-  eletronicos: "bg-cyan-50 text-cyan-600 hover:bg-cyan-100",
-  empregos: "bg-indigo-50 text-indigo-600 hover:bg-indigo-100",
-  eventos: "bg-fuchsia-50 text-fuchsia-600 hover:bg-fuchsia-100",
-  classificados: "bg-slate-50 text-slate-600 hover:bg-slate-100",
-  saude: "bg-emerald-50 text-emerald-700 hover:bg-emerald-100",
-  educacao: "bg-orange-50 text-orange-700 hover:bg-orange-100",
-  seguranca: "bg-blue-50 text-blue-700 hover:bg-blue-100",
-  "utilidade-publica": "bg-teal-50 text-teal-700 hover:bg-teal-100",
-};
+} from "lucide-react";
 
 type HomeHighlightListing = {
   id: number;
@@ -108,6 +38,7 @@ type HomeHighlightListing = {
   categoryId?: number | null;
   subcategory?: string | null;
   whatsapp?: string | null;
+  price?: string | null;
   images?: { url: string; isPrimary?: boolean | null }[];
   seller?: {
     id?: number;
@@ -118,16 +49,117 @@ type HomeHighlightListing = {
   } | null;
 };
 
+const GUIDE_SHORTCUTS = [
+  {
+    title: "Saude",
+    description: "Hospitais, clinicas e farmacias",
+    href: "/busca?q=saude",
+    icon: Stethoscope,
+    tone: "bg-emerald-50 text-emerald-700",
+  },
+  {
+    title: "Educacao",
+    description: "Escolas, cursos e faculdades",
+    href: "/busca?q=educacao",
+    icon: Briefcase,
+    tone: "bg-orange-50 text-orange-700",
+  },
+  {
+    title: "Seguranca",
+    description: "Policia, apoio e servicos uteis",
+    href: "/busca?q=seguranca",
+    icon: Shield,
+    tone: "bg-blue-50 text-blue-700",
+  },
+  {
+    title: "Emergencias",
+    description: "Atalhos para urgencias da cidade",
+    href: "/busca?q=emergencia",
+    icon: Ambulance,
+    tone: "bg-rose-50 text-rose-700",
+  },
+  {
+    title: "Oficinas",
+    description: "Mecanicos, eletricistas e reparos",
+    href: "/busca?q=oficina",
+    icon: Wrench,
+    tone: "bg-amber-50 text-amber-700",
+  },
+  {
+    title: "Servicos",
+    description: "Prestadores e negocios locais",
+    href: "/busca?q=servicos",
+    icon: HeartHandshake,
+    tone: "bg-violet-50 text-violet-700",
+  },
+];
+
+const MAIN_SHORTCUTS = [
+  {
+    label: "Guia Local",
+    description: "Servicos e contatos da sua cidade",
+    href: "#guia-local",
+    icon: MapPin,
+    tone: "bg-white text-slate-900",
+  },
+  {
+    label: "Marketplace",
+    description: "Produtos, servicos e oportunidades",
+    href: "#marketplace",
+    icon: ShoppingCart,
+    tone: "bg-orange-500 text-white",
+  },
+  {
+    label: "Lojas e Empresas",
+    description: "Negocios locais em destaque",
+    href: "#lojas-empresas",
+    icon: Store,
+    tone: "bg-slate-900 text-white",
+  },
+];
+
+const PRIMARY_CATEGORIES = [
+  {
+    title: "Imoveis",
+    query: "imoveis",
+    icon: HomeIcon,
+    tone: "from-teal-500 to-cyan-500",
+  },
+  {
+    title: "Veiculos",
+    query: "veiculos",
+    icon: Car,
+    tone: "from-blue-600 to-indigo-500",
+  },
+  {
+    title: "Delivery",
+    query: "delivery",
+    icon: ShoppingBag,
+    tone: "from-orange-500 to-amber-500",
+  },
+  {
+    title: "Servicos Gerais",
+    query: "servicos",
+    icon: Wrench,
+    tone: "from-violet-500 to-fuchsia-500",
+  },
+];
+
+function formatPrice(price?: string | null) {
+  if (!price) return "Sob consulta";
+  const value = Number(price);
+  if (Number.isNaN(value)) return "Sob consulta";
+  return `R$ ${value.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
+}
+
 export default function Home() {
   const { isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
   const [selectedCity, setSelectedCity] = useState<number | null>(null);
-  const [categoryCarouselApi, setCategoryCarouselApi] = useState<CarouselApi>();
-  const [cashbackCarouselApi, setCashbackCarouselApi] = useState<CarouselApi>();
 
   const { data: categories } = trpc.public.categories.useQuery();
   const { data: topCategories } = trpc.public.topCategories.useQuery({
-    limit: 10,
+    limit: 8,
   });
   const { data: cities } = trpc.public.cities.useQuery();
   const { data: featured } = trpc.public.featuredListings.useQuery({
@@ -143,866 +175,549 @@ export default function Home() {
     limit: 6,
   });
 
-  const handleSearch = (q: string) => {
-    navigate(`/busca?q=${encodeURIComponent(q)}&city=${selectedCity || ""}`);
+  const cityName = cities?.find(city => city.id === selectedCity)?.name;
+  const topCategoryList = topCategories?.length ? topCategories : categories?.slice(0, 8);
+  const featuredListings = featured ?? [];
+  const recentListings = recent ?? [];
+
+  const companyHighlights = useMemo(
+    () =>
+      (featuredListings.length ? featuredListings : recentListings)
+        .reduce<HomeHighlightListing[]>((acc, item) => {
+          const key = (
+            item.seller?.companyName ||
+            item.seller?.name ||
+            item.title
+          )
+            .trim()
+            .toLowerCase();
+          if (!acc.some(existing => {
+            const existingKey = (
+              existing.seller?.companyName ||
+              existing.seller?.name ||
+              existing.title
+            )
+              .trim()
+              .toLowerCase();
+            return existingKey === key;
+          })) {
+            acc.push(item as HomeHighlightListing);
+          }
+          return acc;
+        }, [])
+        .slice(0, 8),
+    [featuredListings, recentListings]
+  );
+
+  const handleSearch = (query: string) => {
+    navigate(`/busca?q=${encodeURIComponent(query)}&city=${selectedCity || ""}`);
   };
 
-  const cityName = cities?.find(c => c.id === selectedCity)?.name;
-  const featuredCategories = topCategories?.length
-    ? topCategories
-    : categories?.slice(0, 10);
-  const companySource = (
-    featured?.length ? featured : (recent ?? [])
-  ) as HomeHighlightListing[];
-  const companyHighlights = companySource
-    .slice(0, 12)
-    .reduce<HomeHighlightListing[]>((acc, item) => {
-      const displayName = item.seller?.name?.trim() || item.title.trim();
-      const alreadyIncluded = acc.some(
-        existing =>
-          (
-            existing.seller?.name?.trim() || existing.title.trim()
-          ).toLowerCase() === displayName.toLowerCase()
-      );
-
-      if (!alreadyIncluded) {
-        acc.push(item);
-      }
-
-      return acc;
-    }, [])
-    .slice(0, 3);
-  const quickLinks = [
-    {
-      label: "Guia local",
-      description: "Ache lojas e servicos por perto",
-      href: "/busca",
-      icon: MapPin,
-    },
-    {
-      label: "Compra e venda",
-      description: "Anuncie e publique seus produtos",
-      href: isAuthenticated ? "/anunciante/novo" : LOGIN_ROUTE,
-      icon: ShoppingCart,
-    },
-    {
-      label: "Vitrine digital",
-      description: "Descubra vitrines e ofertas locais",
-      href: "/busca?q=lojas",
-      icon: ShoppingBag,
-    },
-    {
-      label: "Perfil da loja",
-      description: "Veja contatos e perfis comerciais",
-      href: "/busca?q=perfil%20de%20loja",
-      icon: Building2,
-    },
-  ];
-
-  useEffect(() => {
-    if (!categoryCarouselApi || !featuredCategories?.length) return;
-
-    const timer = window.setInterval(() => {
-      if (categoryCarouselApi.canScrollNext()) {
-        categoryCarouselApi.scrollNext();
-        return;
-      }
-
-      categoryCarouselApi.scrollTo(0);
-    }, 3500);
-
-    return () => window.clearInterval(timer);
-  }, [categoryCarouselApi, featuredCategories]);
-
-  useEffect(() => {
-    if (!cashbackCarouselApi) return;
-
-    const timer = window.setInterval(() => {
-      if (cashbackCarouselApi.canScrollNext()) {
-        cashbackCarouselApi.scrollNext();
-        return;
-      }
-
-      cashbackCarouselApi.scrollTo(0);
-    }, 3200);
-
-    return () => window.clearInterval(timer);
-  }, [cashbackCarouselApi]);
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[linear-gradient(180deg,#fff8ef_0%,#f8fafc_32%,#f8fafc_100%)]">
       <Header
         selectedCity={selectedCity}
         onCityChange={setSelectedCity}
         onSearch={handleSearch}
       />
-      <section className="container pt-8 pb-4">
-        <div className="overflow-hidden rounded-[28px] bg-brand-gradient p-6 text-white shadow-sm sm:p-8">
-          <div className="mx-auto max-w-5xl text-center">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/12 px-4 py-2 text-sm font-semibold text-white">
-              <MapPin className="h-4 w-4" />
-              Portal local do Norte Pioneiro
-            </div>
-            <h1 className="font-display text-3xl font-black text-white sm:text-4xl">
-              O portal local para encontrar e ser encontrado
-            </h1>
-            <p className="mx-auto mt-3 max-w-3xl text-blue-50/90">
-              Descubra lojas, produtos, servicos e oportunidades da sua
-              regiao. No Norte Vivo, cada negocio pode ter perfil, vitrine
-              publica e mais chances de aparecer para novos clientes.
-            </p>
-            <div className="mx-auto mt-6 hidden max-w-5xl grid-cols-2 gap-3 sm:grid sm:grid-cols-2 lg:grid-cols-4">
-              {quickLinks.map(item => {
-                const Icon = item.icon;
 
-                return (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    className="group rounded-[20px] bg-orange-gradient px-4 py-3 text-white shadow-lg transition-all hover:-translate-y-0.5 hover:opacity-95 sm:rounded-[22px] sm:px-4 sm:py-4"
-                  >
-                    <div className="flex flex-col items-center text-center">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/20 text-white shadow-sm sm:h-11 sm:w-11">
-                        <Icon className="h-4 w-4" />
-                      </div>
-                      <p className="mt-2 text-base font-semibold text-white sm:mt-3 sm:text-base">
-                        {item.label}
-                      </p>
-                      <p className="mt-1 hidden text-sm leading-snug text-orange-50/90 sm:block">
-                        {item.description}
-                      </p>
-                      <div className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-white sm:mt-3">
-                        Acessar
-                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-            <div className="mt-6 sm:hidden">
-              <Carousel
-                opts={{ align: "start", loop: true }}
-                setApi={setCategoryCarouselApi}
-              >
-                <CarouselContent className="-ml-3">
-                  {(featuredCategories ?? categories ?? []).map(category => {
-                    const Icon =
-                      ICON_MAP[category.icon || "Tag"] ?? ShoppingBag;
-                    const colorClass =
-                      CATEGORY_COLORS[category.slug] ??
-                      "bg-white text-blue-700 hover:bg-blue-50";
+      <main className="pb-24 md:pb-0">
+        <section className="container pt-6 pb-4">
+          <div className="overflow-hidden rounded-[32px] bg-[linear-gradient(135deg,#0f172a_0%,#1d4ed8_45%,#f97316_120%)] px-5 py-8 text-white shadow-[0_20px_70px_rgba(15,23,42,0.18)] sm:px-8 sm:py-10">
+            <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full bg-white/12 px-4 py-2 text-sm font-semibold text-white">
+                  <BadgeCheck className="h-4 w-4" />
+                  Marketplace + Guia Local + Lojas e Empresas
+                </div>
+                <h1 className="mt-4 font-display text-4xl font-black leading-tight text-white sm:text-5xl">
+                  O shopping da cidade e os servicos locais em um so lugar.
+                </h1>
+                <p className="mt-4 max-w-2xl text-base leading-7 text-blue-50/90 sm:text-lg">
+                  Encontre produtos, negocios e servicos reais do Norte
+                  Pioneiro logo na primeira busca.
+                </p>
 
+                <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                  {MAIN_SHORTCUTS.map(item => {
+                    const Icon = item.icon;
                     return (
-                      <CarouselItem
-                        key={category.id}
-                        className="basis-[72%] pl-3"
+                      <a
+                        key={item.label}
+                        href={item.href}
+                        className={`rounded-[24px] px-4 py-4 shadow-lg transition-transform hover:-translate-y-0.5 ${item.tone}`}
                       >
-                        <Link
-                          href={`/categoria/${category.slug}`}
-                          className="block rounded-[24px] bg-white/12 p-4 text-left text-white backdrop-blur-sm"
-                        >
-                          <div
-                            className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white ${colorClass}`}
-                          >
+                        <div className="flex items-center gap-3">
+                          <div className="rounded-2xl bg-black/10 p-3">
                             <Icon className="h-5 w-5" />
                           </div>
-                          <p className="mt-4 text-xl font-bold text-white">
-                            {category.name}
-                          </p>
-                          <p className="mt-2 text-sm text-blue-50/90">
-                            Explore vitrines, produtos e servicos desta
-                            categoria.
-                          </p>
-                          <div className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-white">
-                            Ver categoria
-                            <ArrowRight className="h-4 w-4" />
+                          <div>
+                            <p className="font-semibold">{item.label}</p>
+                            <p className="text-sm opacity-80">
+                              {item.description}
+                            </p>
                           </div>
-                        </Link>
-                      </CarouselItem>
+                        </div>
+                      </a>
                     );
                   })}
-                </CarouselContent>
-              </Carousel>
+                </div>
+              </div>
+
+              <div className="rounded-[28px] border border-white/10 bg-white/10 p-5 backdrop-blur-md">
+                <div className="flex items-center gap-3">
+                  <div className="rounded-2xl bg-white/15 p-3">
+                    <Search className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-100">
+                      Busca global
+                    </p>
+                    <p className="text-sm text-blue-50/85">
+                      Produtos, servicos e negocios da regiao
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-5 space-y-3">
+                  {[
+                    "Buscar produtos em oferta",
+                    "Encontrar servicos locais",
+                    "Explorar lojas e empresas",
+                  ].map(suggestion => (
+                    <button
+                      key={suggestion}
+                      type="button"
+                      onClick={() => handleSearch(suggestion)}
+                      className="flex w-full items-center justify-between rounded-2xl bg-white px-4 py-3 text-left text-slate-800 transition hover:bg-orange-50"
+                    >
+                      <span className="font-medium">{suggestion}</span>
+                      <ArrowRight className="h-4 w-4 text-orange-500" />
+                    </button>
+                  ))}
+                </div>
+
+                <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-2xl bg-white/10 p-4">
+                    <p className="text-2xl font-black text-white">
+                      {featuredListings.length || recentListings.length}
+                    </p>
+                    <p className="text-sm text-blue-100">Anuncios em destaque</p>
+                  </div>
+                  <div className="rounded-2xl bg-white/10 p-4">
+                    <p className="text-2xl font-black text-white">
+                      {companyHighlights.length}
+                    </p>
+                    <p className="text-sm text-blue-100">Lojas e empresas visiveis</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="container py-8">
-        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="min-w-0">
-            <h2 className="section-heading">Empresas em destaque</h2>
-            <p className="text-sm text-gray-500">
-              Descubra lojas da regiao que ja usam o portal para mostrar sua
-              marca, seus produtos e seus contatos.
-            </p>
+        <section id="guia-local" className="container py-8">
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-orange-600">
+                Guia local
+              </p>
+              <h2 className="font-display text-3xl font-black text-slate-900">
+                Servicos locais que resolvem o dia a dia
+              </h2>
+              <p className="mt-2 text-sm text-slate-500">
+                Atalhos rapidos para o que a cidade mais precisa.
+              </p>
+            </div>
+            <Link href="/busca?q=servicos">
+              <Button variant="outline" className="rounded-2xl">
+                Ver todos os servicos
+              </Button>
+            </Link>
           </div>
-          <Link
-            href={isAuthenticated ? "/anunciante/novo" : LOGIN_ROUTE}
-            className="text-sm font-medium text-orange-600 hover:underline sm:shrink-0"
-          >
-            Cadastrar empresa
-          </Link>
-        </div>
 
-        {companyHighlights.length > 0 ? (
-          <div className="grid gap-4 md:grid-cols-3">
-            {companyHighlights.map(item => {
-              const cover =
-                (item.seller?.bannerUrl ||
-                  item.images?.find(image => image.isPrimary)?.url) ??
-                item.images?.[0]?.url;
-              const displayName =
-                item.seller?.companyName?.trim() ||
-                item.seller?.name?.trim() ||
-                item.title;
-              const subtitle =
-                categories?.find(category => category.id === item.categoryId)
-                  ?.name ||
-                item.subcategory ||
-                "Negocio local";
-              const whatsappHref = item.whatsapp
-                ? `https://wa.me/55${item.whatsapp.replace(/\D/g, "")}`
-                : null;
-
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {GUIDE_SHORTCUTS.map(item => {
+              const Icon = item.icon;
               return (
-                <article
-                  key={item.id}
-                  className="overflow-hidden rounded-[24px] border border-gray-100 bg-white shadow-sm"
+                <Link
+                  key={item.title}
+                  href={item.href}
+                  className="group rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-orange-200 hover:bg-orange-50/40"
                 >
-                  <Link href={`/anuncio/${item.id}`} className="block">
-                    <div className="relative h-36 overflow-hidden bg-gray-100">
-                      {cover ? (
-                        <img
-                          src={cover}
-                          alt={displayName}
-                          className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200">
-                          <span className="font-display text-3xl font-black text-blue-700">
-                            {displayName.charAt(0).toUpperCase()}
-                          </span>
-                        </div>
-                        )}
-                      </div>
-                  </Link>
+                  <div className={`inline-flex rounded-2xl p-3 ${item.tone}`}>
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="mt-4 font-display text-2xl font-bold text-slate-900">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-500">
+                    {item.description}
+                  </p>
+                  <div className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-orange-600">
+                    Explorar
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
 
-                  <div className="relative px-5 pb-5">
-                    <div className="-mt-7 flex justify-center">
-                      <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border-4 border-white bg-white text-lg font-black text-blue-700 shadow-md">
-                        {item.seller?.avatar ? (
+        <section id="lojas-empresas" className="container py-8">
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-600">
+                Lojas e empresas
+              </p>
+              <h2 className="font-display text-3xl font-black text-slate-900">
+                Negocios locais em destaque
+              </h2>
+              <p className="mt-2 text-sm text-slate-500">
+                Parceiros, negocios ativos e empresas com presenca no portal.
+              </p>
+            </div>
+            <Link href="/busca?q=lojas">
+              <Button variant="outline" className="rounded-2xl">
+                Buscar lojas
+              </Button>
+            </Link>
+          </div>
+
+          {companyHighlights.length > 0 ? (
+            <div className="flex gap-4 overflow-x-auto pb-2">
+              {companyHighlights.map(item => {
+                const cover =
+                  item.seller?.bannerUrl ||
+                  item.images?.find(image => image.isPrimary)?.url ||
+                  item.images?.[0]?.url;
+                const displayName =
+                  item.seller?.companyName?.trim() ||
+                  item.seller?.name?.trim() ||
+                  item.title;
+                const subtitle =
+                  categories?.find(category => category.id === item.categoryId)?.name ||
+                  item.subcategory ||
+                  "Negocio local";
+                return (
+                  <article
+                    key={item.id}
+                    className="min-w-[280px] max-w-[320px] flex-1 overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm"
+                  >
+                    <Link href={`/anuncio/${item.id}`} className="block">
+                      <div className="relative h-40 bg-slate-100">
+                        {cover ? (
                           <img
-                            src={item.seller.avatar}
+                            src={cover}
                             alt={displayName}
                             className="h-full w-full object-cover"
                           />
                         ) : (
-                          displayName.charAt(0).toUpperCase()
+                          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-100 to-orange-100">
+                            <span className="font-display text-4xl font-black text-slate-700">
+                              {displayName.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
                         )}
                       </div>
-                    </div>
-
-                    <div className="mt-3 text-center">
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-400">
-                        Destaque local
-                      </p>
-                      <h3 className="mt-2 font-display text-lg font-bold text-gray-900">
-                        {displayName}
-                      </h3>
-                      <p className="mt-1 text-sm text-gray-500">{subtitle}</p>
-                      <p className="mt-1 text-xs text-gray-400">
+                    </Link>
+                    <div className="p-5">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-slate-100 text-lg font-black text-blue-700">
+                          {item.seller?.avatar ? (
+                            <img
+                              src={item.seller.avatar}
+                              alt={displayName}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            displayName.charAt(0).toUpperCase()
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="truncate font-display text-xl font-bold text-slate-900">
+                            {displayName}
+                          </p>
+                          <p className="truncate text-sm text-slate-500">
+                            {subtitle}
+                          </p>
+                        </div>
+                      </div>
+                      <p className="mt-4 text-sm text-slate-500">
                         {cities?.find(city => city.id === item.cityId)?.name ||
                           "Norte Pioneiro"}
                       </p>
                     </div>
+                  </article>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="rounded-[28px] border border-dashed border-slate-200 bg-white p-10 text-center">
+              <Building2 className="mx-auto h-12 w-12 text-slate-300" />
+              <p className="mt-4 text-slate-500">
+                As primeiras lojas e empresas aparecerao aqui.
+              </p>
+            </div>
+          )}
+        </section>
 
-                    <div className="mt-4 flex items-center justify-center gap-2">
-                      <Link href={`/anuncio/${item.id}`}>
-                        <Button
-                          size="sm"
-                          className="rounded-xl bg-brand-gradient text-white hover:opacity-90"
-                        >
-                          Ver anuncio
-                        </Button>
-                      </Link>
-                      {whatsappHref && (
-                        <a
-                          href={whatsappHref}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <Button
-                            size="sm"
-                            className="rounded-xl bg-green-500 text-white hover:bg-green-600"
-                          >
-                            <MessageCircle className="mr-1 h-4 w-4" />
-                            WhatsApp
-                          </Button>
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="rounded-[24px] border border-dashed border-gray-200 bg-white p-10 text-center">
-            <Building2 className="mx-auto h-10 w-10 text-blue-200" />
-            <h3 className="mt-4 font-display text-xl font-bold text-gray-900">
-              Sua empresa pode aparecer aqui
-            </h3>
-            <p className="mt-2 text-sm text-gray-500">
-              Publique seus produtos, divulgue sua empresa e entre para os
-              destaques do portal local.
-            </p>
-            <Link href={isAuthenticated ? "/anunciante/novo" : LOGIN_ROUTE}>
-              <Button className="mt-5 rounded-2xl bg-orange-gradient text-white hover:opacity-90">
-                Publicar agora
+        <section id="marketplace" className="container py-8">
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-orange-600">
+                Booster
+              </p>
+              <h2 className="font-display text-3xl font-black text-slate-900">
+                Anuncios em destaque
+              </h2>
+              <p className="mt-2 text-sm text-slate-500">
+                Produtos e servicos reais para o usuario ver logo de cara.
+              </p>
+            </div>
+            <Link href="/busca">
+              <Button variant="outline" className="rounded-2xl">
+                Explorar marketplace
               </Button>
             </Link>
           </div>
-        )}
-      </section>
 
-      <section className="container pb-4">
-        <div className="grid gap-4 md:grid-cols-3">
-          {[
-            {
-              icon: SearchCheck,
-              title: "Encontre perto de voce",
-              desc: "Ache o que voce precisa na sua cidade sem depender de varios sites diferentes.",
-            },
-            {
-              icon: StoreIcon,
-              title: "Cada loja com sua vitrine",
-              desc: "Cada negocio pode mostrar banner, produtos, contatos e informacoes em um perfil publico.",
-            },
-            {
-              icon: Globe,
-              title: "Presenca digital regional",
-              desc: "Uma forma simples de sua empresa aparecer no portal e ser descoberta por novos clientes.",
-            },
-          ].map(item => {
-            const IconComp = item.icon;
-            return (
-              <article
-                key={item.title}
-                className="rounded-[24px] border border-gray-100 bg-white p-5 shadow-sm"
-              >
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
-                  <IconComp className="h-5 w-5" />
-                </div>
-                <h3 className="mt-4 font-display text-xl font-bold text-gray-900">
-                  {item.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-gray-600">
-                  {item.desc}
-                </p>
-              </article>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="container py-12">
-        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="min-w-0">
-            <h2 className="section-heading">
-              Categorias que movimentam o portal
-            </h2>
-            <p className="text-sm text-gray-500">
-              Explore os segmentos que mais fazem parte da rotina da regiao e
-              descubra novas vitrines locais.
-            </p>
-          </div>
-          <Link
-            href="/como-funciona"
-            className="text-sm font-medium text-emerald-600 hover:underline sm:shrink-0"
-          >
-            Como funciona
-          </Link>
-        </div>
-
-        <div className="hidden gap-4 md:grid md:grid-cols-2 xl:grid-cols-4">
-          {CASHBACK_RULES.slice(0, 4).map(rule => (
-            <article
-              key={rule.slug}
-              className="rounded-[24px] border border-emerald-100 bg-emerald-50 p-5 shadow-sm"
-            >
-              <div className="mb-3 inline-flex rounded-full bg-white px-3 py-1 text-xs font-black text-emerald-700">
-                ate {rule.rate}% de cashback
-              </div>
-              <h3 className="font-display text-xl font-bold text-gray-900">
-                {rule.label}
-              </h3>
-              <p className="mt-2 text-sm text-gray-600">{rule.description}</p>
-            </article>
-          ))}
-        </div>
-
-        <div className="md:hidden">
-          <Carousel opts={{ align: "start", loop: true }} setApi={setCashbackCarouselApi}>
-            <CarouselContent className="-ml-2">
-              {CASHBACK_RULES.slice(0, 4).map(rule => (
-                <CarouselItem key={rule.slug} className="basis-[88%] pl-2">
-                  <article className="min-h-[180px] rounded-[24px] border border-emerald-100 bg-emerald-50 p-5 shadow-sm">
-                    <div className="mb-3 inline-flex rounded-full bg-white px-3 py-1 text-xs font-black text-emerald-700">
-                      ate {rule.rate}% de cashback
+          {featuredListings.length > 0 ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              {featuredListings.map(listing => (
+                <div
+                  key={listing.id}
+                  className="overflow-hidden rounded-[28px] border border-amber-200 bg-white shadow-sm ring-1 ring-amber-100"
+                >
+                  <div className="flex items-center justify-between bg-amber-50 px-4 py-3">
+                    <div className="inline-flex items-center gap-1 rounded-full bg-amber-400 px-3 py-1 text-xs font-black text-white">
+                      <Zap className="h-3.5 w-3.5" />
+                      BOOSTER
                     </div>
-                    <h3 className="font-display text-xl font-bold text-gray-900">
-                      {rule.label}
-                    </h3>
-                    <p className="mt-2 text-sm text-gray-600">
-                      {rule.description}
-                    </p>
-                  </article>
-                </CarouselItem>
+                    <span className="text-xs font-semibold text-amber-700">
+                      Destaque local
+                    </span>
+                  </div>
+                  <ListingCard
+                    {...listing}
+                    cityName={cities?.find(city => city.id === listing.cityId)?.name}
+                    categoryName={
+                      categories?.find(category => category.id === listing.categoryId)?.name
+                    }
+                  />
+                </div>
               ))}
-            </CarouselContent>
-          </Carousel>
-        </div>
-      </section>
-
-      {/* ─── DELIVERY ─────────────────────────────────────────────────────── */}
-      <section className="bg-orange-50 py-10">
-        <div className="container">
-          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-orange-500 rounded-xl flex items-center justify-center">
-                <ShoppingBag className="w-4 h-4 text-white" />
-              </div>
-              <h2 className="section-heading">
-                Delivery, pedidos e vitrines ativas
-              </h2>
             </div>
-            <Link
-              href="/categoria/delivery"
-              className="flex items-center gap-1 text-sm font-medium text-orange-600 transition-all hover:gap-2 sm:shrink-0"
-            >
-              Ver todos <ChevronRight className="w-4 h-4" />
+          ) : (
+            <div className="rounded-[28px] border border-dashed border-amber-200 bg-white p-10 text-center">
+              <Zap className="mx-auto h-12 w-12 text-amber-300" />
+              <p className="mt-4 text-slate-500">
+                Assim que houver anuncios impulsionados, eles aparecerao aqui.
+              </p>
+            </div>
+          )}
+        </section>
+
+        <section className="container py-8">
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-violet-600">
+                Navegacao rapida
+              </p>
+              <h2 className="font-display text-3xl font-black text-slate-900">
+                Categorias mais vistas
+              </h2>
+              <p className="mt-2 text-sm text-slate-500">
+                Entradas visuais para acelerar a descoberta.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {PRIMARY_CATEGORIES.map(item => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.title}
+                  href={`/busca?q=${encodeURIComponent(item.query)}`}
+                  className={`rounded-[28px] bg-gradient-to-br ${item.tone} p-6 text-white shadow-lg transition hover:-translate-y-0.5`}
+                >
+                  <div className="inline-flex rounded-2xl bg-white/15 p-3">
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <h3 className="mt-8 font-display text-3xl font-black">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-sm text-white/85">
+                    Ver anuncios e servicos relacionados.
+                  </p>
+                </Link>
+              );
+            })}
+          </div>
+
+          {topCategoryList && topCategoryList.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {topCategoryList.map(category => (
+                <Link key={category.id} href={`/categoria/${category.slug}`}>
+                  <span className="inline-flex items-center rounded-full bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-100">
+                    {category.name}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="bg-orange-50 py-10">
+          <div className="container">
+            <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-orange-600">
+                  Delivery
+                </p>
+                <h2 className="font-display text-3xl font-black text-slate-900">
+                  Delivery e pedidos ativos
+                </h2>
+                <p className="mt-2 text-sm text-slate-500">
+                  Um recorte comercial forte para gerar cliques rapidos.
+                </p>
+              </div>
+              <Link href="/categoria/delivery">
+                <Button variant="outline" className="rounded-2xl">
+                  Ver delivery
+                </Button>
+              </Link>
+            </div>
+
+            {deliveryListings && deliveryListings.length > 0 ? (
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+                {deliveryListings.map(listing => (
+                  <ListingCard
+                    key={listing.id}
+                    {...listing}
+                    cityName={cities?.find(city => city.id === listing.cityId)?.name}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-[28px] bg-white p-10 text-center shadow-sm">
+                <ShoppingBag className="mx-auto h-12 w-12 text-orange-200" />
+                <p className="mt-4 text-slate-500">
+                  Os primeiros deliveries em destaque aparecerao aqui.
+                </p>
+              </div>
+            )}
+          </div>
+        </section>
+
+        <section className="container py-10">
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-600">
+                Feed de novidades
+              </p>
+              <h2 className="font-display text-3xl font-black text-slate-900">
+                Ultimos anuncios publicados
+              </h2>
+              <p className="mt-2 text-sm text-slate-500">
+                Novidades para manter a Home viva e em movimento.
+              </p>
+            </div>
+            <Link href="/busca">
+              <Button variant="outline" className="rounded-2xl">
+                Ver mais
+              </Button>
             </Link>
           </div>
-          {deliveryListings && deliveryListings.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {deliveryListings.map(listing => (
+
+          {recentListings.length > 0 ? (
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-4 xl:grid-cols-5">
+              {recentListings.map(listing => (
                 <ListingCard
                   key={listing.id}
                   {...listing}
-                  cityName={cities?.find(c => c.id === listing.cityId)?.name}
+                  cityName={cities?.find(city => city.id === listing.cityId)?.name}
+                  categoryName={
+                    categories?.find(category => category.id === listing.categoryId)?.name
+                  }
                 />
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 bg-white rounded-2xl">
-              <ShoppingBag className="w-12 h-12 text-orange-200 mx-auto mb-3" />
-              <p className="text-gray-500 mb-4">
-                Essa categoria ainda nao tem vitrines publicadas. Seja a
-                primeira empresa a aparecer aqui.
+            <div className="rounded-[28px] border border-dashed border-slate-200 bg-white p-12 text-center">
+              <LayoutGrid className="mx-auto h-12 w-12 text-slate-300" />
+              <p className="mt-4 text-slate-500">
+                Assim que novos anuncios entrarem no portal, a Home vai refletir isso aqui.
               </p>
-              <Link href={isAuthenticated ? "/anunciante/novo" : LOGIN_ROUTE}>
-                <Button className="bg-orange-500 text-white rounded-xl hover:bg-orange-600">
-                  Publicar agora
-                </Button>
-              </Link>
             </div>
           )}
-        </div>
-      </section>
+        </section>
 
-      {/* ─── RECENT LISTINGS ──────────────────────────────────────────────── */}
-      <section className="container py-10">
-        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-brand-gradient rounded-xl flex items-center justify-center">
-              <TrendingUp className="w-4 h-4 text-white" />
-            </div>
-            <h2 className="section-heading">
-              Produtos, servicos e oportunidades
-              {cityName && (
-                <span className="text-blue-600 ml-2">— {cityName}</span>
-              )}
-            </h2>
-          </div>
-          <Link
-            href="/busca"
-            className="flex items-center gap-1 text-sm font-medium text-blue-600 transition-all hover:gap-2 sm:shrink-0"
-          >
-            Ver todos <ChevronRight className="w-4 h-4" />
-          </Link>
-        </div>
-        {recent && recent.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {recent.map(listing => (
-              <ListingCard
-                key={listing.id}
-                {...listing}
-                cityName={cities?.find(c => c.id === listing.cityId)?.name}
-                categoryName={
-                  categories?.find(c => c.id === listing.categoryId)?.name
-                }
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-gray-200">
-            <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Zap className="w-8 h-8 text-blue-400" />
-            </div>
-            <h3 className="font-display font-bold text-gray-700 text-lg mb-2">
-              Nada publicado ainda
-            </h3>
-            <p className="text-gray-500 mb-6">
-              Seja a primeira loja ou anunciante a marcar presenca no portal.
-            </p>
-            <Link href={isAuthenticated ? "/anunciante/novo" : LOGIN_ROUTE}>
-              <Button className="bg-brand-gradient text-white rounded-xl px-8">
-                <Zap className="w-4 h-4 mr-2" /> Criar vitrine
-              </Button>
-            </Link>
-          </div>
-        )}
-      </section>
-
-      {/* ─── CITIES ───────────────────────────────────────────────────────── */}
-      <section className="bg-white py-10 border-y border-gray-100">
-        <div className="container">
-          <h2 className="section-heading text-center mb-2">
-            Cidades e negocios da regiao
-          </h2>
-          <p className="text-gray-500 text-center mb-8">
-            Um portal feito para ligar moradores, clientes e negocios do Norte
-            Pioneiro em um so lugar.
-          </p>
-          <div className="flex flex-wrap justify-center gap-3">
-            {cities?.map(city => (
-              <Link key={city.id} href={`/cidade/${city.slug}`}>
-                <span className="flex items-center gap-1.5 bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-100 transition-colors cursor-pointer">
-                  <MapPin className="w-3.5 h-3.5" />
-                  {city.name}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── HOW IT WORKS ─────────────────────────────────────────────────── */}
-      <section className="container py-14">
-        <h2 className="section-heading text-center mb-2">
-          Como sua loja entra para o portal
-        </h2>
-        <p className="text-gray-500 text-center mb-10">
-          Em poucos passos, sua loja cria presenca digital, monta a vitrine e
-          passa a ser encontrada por quem busca na regiao.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            {
-              step: "01",
-              icon: Users,
-              title: "Crie sua conta",
-              desc: "Cadastre sua loja ou seu perfil em poucos minutos para entrar no portal.",
-              color: "bg-blue-500",
-            },
-            {
-              step: "02",
-              icon: Zap,
-              title: "Monte sua vitrine",
-              desc: "Publique produtos, servicos, fotos e contatos para mostrar o que voce oferece.",
-              color: "bg-orange-500",
-            },
-            {
-              step: "03",
-              icon: TrendingUp,
-              title: "Ganhe visibilidade",
-              desc: "Apareca para quem busca no portal e fortaleça sua presenca na regiao.",
-              color: "bg-green-500",
-            },
-          ].map(item => {
-            const IconComp = item.icon;
-            return (
-              <div key={item.step} className="text-center">
-                <div
-                  className={`w-16 h-16 ${item.color} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg`}
-                >
-                  <IconComp className="w-8 h-8 text-white" />
-                </div>
-                <div className="text-xs font-bold text-gray-400 mb-2">
-                  PASSO {item.step}
-                </div>
-                <h3 className="font-display font-bold text-lg text-gray-900 mb-2">
-                  {item.title}
-                </h3>
-                <p className="text-gray-500 text-sm">{item.desc}</p>
+        <section className="container pb-14">
+          <div className="rounded-[32px] bg-[linear-gradient(135deg,#0f172a_0%,#1e293b_55%,#f97316_140%)] p-6 text-white shadow-[0_22px_70px_rgba(15,23,42,0.18)] sm:p-8">
+            <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-orange-200">
+                  Publique agora
+                </p>
+                <h2 className="mt-3 font-display text-3xl font-black">
+                  O Norte Vivo precisa parecer vivo ja na primeira dobra.
+                </h2>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-200 sm:text-base">
+                  Quanto mais anuncios, lojas e servicos reais aparecerem aqui,
+                  mais forte fica a percepcao comercial do portal.
+                </p>
               </div>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="container pb-14">
-        <div className="rounded-[32px] bg-white p-6 shadow-sm sm:p-8">
-          <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-            <div>
-              <div className="inline-flex rounded-full bg-orange-50 px-3 py-1 text-xs font-black text-orange-600">
-                Para empresas da regiao
-              </div>
-              <h2 className="mt-4 font-display text-3xl font-black text-gray-900">
-                Sua loja precisa estar onde as pessoas procuram
-              </h2>
-              <p className="mt-3 text-gray-600">
-                Monte sua vitrine digital, publique produtos, servicos e
-                contatos e ganhe mais chances de ser visto por quem procura na
-                sua cidade e em toda a regiao.
-              </p>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {[
-                {
-                  label: "Perfil publico da loja",
-                  href: isAuthenticated ? "/anunciante/meus-dados" : LOGIN_ROUTE,
-                },
-                {
-                  label: "Vitrine com produtos e banner",
-                  href: isAuthenticated ? "/anunciante/novo" : LOGIN_ROUTE,
-                },
-                {
-                  label: "Contato rapido por WhatsApp",
-                  href: isAuthenticated ? "/anunciante/meus-dados" : LOGIN_ROUTE,
-                },
-                {
-                  label: "Mais descoberta nas buscas locais",
-                  href: "/planos",
-                },
-              ].map(item => (
-                <Link key={item.label} href={item.href}>
-                  <div className="rounded-[22px] bg-gray-50 px-4 py-4 text-sm font-semibold text-gray-700 transition-colors hover:bg-orange-50 hover:text-orange-600">
-                    {item.label}
-                  </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Link href={isAuthenticated ? "/anunciante/novo" : LOGIN_ROUTE}>
+                  <Button className="h-12 w-full rounded-2xl bg-white text-slate-900 hover:bg-slate-100">
+                    <Zap className="mr-2 h-4 w-4" />
+                    Anunciar agora
+                  </Button>
                 </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── PLANS PREVIEW ────────────────────────────────────────────────── */}
-      <section className="bg-gray-900 py-14">
-        <div className="container">
-          <h2 className="font-display text-3xl font-black text-white text-center mb-2">
-            Planos e presença digital
-          </h2>
-          <p className="text-gray-400 text-center mb-10">
-            Comece gratis, entre no portal e evolua sua vitrine com mais
-            alcance e destaque.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            {[
-              {
-                name: "Gratis",
-                price: "R$ 0",
-                period: "30 dias",
-                features: [
-                  "5 anuncios",
-                  "3 fotos por anuncio",
-                  "Suporte basico",
-                ],
-                color: "border-gray-600",
-                badge: null,
-              },
-              {
-                name: "Profissional",
-                price: "R$ 99,90",
-                period: "/ano",
-                features: [
-                  "15 anuncios",
-                  "8 fotos por anuncio",
-                  "12 boosters de 24h/ano",
-                  "Suporte prioritario",
-                ],
-                color: "border-blue-500",
-                badge: "LANCAMENTO",
-              },
-              {
-                name: "Premium",
-                price: "R$ 129,90",
-                period: "/ano",
-                features: [
-                  "Anuncios ilimitados",
-                  "20 fotos por anuncio",
-                  "24 boosters de 24h/ano",
-                  "Acumula e usa quando quiser",
-                ],
-                color: "border-amber-400",
-                badge: "MELHOR",
-              },
-            ].map(plan => (
-              <div
-                key={plan.name}
-                className={`bg-gray-800 rounded-2xl p-6 border-2 ${plan.color} relative`}
-              >
-                {plan.badge && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span
-                      className={`text-xs font-black px-3 py-1 rounded-full ${plan.badge === "POPULAR" ? "bg-blue-500 text-white" : "bg-amber-400 text-gray-900"}`}
-                    >
-                      {plan.badge}
-                    </span>
-                  </div>
-                )}
-                <h3 className="font-display font-bold text-white text-xl mb-1">
-                  {plan.name}
-                </h3>
-                <div className="flex items-baseline gap-1 mb-4">
-                  <span className="text-3xl font-black text-white">
-                    {plan.price}
-                  </span>
-                  <span className="text-gray-400 text-sm">{plan.period}</span>
-                </div>
-                <ul className="space-y-2 mb-6">
-                  {plan.features.map(f => (
-                    <li
-                      key={f}
-                      className="flex items-center gap-2 text-sm text-gray-300"
-                    >
-                      <CheckCircle className="w-4 h-4 text-green-400 shrink-0" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
                 <Link href="/planos">
-                  <Button
-                    className={`w-full rounded-xl font-bold ${plan.badge === "MELHOR" ? "bg-amber-400 text-gray-900 hover:bg-amber-300" : plan.badge === "POPULAR" ? "bg-blue-500 text-white hover:bg-blue-400" : "bg-gray-700 text-white hover:bg-gray-600"}`}
-                  >
-                    {plan.name === "Grátis"
-                      ? "Começar Grátis"
-                      : "Assinar Agora"}
+                  <Button className="h-12 w-full rounded-2xl bg-orange-500 text-white hover:bg-orange-600">
+                    <Zap className="mr-2 h-4 w-4" />
+                    Ver planos
                   </Button>
                 </Link>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── BOOSTER CTA ──────────────────────────────────────────────────── */}
-      <section className="container py-14">
-        <div className="bg-orange-gradient rounded-3xl p-8 md:p-12 text-white text-center relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-4 left-8 w-24 h-24 rounded-full border-4 border-white" />
-            <div className="absolute bottom-4 right-8 w-16 h-16 rounded-full border-4 border-white" />
-            <div className="absolute top-1/2 left-1/4 w-8 h-8 rounded-full bg-white" />
-          </div>
-          <div className="relative z-10">
-            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Zap className="w-8 h-8 text-white" />
             </div>
-            <h2 className="font-display text-3xl md:text-4xl font-black mb-3">
-              Turbine sua vitrine com o Booster!
-            </h2>
-            <p className="text-orange-100 text-lg mb-6 max-w-xl mx-auto">
-              Coloque sua vitrine em evidencia, apareca no topo e aumente suas
-              chances de contato e descoberta.
-            </p>
-            <Link href={isAuthenticated ? "/anunciante" : LOGIN_ROUTE}>
-              <Button className="bg-white text-orange-600 font-black px-10 py-4 text-lg rounded-2xl hover:bg-orange-50 shadow-xl">
-                <Zap className="w-5 h-5 mr-2" />
-                Ativar Booster Agora
-              </Button>
-            </Link>
           </div>
-        </div>
-      </section>
+        </section>
+      </main>
 
-      {/* ─── TRUST SIGNALS ────────────────────────────────────────────────── */}
-      <section className="bg-blue-50 py-10">
-        <div className="container">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[
-              {
-                icon: Shield,
-                title: "Portal confiavel",
-                desc: "Um ambiente pensado para reunir negocios reais da regiao.",
-              },
-              {
-                icon: Zap,
-                title: "Vitrine rapida",
-                desc: "Sua loja ou anuncio pode entrar no ar em poucos minutos.",
-              },
-              {
-                icon: MapPin,
-                title: "Presenca regional",
-                desc: "Foco em quem compra, vende e procura por perto.",
-              },
-              {
-                icon: BadgeCheck,
-                title: "Mais descoberta",
-                desc: "Produtos, perfis e servicos organizados para serem encontrados.",
-              },
-            ].map(item => {
-              const IconComp = item.icon;
-              return (
-                <div key={item.title} className="text-center">
-                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                    <IconComp className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <h4 className="font-bold text-gray-900 mb-1">{item.title}</h4>
-                  <p className="text-xs text-gray-500">{item.desc}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      <Footer />
-
-      {/* Mobile bottom nav */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 shadow-2xl md:hidden z-40">
-        <div className="flex items-center justify-around py-2">
-          <Link
-            href="/"
-            className="flex flex-col items-center gap-0.5 text-blue-600 px-3 py-1"
-          >
-            <Zap className="w-5 h-5" />
-            <span className="text-xs font-medium">Início</span>
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-3 py-2 backdrop-blur md:hidden">
+        <div className="mx-auto grid max-w-md grid-cols-5 gap-2">
+          <Link href="/" className="flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-xs font-medium text-slate-700">
+            <HomeIcon className="h-5 w-5" />
+            Inicio
           </Link>
-          <Link
-            href="/busca"
-            className="flex flex-col items-center gap-0.5 text-gray-500 px-3 py-1"
+          <button
+            type="button"
+            onClick={() => navigate("/busca")}
+            className="flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-xs font-medium text-slate-700"
           >
-            <Tag className="w-5 h-5" />
-            <span className="text-xs">Buscar</span>
+            <Search className="h-5 w-5" />
+            Buscar
+          </button>
+          <Link href={isAuthenticated ? "/anunciante/novo" : LOGIN_ROUTE} className="flex flex-col items-center gap-1 rounded-2xl bg-orange-500 px-2 py-2 text-xs font-semibold text-white">
+            <Zap className="h-5 w-5" />
+            Anunciar
           </Link>
-          <Link
-            href={isAuthenticated ? "/anunciante/novo" : LOGIN_ROUTE}
-            className="flex flex-col items-center gap-0.5 px-3 py-1"
-          >
-            <div className="w-12 h-12 bg-orange-gradient rounded-2xl flex items-center justify-center -mt-5 shadow-lg">
-              <Zap className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-xs text-orange-500 font-bold">Anunciar</span>
-          </Link>
-          <Link
-            href="/favoritos"
-            className="flex flex-col items-center gap-0.5 text-gray-500 px-3 py-1"
-          >
-            <Heart className="w-5 h-5" />
-            <span className="text-xs">Favoritos</span>
-          </Link>
-          <Link
-            href={isAuthenticated ? "/anunciante" : LOGIN_ROUTE}
-            className="flex flex-col items-center gap-0.5 text-gray-500 px-3 py-1"
-          >
-            <Users className="w-5 h-5" />
-            <span className="text-xs">Perfil</span>
+          <a href="#lojas-empresas" className="flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-xs font-medium text-slate-700">
+            <Store className="h-5 w-5" />
+            Lojas
+          </a>
+          <Link href={isAuthenticated ? "/anunciante" : LOGIN_ROUTE} className="flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-xs font-medium text-slate-700">
+            <CircleUserRound className="h-5 w-5" />
+            Perfil
           </Link>
         </div>
       </nav>
-      <div className="h-16 md:hidden" />
+
+      <Footer />
     </div>
   );
 }

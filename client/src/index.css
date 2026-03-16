@@ -191,9 +191,9 @@
   .boost-pulse { animation: boostPulse 2s infinite; }
   @keyframes pillMarquee {
     from { transform: translateX(0); }
-    to { transform: translateX(calc(-50% - 0.25rem)); }
+    to { transform: translateX(calc(-33.333% - 0.35rem)); }
   }
-  .animate-pill-marquee { animation: pillMarquee 24s linear infinite; }
+  .animate-pill-marquee { animation: pillMarquee 18s linear infinite; }
 }
 
 @layer components {

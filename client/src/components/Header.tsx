@@ -358,9 +358,9 @@ export default function Header({
 
       <div className="border-t border-slate-100 bg-white">
         <div className="container">
-          <div className="overflow-hidden py-2 sm:py-3">
+          <div className="overflow-x-auto py-2 sm:py-3 scrollbar-hide">
             <div className="flex w-max items-center gap-2 motion-safe:animate-pill-marquee">
-              {[...HEADER_PILLS, ...HEADER_PILLS].map((item, index) => {
+              {[...HEADER_PILLS, ...HEADER_PILLS, ...HEADER_PILLS].map((item, index) => {
               const Icon = item.icon;
               const href = item.label === "Favoritos" && !isAuthenticated ? LOGIN_ROUTE : item.href;
               return (

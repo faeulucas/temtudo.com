@@ -808,8 +808,8 @@ export default function Home() {
         <div className="mx-auto grid max-w-md grid-cols-5 gap-2">
           <Link
             href="/"
-            className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-xs font-medium ${
-              location === "/" ? "bg-slate-900 text-white" : "text-slate-700"
+            className={`flex flex-col items-center gap-1 px-2 py-1 text-xs font-medium ${
+              location === "/" ? "text-violet-600" : "text-slate-700"
             }`}
           >
             <HomeIcon className="h-5 w-5" />
@@ -818,8 +818,8 @@ export default function Home() {
           <button
             type="button"
             onClick={() => navigate("/busca")}
-            className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-xs font-medium ${
-              location.startsWith("/busca") ? "bg-slate-900 text-white" : "text-slate-700"
+            className={`flex flex-col items-center gap-1 px-2 py-1 text-xs font-medium ${
+              location.startsWith("/busca") ? "text-violet-600" : "text-slate-700"
             }`}
           >
             <Search className="h-5 w-5" />
@@ -827,16 +827,20 @@ export default function Home() {
           </button>
           <Link
             href={isAuthenticated ? "/anunciante/novo" : LOGIN_ROUTE}
-            className="flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-xs font-semibold text-slate-700"
+            className={`flex flex-col items-center gap-1 px-2 py-1 text-xs font-medium ${
+              location.startsWith("/anunciante/novo") || location.startsWith("/anunciar")
+                ? "text-violet-600"
+                : "text-slate-700"
+            }`}
           >
             <Zap className="h-5 w-5" />
             Anunciar
           </Link>
           <Link
             href={isAuthenticated ? "/anunciante" : LOGIN_ROUTE}
-            className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-xs font-medium ${
+            className={`flex flex-col items-center gap-1 px-2 py-1 text-xs font-medium ${
               location.startsWith("/anunciante") || location.startsWith("/entrar")
-                ? "bg-slate-900 text-white"
+                ? "text-violet-600"
                 : "text-slate-700"
             }`}
           >
@@ -846,8 +850,8 @@ export default function Home() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(current => !current)}
-            className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-xs font-medium ${
-              mobileMenuOpen ? "bg-slate-900 text-white" : "text-slate-700"
+            className={`flex flex-col items-center gap-1 px-2 py-1 text-xs font-medium ${
+              mobileMenuOpen ? "text-violet-600" : "text-slate-700"
             }`}
           >
             <Menu className="h-5 w-5" />

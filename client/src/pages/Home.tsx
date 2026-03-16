@@ -146,7 +146,7 @@ const PRIMARY_CATEGORIES = [
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
   const [selectedCity, setSelectedCity] = useState<number | null>(null);
 
   const { data: categories } = trpc.public.categories.useQuery();
@@ -170,6 +170,8 @@ export default function Home() {
   const topCategoryList = topCategories?.length ? topCategories : categories?.slice(0, 8);
   const featuredListings = featured ?? [];
   const recentListings = recent ?? [];
+  const selectedCityName =
+    cities?.find(city => city.id === selectedCity)?.name ?? "sua cidade";
 
   const companyHighlights = useMemo(
     () =>
@@ -214,22 +216,22 @@ export default function Home() {
 
       <main className="pb-24 md:pb-0">
         <section className="container pt-6 pb-4">
-          <div className="overflow-hidden rounded-[32px] bg-[linear-gradient(135deg,#0f172a_0%,#1d4ed8_45%,#f97316_120%)] px-5 py-8 text-white shadow-[0_20px_70px_rgba(15,23,42,0.18)] sm:px-8 sm:py-10">
+          <div className="overflow-hidden rounded-[32px] bg-[linear-gradient(135deg,#0f172a_0%,#1d4ed8_45%,#f97316_120%)] px-5 py-6 text-white shadow-[0_20px_70px_rgba(15,23,42,0.18)] sm:px-8 sm:py-10">
             <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
               <div>
                 <div className="inline-flex items-center gap-2 rounded-full bg-white/12 px-4 py-2 text-sm font-semibold text-white">
                   <BadgeCheck className="h-4 w-4" />
                   Marketplace + Guia Local + Lojas e Empresas
                 </div>
-                <h1 className="mt-4 font-display text-4xl font-black leading-tight text-white sm:text-5xl">
+                <h1 className="mt-4 font-display text-3xl font-black leading-tight text-white sm:text-5xl">
                   O shopping da cidade e os servicos locais em um so lugar.
                 </h1>
-                <p className="mt-4 max-w-2xl text-base leading-7 text-blue-50/90 sm:text-lg">
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-blue-50/90 sm:mt-4 sm:text-lg sm:leading-7">
                   Encontre produtos, negocios e servicos reais do Norte
                   Pioneiro logo na primeira busca.
                 </p>
 
-                <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                <div className="mt-6 grid gap-3 md:grid-cols-3">
                   {MAIN_SHORTCUTS.map(item => {
                     const Icon = item.icon;
                     return (
@@ -253,9 +255,24 @@ export default function Home() {
                     );
                   })}
                 </div>
+
+                <div className="mt-4 grid grid-cols-2 gap-3 lg:hidden">
+                  <div className="rounded-[22px] bg-white/10 p-4 backdrop-blur-sm">
+                    <p className="text-2xl font-black text-white">
+                      {featuredListings.length || recentListings.length}
+                    </p>
+                    <p className="text-sm text-blue-100">Ofertas visiveis agora</p>
+                  </div>
+                  <div className="rounded-[22px] bg-white/10 p-4 backdrop-blur-sm">
+                    <p className="text-2xl font-black text-white">
+                      {companyHighlights.length}
+                    </p>
+                    <p className="text-sm text-blue-100">Lojas e empresas</p>
+                  </div>
+                </div>
               </div>
 
-              <div className="rounded-[28px] border border-white/10 bg-white/10 p-5 backdrop-blur-md">
+              <div className="hidden rounded-[28px] border border-white/10 bg-white/10 p-5 backdrop-blur-md lg:block">
                 <div className="flex items-center gap-3">
                   <div className="rounded-2xl bg-white/15 p-3">
                     <Search className="h-5 w-5" />
@@ -317,7 +334,7 @@ export default function Home() {
                 Servicos locais que resolvem o dia a dia
               </h2>
               <p className="mt-2 text-sm text-slate-500">
-                Atalhos rapidos para o que a cidade mais precisa.
+                Atalhos rapidos para o que mais importa em {selectedCityName}.
               </p>
             </div>
             <Link href="/guia">
@@ -327,22 +344,22 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3">
             {GUIDE_SHORTCUTS.map(item => {
               const Icon = item.icon;
               return (
                 <Link
                   key={item.title}
                   href={item.href}
-                  className="group rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-orange-200 hover:bg-orange-50/40"
+                  className="group rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-orange-200 hover:bg-orange-50/40 sm:rounded-[28px] sm:p-5"
                 >
                   <div className={`inline-flex rounded-2xl p-3 ${item.tone}`}>
                     <Icon className="h-5 w-5" />
                   </div>
-                  <h3 className="mt-4 font-display text-2xl font-bold text-slate-900">
+                  <h3 className="mt-4 font-display text-xl font-bold text-slate-900 sm:text-2xl">
                     {item.title}
                   </h3>
-                  <p className="mt-2 text-sm leading-6 text-slate-500">
+                  <p className="mt-2 text-xs leading-5 text-slate-500 sm:text-sm sm:leading-6">
                     {item.description}
                   </p>
                   <div className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-orange-600">
@@ -376,7 +393,52 @@ export default function Home() {
           </div>
 
           {companyHighlights.length > 0 ? (
-            <div className="flex gap-4 overflow-x-auto pb-2">
+            <>
+              <div className="flex gap-3 overflow-x-auto pb-2 md:hidden">
+                {companyHighlights.map(item => {
+                  const displayName =
+                    item.seller?.companyName?.trim() ||
+                    item.seller?.name?.trim() ||
+                    item.title;
+                  const cover =
+                    item.seller?.avatar ||
+                    item.images?.find(image => image.isPrimary)?.url ||
+                    item.images?.[0]?.url;
+
+                  return (
+                    <Link
+                      key={item.id}
+                      href={`/anuncio/${item.id}`}
+                      className="min-w-[150px] rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-slate-100 text-lg font-black text-blue-700">
+                          {cover ? (
+                            <img
+                              src={cover}
+                              alt={displayName}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            displayName.charAt(0).toUpperCase()
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="truncate font-display text-lg font-bold text-slate-900">
+                            {displayName}
+                          </p>
+                          <p className="truncate text-xs text-slate-500">
+                            {cities?.find(city => city.id === item.cityId)?.name ||
+                              "Norte Pioneiro"}
+                          </p>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+
+              <div className="hidden gap-4 overflow-x-auto pb-2 md:flex">
               {companyHighlights.map(item => {
                 const cover =
                   item.seller?.bannerUrl ||
@@ -442,7 +504,8 @@ export default function Home() {
                   </article>
                 );
               })}
-            </div>
+              </div>
+            </>
           ) : (
             <div className="rounded-[28px] border border-dashed border-slate-200 bg-white p-10 text-center">
               <Building2 className="mx-auto h-12 w-12 text-slate-300" />
@@ -474,7 +537,7 @@ export default function Home() {
           </div>
 
           {featuredListings.length > 0 ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
               {featuredListings.map(listing => (
                 <div
                   key={listing.id}
@@ -524,22 +587,22 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
             {PRIMARY_CATEGORIES.map(item => {
               const Icon = item.icon;
               return (
                 <Link
                   key={item.title}
                   href={`/busca?q=${encodeURIComponent(item.query)}`}
-                  className={`rounded-[28px] bg-gradient-to-br ${item.tone} p-6 text-white shadow-lg transition hover:-translate-y-0.5`}
+                  className={`rounded-[24px] bg-gradient-to-br ${item.tone} p-5 text-white shadow-lg transition hover:-translate-y-0.5 sm:rounded-[28px] sm:p-6`}
                 >
                   <div className="inline-flex rounded-2xl bg-white/15 p-3">
                     <Icon className="h-6 w-6" />
                   </div>
-                  <h3 className="mt-8 font-display text-3xl font-black">
+                  <h3 className="mt-6 font-display text-2xl font-black sm:mt-8 sm:text-3xl">
                     {item.title}
                   </h3>
-                  <p className="mt-2 text-sm text-white/85">
+                  <p className="mt-2 text-xs text-white/85 sm:text-sm">
                     Ver anuncios e servicos relacionados.
                   </p>
                 </Link>
@@ -623,7 +686,52 @@ export default function Home() {
           </div>
 
           {recentListings.length > 0 ? (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-4 xl:grid-cols-5">
+            <>
+              <div className="space-y-3 md:hidden">
+                {recentListings.slice(0, 6).map(listing => {
+                  const listingMedia = listing as typeof listing & {
+                    images?: { url: string; isPrimary?: boolean | null }[];
+                  };
+                  const image =
+                    listingMedia.images?.find(photo => photo.isPrimary)?.url ||
+                    listingMedia.images?.[0]?.url;
+                  return (
+                    <Link
+                      key={listing.id}
+                      href={`/anuncio/${listing.id}`}
+                      className="flex items-center gap-3 rounded-[24px] border border-slate-200 bg-white p-3 shadow-sm"
+                    >
+                      <div className="h-20 w-20 shrink-0 overflow-hidden rounded-2xl bg-slate-100">
+                        {image ? (
+                          <img
+                            src={image}
+                            alt={listing.title}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center bg-slate-100">
+                            <LayoutGrid className="h-5 w-5 text-slate-400" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="truncate font-display text-lg font-bold text-slate-900">
+                          {listing.title}
+                        </p>
+                        <p className="mt-1 text-base font-black text-orange-600">
+                          {listing.price || "Consulte"}
+                        </p>
+                        <p className="mt-1 truncate text-xs text-slate-500">
+                          {cities?.find(city => city.id === listing.cityId)?.name ||
+                            "Norte Pioneiro"}
+                        </p>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+
+              <div className="hidden grid-cols-2 gap-4 md:grid md:grid-cols-4 xl:grid-cols-5">
               {recentListings.map(listing => (
                 <ListingCard
                   key={listing.id}
@@ -634,7 +742,8 @@ export default function Home() {
                   }
                 />
               ))}
-            </div>
+              </div>
+            </>
           ) : (
             <div className="rounded-[28px] border border-dashed border-slate-200 bg-white p-12 text-center">
               <LayoutGrid className="mx-auto h-12 w-12 text-slate-300" />
@@ -681,14 +790,21 @@ export default function Home() {
 
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-3 py-2 backdrop-blur md:hidden">
         <div className="mx-auto grid max-w-md grid-cols-5 gap-2">
-          <Link href="/" className="flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-xs font-medium text-slate-700">
+          <Link
+            href="/"
+            className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-xs font-medium ${
+              location === "/" ? "bg-slate-900 text-white" : "text-slate-700"
+            }`}
+          >
             <HomeIcon className="h-5 w-5" />
             Inicio
           </Link>
           <button
             type="button"
             onClick={() => navigate("/busca")}
-            className="flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-xs font-medium text-slate-700"
+            className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-xs font-medium ${
+              location.startsWith("/busca") ? "bg-slate-900 text-white" : "text-slate-700"
+            }`}
           >
             <Search className="h-5 w-5" />
             Buscar
@@ -697,11 +813,23 @@ export default function Home() {
             <Zap className="h-5 w-5" />
             Anunciar
           </Link>
-          <Link href="/lojas" className="flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-xs font-medium text-slate-700">
+          <Link
+            href="/lojas"
+            className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-xs font-medium ${
+              location.startsWith("/lojas") ? "bg-slate-900 text-white" : "text-slate-700"
+            }`}
+          >
             <Store className="h-5 w-5" />
             Lojas
           </Link>
-          <Link href={isAuthenticated ? "/anunciante" : LOGIN_ROUTE} className="flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-xs font-medium text-slate-700">
+          <Link
+            href={isAuthenticated ? "/anunciante" : LOGIN_ROUTE}
+            className={`flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-xs font-medium ${
+              location.startsWith("/anunciante") || location.startsWith("/entrar")
+                ? "bg-slate-900 text-white"
+                : "text-slate-700"
+            }`}
+          >
             <CircleUserRound className="h-5 w-5" />
             Perfil
           </Link>

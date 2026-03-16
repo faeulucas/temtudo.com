@@ -317,7 +317,7 @@ export default function Header({
         </div>
       </div>
 
-      <div className="border-t border-slate-100 bg-white">
+      <div className="hidden border-t border-slate-100 bg-white sm:block">
         <div className="container">
           <div className="flex items-center gap-2 overflow-x-auto py-3">
             {HEADER_PILLS.map(item => {

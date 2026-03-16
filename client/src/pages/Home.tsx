@@ -155,15 +155,39 @@ const PRIMARY_CATEGORIES = [
   },
 ];
 
+function isServiceProviderListing(item: HomeHighlightListing, categoryName?: string) {
+  const haystack = [
+    categoryName,
+    item.subcategory,
+    item.title,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  return item.whatsapp != null || item.seller?.whatsapp != null
+    ? item.title.toLowerCase().includes("serv") ||
+        haystack.includes("serv") ||
+        haystack.includes("oficina") ||
+        haystack.includes("manut") ||
+        haystack.includes("assist") ||
+        haystack.includes("instal") ||
+        haystack.includes("tecnico") ||
+        haystack.includes("eletric") ||
+        haystack.includes("encan") ||
+        haystack.includes("limpeza") ||
+        haystack.includes("delivery") ||
+        haystack.includes("saude") ||
+        haystack.includes("beleza")
+    : false;
+}
+
 export default function Home() {
   const { isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
   const [selectedCity, setSelectedCity] = useState<number | null>(null);
 
   const { data: categories } = trpc.public.categories.useQuery();
-  const { data: topCategories } = trpc.public.topCategories.useQuery({
-    limit: 8,
-  });
   const { data: cities } = trpc.public.cities.useQuery();
   const { data: featured } = trpc.public.featuredListings.useQuery({
     limit: 8,
@@ -178,7 +202,6 @@ export default function Home() {
     limit: 6,
   });
 
-  const topCategoryList = topCategories?.length ? topCategories : categories?.slice(0, 8);
   const featuredListings = featured ?? [];
   const recentListings = recent ?? [];
   const selectedCityName =
@@ -212,6 +235,43 @@ export default function Home() {
         .slice(0, 8),
     [featuredListings, recentListings]
   );
+
+  const serviceProviders = useMemo(() => {
+    return (featuredListings.length ? featuredListings : recentListings)
+      .filter(item =>
+        isServiceProviderListing(
+          item as HomeHighlightListing,
+          categories?.find(category => category.id === item.categoryId)?.name
+        )
+      )
+      .reduce<HomeHighlightListing[]>((acc, item) => {
+        const key = (
+          item.seller?.companyName ||
+          item.seller?.name ||
+          item.title
+        )
+          .trim()
+          .toLowerCase();
+
+        if (
+          !acc.some(existing => {
+            const existingKey = (
+              existing.seller?.companyName ||
+              existing.seller?.name ||
+              existing.title
+            )
+              .trim()
+              .toLowerCase();
+            return existingKey === key;
+          })
+        ) {
+          acc.push(item as HomeHighlightListing);
+        }
+
+        return acc;
+      }, [])
+      .slice(0, 8);
+  }, [categories, featuredListings, recentListings]);
 
   const handleSearch = (query: string) => {
     navigate(`/busca?q=${encodeURIComponent(query)}&city=${selectedCity || ""}`);
@@ -703,49 +763,98 @@ export default function Home() {
           <div className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-violet-600">
-                Navegacao rapida
+                Mao de obra local
               </p>
               <h2 className="font-display text-3xl font-black text-slate-900">
-                Categorias mais vistas
+                Precisando de um servico? Contrate agora mesmo
               </h2>
               <p className="mt-2 text-sm text-slate-500">
-                Entradas visuais para acelerar a descoberta.
+                Encontre prestadores com perfil ativo, cidade visivel e contato rapido por WhatsApp.
               </p>
             </div>
+            <Link href="/busca?q=servicos">
+              <Button variant="outline" className="rounded-2xl px-4 py-2 text-sm">
+                Ver servicos
+              </Button>
+            </Link>
           </div>
 
+          {serviceProviders.length > 0 ? (
             <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 xl:grid xl:grid-cols-4 xl:overflow-visible xl:pb-0">
-              {PRIMARY_CATEGORIES.map(item => {
-                const Icon = item.icon;
-                return (
-                <Link
-                  key={item.title}
-                  href={`/busca?q=${encodeURIComponent(item.query)}`}
-                  className={`min-w-[82%] snap-center rounded-[24px] bg-gradient-to-br ${item.tone} p-5 text-white shadow-lg transition hover:-translate-y-0.5 sm:min-w-[320px] sm:rounded-[28px] sm:p-6 xl:min-w-0`}
-                >
-                  <div className="inline-flex rounded-2xl bg-white/15 p-3">
-                    <Icon className="h-6 w-6" />
-                  </div>
-                  <h3 className="mt-6 font-display text-2xl font-black sm:mt-8 sm:text-3xl">
-                    {item.title}
-                  </h3>
-                    <p className="mt-2 text-sm text-white/85">
-                      Ver anuncios e servicos relacionados.
-                    </p>
-                  </Link>
-              );
-            })}
-          </div>
+              {serviceProviders.map(item => {
+                const displayName =
+                  item.seller?.companyName?.trim() ||
+                  item.seller?.name?.trim() ||
+                  item.title;
+                const cityName =
+                  cities?.find(city => city.id === item.seller?.cityId)?.name ||
+                  cities?.find(city => city.id === item.cityId)?.name ||
+                  "Norte Pioneiro";
+                const whatsappNumber = item.seller?.whatsapp || item.whatsapp;
+                const whatsappHref = whatsappNumber
+                  ? `https://wa.me/55${whatsappNumber.replace(/\D/g, "")}`
+                  : null;
 
-          {topCategoryList && topCategoryList.length > 0 && (
-            <div className="mt-4 hidden flex-wrap gap-2 sm:flex">
-              {topCategoryList.map(category => (
-                <Link key={category.id} href={`/categoria/${category.slug}`}>
-                  <span className="inline-flex items-center rounded-full bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-100">
-                    {category.name}
-                  </span>
-                </Link>
-              ))}
+                return (
+                  <article
+                    key={item.id}
+                    className="min-w-[82%] snap-center rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm sm:min-w-[300px] sm:rounded-[28px] xl:min-w-0"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[20px] bg-slate-100 text-lg font-black text-blue-700">
+                        {item.seller?.avatar ? (
+                          <img
+                            src={item.seller.avatar}
+                            alt={displayName}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          displayName.charAt(0).toUpperCase()
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="truncate font-display text-xl font-bold text-slate-900">
+                          {displayName}
+                        </p>
+                        <p className="mt-1 truncate text-sm text-slate-500">
+                          {cities?.find(city => city.id === item.seller?.cityId)?.name ||
+                            cityName}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex items-center gap-2 text-sm text-slate-500">
+                      <MapPin className="h-4 w-4 text-slate-400" />
+                      <span>{cityName}</span>
+                    </div>
+                    {whatsappHref ? (
+                      <a
+                        href={whatsappHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700"
+                      >
+                        <Phone className="h-4 w-4" />
+                        WhatsApp
+                      </a>
+                    ) : (
+                      <Link
+                        href={`/anuncio/${item.id}`}
+                        className="mt-4 inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700"
+                      >
+                        <ArrowRight className="h-4 w-4" />
+                        Ver perfil
+                      </Link>
+                    )}
+                  </article>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="rounded-[28px] border border-dashed border-slate-200 bg-white p-8 text-center">
+              <HeartHandshake className="mx-auto h-10 w-10 text-violet-300" />
+              <p className="mt-4 text-slate-500">
+                Os primeiros prestadores com contato rapido aparecerao aqui.
+              </p>
             </div>
           )}
         </section>

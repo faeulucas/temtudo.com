@@ -313,12 +313,6 @@ export default function Header({
                 {item.label}
               </Link>
             ))}
-            <Link href={isAuthenticated ? "/anunciante/novo" : LOGIN_ROUTE}>
-              <Button className="whitespace-nowrap rounded-full bg-orange-gradient px-4 text-white">
-                <Plus className="mr-2 h-4 w-4" />
-                Anunciar
-              </Button>
-            </Link>
           </div>
         </div>
       </div>

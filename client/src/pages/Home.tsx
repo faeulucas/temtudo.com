@@ -34,11 +34,14 @@ type HomeHighlightListing = {
   id: number;
   userId: number;
   title: string;
+  type?: string | null;
+  createdAt?: Date | string;
   cityId?: number | null;
   categoryId?: number | null;
   subcategory?: string | null;
   whatsapp?: string | null;
   price?: string | null;
+  viewCount?: number | null;
   images?: { url: string; isPrimary?: boolean | null }[];
   seller?: {
     id?: number;
@@ -190,9 +193,13 @@ function isFoodListing(item: HomeHighlightListing) {
     .toLowerCase();
 
   return (
+    item.type === "food" ||
     haystack.includes("lanche") ||
     haystack.includes("pizza") ||
     haystack.includes("hamb") ||
+    haystack.includes("hamburguer") ||
+    haystack.includes("hamburger") ||
+    haystack.includes("espet") ||
     haystack.includes("pastel") ||
     haystack.includes("marmita") ||
     haystack.includes("porcao") ||
@@ -201,6 +208,8 @@ function isFoodListing(item: HomeHighlightListing) {
     haystack.includes("coxinha") ||
     haystack.includes("hot dog") ||
     haystack.includes("cachorro") ||
+    haystack.includes("batata") ||
+    haystack.includes("refeicao") ||
     haystack.includes("prato")
   );
 }
@@ -297,9 +306,8 @@ export default function Home() {
   }, [categories, featuredListings, recentListings]);
 
   const foodListings = useMemo(() => {
-    const source = deliveryListings ?? [];
-    const prioritized = source.filter(item => isFoodListing(item as HomeHighlightListing));
-    return (prioritized.length > 0 ? prioritized : source).slice(0, 6);
+    const source = (deliveryListings ?? []) as HomeHighlightListing[];
+    return source.filter(item => isFoodListing(item)).slice(0, 6);
   }, [deliveryListings]);
 
   const handleSearch = (query: string) => {
@@ -988,6 +996,7 @@ export default function Home() {
                       <div className="hidden sm:block">
                         <ListingCard
                           {...listing}
+                          createdAt={listing.createdAt ?? new Date()}
                           cityName={cityName}
                         />
                       </div>

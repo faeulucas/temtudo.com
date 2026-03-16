@@ -221,7 +221,7 @@ export default function Home() {
       />
 
       <main className="pb-24 md:pb-0">
-        <section className="container pt-6 pb-4">
+        <section className="container pt-2 pb-0 sm:pt-6 sm:pb-4">
           <div className="hidden overflow-hidden rounded-[32px] bg-[linear-gradient(135deg,#0f172a_0%,#1d4ed8_45%,#f97316_120%)] px-5 py-6 text-white shadow-[0_20px_70px_rgba(15,23,42,0.18)] sm:block sm:px-8 sm:py-10">
             <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
               <div>
@@ -380,22 +380,22 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="lojas-empresas" className="container py-8">
+        <section id="lojas-empresas" className="container pb-8 pt-4 sm:py-8">
           <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-600">
                 Lojas e empresas
               </p>
               <h2 className="font-display text-3xl font-black text-slate-900">
-                Negocios locais em destaque
+                Encontre marcas e negocios da sua cidade
               </h2>
               <p className="mt-2 text-sm text-slate-500">
-                Parceiros, negocios ativos e empresas com presenca no portal.
+                Perfis ativos, lojas verificadas e empresas locais para voce descobrir sem sair da home.
               </p>
             </div>
             <Link href="/lojas">
               <Button variant="outline" className="rounded-2xl">
-                Buscar lojas
+                Ver lojas
               </Button>
             </Link>
           </div>

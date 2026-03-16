@@ -183,6 +183,28 @@ function isServiceProviderListing(item: HomeHighlightListing, categoryName?: str
     : false;
 }
 
+function isFoodListing(item: HomeHighlightListing) {
+  const haystack = [item.title, item.subcategory]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  return (
+    haystack.includes("lanche") ||
+    haystack.includes("pizza") ||
+    haystack.includes("hamb") ||
+    haystack.includes("pastel") ||
+    haystack.includes("marmita") ||
+    haystack.includes("porcao") ||
+    haystack.includes("combo") ||
+    haystack.includes("acai") ||
+    haystack.includes("coxinha") ||
+    haystack.includes("hot dog") ||
+    haystack.includes("cachorro") ||
+    haystack.includes("prato")
+  );
+}
+
 export default function Home() {
   const { isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
@@ -273,6 +295,12 @@ export default function Home() {
       }, [])
       .slice(0, 8);
   }, [categories, featuredListings, recentListings]);
+
+  const foodListings = useMemo(() => {
+    const source = deliveryListings ?? [];
+    const prioritized = source.filter(item => isFoodListing(item as HomeHighlightListing));
+    return (prioritized.length > 0 ? prioritized : source).slice(0, 6);
+  }, [deliveryListings]);
 
   const handleSearch = (query: string) => {
     navigate(`/busca?q=${encodeURIComponent(query)}&city=${selectedCity || ""}`);
@@ -865,25 +893,25 @@ export default function Home() {
             <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.18em] text-orange-600">
-                  Delivery
+                  O que comer hoje
                 </p>
                 <h2 className="font-display text-3xl font-black text-slate-900">
-                  Lanches e pedidos do momento
+                  O que tem pra comer hoje perto de mim?
                 </h2>
                 <p className="mt-2 text-sm text-slate-500">
-                  Escolha o produto, veja o preco e descubra se sua cidade recebe entrega.
+                  Descubra lanches e pedidos rapidos na sua regiao para matar a fome sem perder tempo.
                 </p>
               </div>
-              <Link href="/categoria/delivery">
+              <Link href="/busca?q=lanche">
                 <Button variant="outline" className="rounded-2xl">
-                  Ver delivery
+                  Ver lanches
                 </Button>
               </Link>
             </div>
 
-            {deliveryListings && deliveryListings.length > 0 ? (
+            {foodListings.length > 0 ? (
               <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 sm:grid sm:grid-cols-3 sm:overflow-visible sm:pb-0 lg:grid-cols-6">
-                {deliveryListings.map((listing, index) => {
+                {foodListings.map((listing, index) => {
                   const listingMedia = listing as typeof listing & {
                     images?: { url: string; isPrimary?: boolean | null }[];
                   };
@@ -921,12 +949,12 @@ export default function Home() {
                               </div>
                             )}
                             <div className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-blue-600 px-3 py-1 text-xs font-semibold text-white">
-                              Comida
+                              Lanche
                             </div>
                           </div>
                           <div className="p-4">
                             <div className="inline-flex rounded-full bg-orange-50 px-3 py-1 text-[11px] font-semibold text-orange-700">
-                              {listing.subcategory || "Delivery"}
+                              {listing.subcategory || "Lanche do dia"}
                             </div>
                             <h3 className="mt-3 line-clamp-2 text-xl font-bold leading-7 text-slate-900">
                               {listing.title}
@@ -944,11 +972,11 @@ export default function Home() {
                                 {popularityLabel}
                               </span>
                               <span className="text-slate-500">
-                                {listing.viewCount ? `${listing.viewCount} pedidos vistos` : "Novidade no delivery"}
+                                {listing.viewCount ? `${listing.viewCount} visualizacoes` : "Novidade de hoje"}
                               </span>
                             </div>
                             <p className="mt-3 text-sm leading-6 text-slate-500">
-                              Veja se sua cidade recebe entrega e fale com o anunciante.
+                              Veja se a sua cidade esta na rota e fale direto com quem vende.
                             </p>
                             <div className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-slate-500">
                               <MapPin className="h-4 w-4 text-slate-400" />

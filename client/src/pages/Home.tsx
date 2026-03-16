@@ -226,19 +226,19 @@ export default function Home() {
           <div className="overflow-hidden rounded-[32px] bg-[linear-gradient(135deg,#0f172a_0%,#1d4ed8_45%,#f97316_120%)] px-5 py-6 text-white shadow-[0_20px_70px_rgba(15,23,42,0.18)] sm:px-8 sm:py-10">
             <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
               <div>
-                <div className="inline-flex items-center gap-2 rounded-full bg-white/12 px-4 py-2 text-sm font-semibold text-white">
+                <div className="hidden items-center gap-2 rounded-full bg-white/12 px-4 py-2 text-sm font-semibold text-white sm:inline-flex">
                   <BadgeCheck className="h-4 w-4" />
                   Marketplace + Guia Local + Lojas e Empresas
                 </div>
-                <h1 className="mt-4 font-display text-3xl font-black leading-tight text-white sm:text-5xl">
+                <h1 className="hidden mt-4 font-display text-3xl font-black leading-tight text-white sm:block sm:text-5xl">
                   O shopping da cidade e os servicos locais em um so lugar.
                 </h1>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-blue-50/90 sm:mt-4 sm:text-lg sm:leading-7">
+                <p className="hidden mt-3 max-w-2xl text-sm leading-6 text-blue-50/90 sm:block sm:mt-4 sm:text-lg sm:leading-7">
                   Encontre produtos, negocios e servicos reais do Norte
                   Pioneiro logo na primeira busca.
                 </p>
 
-                <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+                <div className="grid grid-cols-2 gap-3 sm:mt-6 md:grid-cols-4">
                   {MAIN_SHORTCUTS.map(item => {
                     const Icon = item.icon;
                     return (

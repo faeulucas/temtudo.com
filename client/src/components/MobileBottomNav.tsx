@@ -121,8 +121,8 @@ export default function MobileBottomNav() {
       </nav>
 
       <div
-        className={`fixed inset-x-0 bottom-[72px] top-0 z-[60] overflow-hidden bg-white md:hidden ${
-          menuOpen ? "pointer-events-auto" : "pointer-events-none"
+        className={`fixed inset-x-0 bottom-[72px] top-0 z-[60] overflow-hidden md:hidden ${
+          menuOpen ? "pointer-events-auto bg-white" : "pointer-events-none bg-transparent"
         }`}
       >
         <div

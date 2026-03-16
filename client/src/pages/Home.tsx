@@ -238,7 +238,7 @@ export default function Home() {
                   Pioneiro logo na primeira busca.
                 </p>
 
-                <div className="grid grid-cols-2 gap-3 sm:mt-6 md:grid-cols-4">
+                <div className="hidden grid-cols-2 gap-3 sm:mt-6 md:grid md:grid-cols-4">
                   {MAIN_SHORTCUTS.map(item => {
                     const Icon = item.icon;
                     return (

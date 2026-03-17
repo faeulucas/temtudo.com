@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Link } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -269,14 +269,8 @@ export default function MyAccountPanel() {
         ? "Ambos"
         : "Anunciante PF"
       : "Comprador";
-  const sections = useMemo(
-    () => buildSections(isAdvertiser, isStoreOwner),
-    [isAdvertiser, isStoreOwner]
-  );
-  const cards = useMemo(
-    () => buildCards(isAdvertiser, isStoreOwner, Boolean(user.trialStartedAt)),
-    [isAdvertiser, isStoreOwner, user.trialStartedAt]
-  );
+  const sections = buildSections(isAdvertiser, isStoreOwner);
+  const cards = buildCards(isAdvertiser, isStoreOwner, Boolean(user.trialStartedAt));
   const currentSection = sections.find(section => section.key === activeSection) ?? sections[0];
   const displayName = user.personType === "pj" ? user.companyName || user.name : user.name;
   const avatarSrc = typeof user.avatar === "string" ? user.avatar : undefined;

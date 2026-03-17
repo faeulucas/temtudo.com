@@ -1,4 +1,4 @@
-const CACHE_NAME = "norte-vivo-pwa-v3";
+const CACHE_NAME = "norte-vivo-pwa-v4";
 const APP_SHELL = [
   "/",
   "/manifest.webmanifest",
@@ -51,6 +51,32 @@ self.addEventListener("fetch", event => {
         })
         .catch(async () => {
           const cached = await caches.match("/");
+          return cached || Response.error();
+        })
+    );
+    return;
+  }
+
+  const url = new URL(request.url);
+  const isVersionedAsset =
+    url.pathname.startsWith("/assets/") ||
+    request.destination === "script" ||
+    request.destination === "style";
+
+  if (isVersionedAsset) {
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          if (!response || response.status !== 200 || response.type !== "basic") {
+            return response;
+          }
+
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+          return response;
+        })
+        .catch(async () => {
+          const cached = await caches.match(request);
           return cached || Response.error();
         })
     );

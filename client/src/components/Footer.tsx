@@ -1,4 +1,5 @@
 import { Link } from "wouter";
+import { useEffect, useState } from "react";
 import { Facebook, Instagram, MapPin, MessageCircle, Zap } from "lucide-react";
 
 const footerCategories = [
@@ -23,6 +24,23 @@ const footerCities = [
 ];
 
 export default function Footer() {
+  const [isPwaMode, setIsPwaMode] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const standalone =
+      window.matchMedia?.("(display-mode: standalone)")?.matches === true ||
+      ("standalone" in navigator &&
+        (navigator as Navigator & { standalone?: boolean }).standalone === true);
+
+    setIsPwaMode(standalone);
+  }, []);
+
+  if (isPwaMode) {
+    return null;
+  }
+
   return (
     <footer className="mt-16 bg-gray-900 text-gray-300">
       <div className="bg-brand-gradient px-4 py-10">

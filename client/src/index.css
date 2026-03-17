@@ -194,6 +194,17 @@
     to { transform: translateX(calc(-33.333% - 0.35rem)); }
   }
   .animate-pill-marquee { animation: pillMarquee 18s linear infinite; }
+  @keyframes navBolt {
+    0%, 100% { transform: translateY(0) scale(1); }
+    30% { transform: translateY(-1px) scale(1.06); }
+    60% { transform: translateY(0) scale(0.98); }
+  }
+  @keyframes navBoltPing {
+    0%, 100% { opacity: 0.15; transform: scale(0.8); }
+    50% { opacity: 0.5; transform: scale(1.2); }
+  }
+  .animate-nav-bolt { animation: navBolt 1.8s ease-in-out infinite; }
+  .animate-nav-bolt-ping { animation: navBoltPing 1.8s ease-in-out infinite; }
 }
 
 @layer components {

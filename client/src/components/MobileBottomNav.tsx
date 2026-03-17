@@ -92,7 +92,10 @@ export default function MobileBottomNav() {
                 : "text-slate-700"
             }`}
           >
-            <Zap className="h-5 w-5" />
+            <span className="relative inline-flex">
+              <Zap className="h-5 w-5 animate-nav-bolt" />
+              <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-orange-500/70 animate-nav-bolt-ping" />
+            </span>
             <span className="whitespace-nowrap">Anunciar</span>
           </Link>
           <Link

@@ -21,6 +21,7 @@ import {
 import {
   Bell,
   Briefcase,
+  Car,
   ChevronDown,
   Heart,
   HeartHandshake,
@@ -29,6 +30,7 @@ import {
   LogOut,
   MapPin,
   Plus,
+  Percent,
   Search,
   Settings,
   Shield,
@@ -63,6 +65,29 @@ const HEADER_PILLS = [
   { label: "Guia", href: "/guia", icon: HeartHandshake, tone: "bg-indigo-50 text-indigo-700" },
 ];
 
+const PWA_TOP_TABS = [
+  { label: "Tudo", href: "/busca", icon: Zap, tone: "text-slate-900" },
+  { label: "Veiculos", href: "/busca?q=veiculos", icon: Car, tone: "text-slate-700" },
+  { label: "Imoveis", href: "/busca?q=imoveis", icon: Home, tone: "text-slate-700" },
+  { label: "Produtos", href: "/busca", icon: ShoppingBag, tone: "text-slate-700" },
+];
+
+const PWA_ACTION_PILLS = [
+  { label: "Favoritos", href: "/favoritos", icon: Heart, tone: "bg-rose-50 text-rose-600" },
+  { label: "Cupons", href: "/planos", icon: Percent, tone: "bg-violet-50 text-violet-600" },
+  { label: "Servicos", href: "/busca?q=servicos", icon: Wrench, tone: "bg-amber-50 text-amber-600" },
+  { label: "Categorias", href: "/busca", icon: LayoutDashboard, tone: "bg-indigo-50 text-indigo-600" },
+];
+
+function isStandaloneMode() {
+  if (typeof window === "undefined") return false;
+
+  return (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    (window.navigator as Navigator & { standalone?: boolean }).standalone === true
+  );
+}
+
 export default function Header({
   selectedCity,
   onCityChange,
@@ -74,6 +99,7 @@ export default function Header({
   const [animatedQuery, setAnimatedQuery] = useState("");
   const [animatedIndex, setAnimatedIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isPwaMode, setIsPwaMode] = useState(false);
 
   const displayName =
     user?.personType === "pj"
@@ -131,6 +157,10 @@ export default function Header({
 
     return () => window.clearTimeout(timeout);
   }, [animatedIndex, animatedQuery, isDeleting, searchSuggestions]);
+
+  useEffect(() => {
+    setIsPwaMode(isStandaloneMode());
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -279,73 +309,168 @@ export default function Header({
           </div>
         </div>
 
-        <div className="space-y-2 py-3 xl:hidden">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-gradient shadow-md">
-                <Zap className="h-5 w-5 text-white" />
-              </div>
-              <div className="min-w-0">
-                <p className="font-display text-lg font-black leading-none text-gray-900">
-                  Norte
-                  <span style={{ color: "oklch(0.68 0.19 45)" }}>Vivo</span>
-                </p>
-              </div>
-            </Link>
-
-            <form onSubmit={handleSearch} className="min-w-0 flex-1">
-              <div className="relative">
-                <input
-                  type="text"
-                  value={searchQ}
-                  onChange={e => setSearchQ(e.target.value)}
-                  placeholder={searchPlaceholder}
-                  className="h-12 w-full rounded-2xl border border-slate-200 bg-white py-3 pl-4 pr-12 text-sm text-slate-700 outline-none"
-                />
-                <button
-                  type="submit"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-700"
+        <div className="xl:hidden">
+          {isPwaMode ? (
+            <div className="space-y-3 py-3">
+              <div className="flex items-center justify-between gap-3">
+                <Select
+                  value={selectedCity ? String(selectedCity) : "all"}
+                  onValueChange={value =>
+                    onCityChange?.(value === "all" ? null : Number(value))
+                  }
                 >
-                  <Search className="h-5 w-5" />
+                  <SelectTrigger className="h-auto max-w-[240px] border-0 bg-transparent px-0 text-sm font-medium text-slate-800 shadow-none focus:ring-0">
+                    <MapPin className="mr-1 h-4 w-4 text-slate-500" />
+                    <SelectValue placeholder="DDD 43 - Londrina e regiao" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas as cidades</SelectItem>
+                    {cities?.map(city => (
+                      <SelectItem key={city.id} value={String(city.id)}>
+                        {city.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <button
+                  type="button"
+                  onClick={() => navigate(isAuthenticated ? "/anunciante" : LOGIN_ROUTE)}
+                  className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl text-slate-700"
+                >
+                  <Bell className="h-5 w-5" />
+                  <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-orange-500" />
                 </button>
               </div>
-            </form>
 
-            <button
-              type="button"
-              onClick={() => navigate(isAuthenticated ? "/anunciante" : LOGIN_ROUTE)}
-              className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-slate-700"
-            >
-              <Bell className="h-5 w-5" />
-              <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-orange-500" />
-            </button>
-          </div>
+              <div className="overflow-x-auto scrollbar-hide">
+                <div className="flex w-max min-w-full items-end gap-6 border-b border-slate-100 pb-2">
+                  {PWA_TOP_TABS.map((item, index) => {
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.label}
+                        href={item.href}
+                        className={`flex min-w-[64px] flex-col items-center gap-1 text-xs font-medium ${item.tone}`}
+                      >
+                        <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-slate-100">
+                          <Icon className={`h-5 w-5 ${index === 0 ? "text-orange-500" : item.tone}`} />
+                        </span>
+                        <span>{item.label}</span>
+                        <span className={`mt-1 h-0.5 w-10 rounded-full ${index === 0 ? "bg-slate-900" : "bg-transparent"}`} />
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
 
-          <div className="border-b border-slate-100 pb-2">
-            <Select
-              value={selectedCity ? String(selectedCity) : "all"}
-              onValueChange={value =>
-                onCityChange?.(value === "all" ? null : Number(value))
-              }
-            >
-              <SelectTrigger className="h-auto max-w-[180px] border-0 bg-transparent px-0 text-sm font-medium text-slate-700 shadow-none focus:ring-0">
-                <MapPin className="mr-1 h-4 w-4 text-slate-500" />
-                <SelectValue placeholder="Parana" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas as cidades</SelectItem>
-                {cities?.map(city => (
-                  <SelectItem key={city.id} value={String(city.id)}>
-                    {city.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+              <form onSubmit={handleSearch}>
+                <div className="relative">
+                  <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    value={searchQ}
+                    onChange={e => setSearchQ(e.target.value)}
+                    placeholder="Buscar em Todos"
+                    className="h-12 w-full rounded-full border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm text-slate-700 outline-none"
+                  />
+                </div>
+              </form>
+
+              <div className="overflow-x-auto scrollbar-hide">
+                <div className="flex w-max gap-3 pb-1">
+                  {PWA_ACTION_PILLS.map(item => {
+                    const Icon = item.icon;
+                    const href =
+                      item.label === "Favoritos" && !isAuthenticated
+                        ? LOGIN_ROUTE
+                        : item.href;
+                    return (
+                      <Link
+                        key={item.label}
+                        href={href}
+                        className="inline-flex shrink-0 items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-3 text-xs font-medium text-slate-700 shadow-sm"
+                      >
+                        <span className={`inline-flex rounded-full p-2 ${item.tone}`}>
+                          <Icon className="h-4 w-4" />
+                        </span>
+                        {item.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-2 py-3">
+              <div className="flex items-center gap-3">
+                <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-gradient shadow-md">
+                    <Zap className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-display text-lg font-black leading-none text-gray-900">
+                      Norte
+                      <span style={{ color: "oklch(0.68 0.19 45)" }}>Vivo</span>
+                    </p>
+                  </div>
+                </Link>
+
+                <form onSubmit={handleSearch} className="min-w-0 flex-1">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={searchQ}
+                      onChange={e => setSearchQ(e.target.value)}
+                      placeholder={searchPlaceholder}
+                      className="h-12 w-full rounded-2xl border border-slate-200 bg-white py-3 pl-4 pr-12 text-sm text-slate-700 outline-none"
+                    />
+                    <button
+                      type="submit"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-700"
+                    >
+                      <Search className="h-5 w-5" />
+                    </button>
+                  </div>
+                </form>
+
+                <button
+                  type="button"
+                  onClick={() => navigate(isAuthenticated ? "/anunciante" : LOGIN_ROUTE)}
+                  className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-slate-700"
+                >
+                  <Bell className="h-5 w-5" />
+                  <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-orange-500" />
+                </button>
+              </div>
+
+              <div className="border-b border-slate-100 pb-2">
+                <Select
+                  value={selectedCity ? String(selectedCity) : "all"}
+                  onValueChange={value =>
+                    onCityChange?.(value === "all" ? null : Number(value))
+                  }
+                >
+                  <SelectTrigger className="h-auto max-w-[180px] border-0 bg-transparent px-0 text-sm font-medium text-slate-700 shadow-none focus:ring-0">
+                    <MapPin className="mr-1 h-4 w-4 text-slate-500" />
+                    <SelectValue placeholder="Parana" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas as cidades</SelectItem>
+                    {cities?.map(city => (
+                      <SelectItem key={city.id} value={String(city.id)}>
+                        {city.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="border-t border-slate-100 bg-white">
+      <div className={`border-t border-slate-100 bg-white ${isPwaMode ? "hidden xl:block" : ""}`}>
         <div className="container">
           <div className="overflow-x-auto py-2 sm:py-3 scrollbar-hide">
             <div className="flex w-max items-center gap-2 motion-safe:animate-pill-marquee">

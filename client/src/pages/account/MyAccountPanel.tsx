@@ -1,5 +1,5 @@
-import { type ComponentType, useMemo, useState } from "react";
-import { Link, useLocation } from "wouter";
+import { useMemo, useState } from "react";
+import { Link } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
@@ -15,259 +15,223 @@ import {
 import { LOGIN_ROUTE } from "@/const";
 import { trpc } from "@/lib/trpc";
 import {
-  Bell,
+  BadgePercent,
+  BriefcaseBusiness,
   ChevronDown,
   ChevronRight,
+  CircleCheck,
   CreditCard,
+  HandCoins,
   LayoutGrid,
   Lock,
   LogIn,
-  Mail,
   MapPin,
   Menu,
   MessageSquare,
-  Pencil,
-  Receipt,
-  Rocket,
+  ReceiptText,
   Settings,
   Shield,
   ShoppingBag,
   Star,
-  Store,
+  Tag,
   User,
-  Wallet,
 } from "lucide-react";
 
-type DashboardItem = {
+type SidebarItem = {
   key: string;
   label: string;
-  description: string;
-  href?: string;
+  icon: React.ComponentType<{ className?: string }>;
+  children?: { key: string; label: string; href?: string }[];
 };
 
-type DashboardGroup = {
-  key: string;
-  label: string;
-  icon: ComponentType<{ className?: string }>;
-  items: DashboardItem[];
-};
-
-type ActionCard = {
+type ProfileCard = {
   key: string;
   title: string;
   description: string;
-  icon: ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string }>;
   href?: string;
-  selectedKey?: string;
-  tone?: "default" | "success" | "premium";
-  badge?: string;
+  tone?: "default" | "ok" | "premium";
+  visible?: boolean;
 };
 
-const ACCOUNT_GROUPS = (
+function getSidebarItems(isAdvertiser: boolean, isStoreOwner: boolean): SidebarItem[] {
+  return [
+    {
+      key: "compras",
+      label: "Compras",
+      icon: ShoppingBag,
+      children: [
+        { key: "pedidos", label: "Pedidos" },
+        { key: "favoritos", label: "Favoritos", href: "/favoritos" },
+        { key: "cashback", label: "Cashback" },
+      ],
+    },
+    {
+      key: "vendas",
+      label: "Vendas",
+      icon: Tag,
+      children: isAdvertiser
+        ? [
+            { key: "ativos", label: "Anuncios ativos", href: "/anunciante" },
+            { key: "pausados", label: "Anuncios pausados", href: "/anunciante" },
+            { key: "novo", label: "Criar anuncio", href: "/anunciante/novo" },
+          ]
+        : [{ key: "vender", label: "Comecar a vender", href: "/anunciar" }],
+    },
+    {
+      key: "marketing",
+      label: "Marketing",
+      icon: BadgePercent,
+      children: [
+        { key: "booster", label: "Booster", href: "/booster" },
+        { key: "planos", label: "Planos", href: "/planos" },
+      ],
+    },
+    {
+      key: "emprestimos",
+      label: "Emprestimos",
+      icon: HandCoins,
+      children: [{ key: "credito", label: "Em breve" }],
+    },
+    {
+      key: "assinaturas",
+      label: "Assinaturas",
+      icon: Star,
+      children: [{ key: "nortevivomais", label: "NorteVivo+", href: "/planos" }],
+    },
+    {
+      key: "faturamento",
+      label: "Faturamento",
+      icon: ReceiptText,
+      children: [
+        { key: "extrato", label: "Extrato" },
+        { key: "pagamentos", label: "Pagamentos" },
+      ],
+    },
+    {
+      key: "meu-perfil",
+      label: "Meu perfil",
+      icon: User,
+      children: [
+        { key: "perfil", label: "Informacoes do perfil", href: "/anunciante/meus-dados" },
+        { key: "seguranca", label: "Seguranca" },
+        { key: "cartoes", label: "Cartoes" },
+        { key: "enderecos", label: "Enderecos" },
+        { key: "privacidade", label: "Privacidade" },
+        { key: "comunicacoes", label: "Comunicacoes" },
+        ...(isStoreOwner
+          ? [{ key: "loja", label: "Minha loja", href: "/anunciante/meus-dados" }]
+          : []),
+      ],
+    },
+    {
+      key: "configuracoes",
+      label: "Configuracoes",
+      icon: Settings,
+      children: [
+        { key: "preferencias", label: "Preferencias" },
+        { key: "ajuda", label: "Ajuda" },
+      ],
+    },
+  ];
+}
+
+function getProfileCards(
   isAdvertiser: boolean,
-  isStoreOwner: boolean
-): DashboardGroup[] => [
-  {
-    key: "conta",
-    label: "Minha Conta",
-    icon: User,
-    items: [
-      {
-        key: "perfil",
-        label: "Informacoes do Perfil",
-        description: "Dados principais da sua conta e apresentacao publica.",
-        href: "/anunciante/meus-dados",
-      },
-      {
-        key: "seguranca",
-        label: "Seguranca",
-        description: "Senha, acesso e protecao da conta.",
-      },
-      {
-        key: "enderecos",
-        label: "Enderecos",
-        description: "Locais salvos para compras e contato.",
-      },
-      {
-        key: "cartoes",
-        label: "Cartoes",
-        description: "Metodos de pagamento ja cadastrados.",
-      },
-      {
-        key: "comunicacoes",
-        label: "Comunicacoes",
-        description: "Escolha o que voce quer receber.",
-      },
-      {
-        key: "privacidade",
-        label: "Privacidade",
-        description: "Controle dos seus dados e permissoes.",
-      },
-    ],
-  },
-  {
-    key: "compras",
-    label: "Minhas Compras",
-    icon: ShoppingBag,
-    items: [
-      {
-        key: "pedidos",
-        label: "Pedidos",
-        description: "Acompanhe compras e negociacoes recentes.",
-      },
-      {
-        key: "favoritos",
-        label: "Favoritos",
-        description: "Anuncios e lojas que voce salvou.",
-        href: "/favoritos",
-      },
-      {
-        key: "cashback",
-        label: "Cashback",
-        description: "Saldo e vantagens acumuladas no portal.",
-      },
-    ],
-  },
-  ...(isAdvertiser
-    ? [
-        {
-          key: "anuncios",
-          label: "Meus Anuncios",
-          icon: LayoutGrid,
-          items: [
-            {
-              key: "ativos",
-              label: "Anuncios Ativos",
-              description: "Itens publicados e aparecendo no portal.",
-              href: "/anunciante",
-            },
-            {
-              key: "pausados",
-              label: "Anuncios Pausados",
-              description: "Itens prontos para voltar ao ar.",
-              href: "/anunciante",
-            },
-            {
-              key: "novo",
-              label: "Criar Novo Anuncio",
-              description: "Publique mais produtos ou servicos.",
-              href: "/anunciante/novo",
-            },
-            {
-              key: "booster",
-              label: "Booster",
-              description: "Impulsione anuncios para ganhar alcance.",
-              href: "/booster",
-            },
-          ],
-        },
-      ]
-    : []),
-  ...(isStoreOwner
-    ? [
-        {
-          key: "lojas",
-          label: "Minhas Lojas",
-          icon: Store,
-          items: [
-            {
-              key: "vitrine",
-              label: "Minha Vitrine",
-              description: "Resumo comercial da sua loja.",
-              href: "/lojas",
-            },
-            {
-              key: "produtos-loja",
-              label: "Produtos da Loja",
-              description: "Catalogo e itens vinculados ao perfil PJ.",
-              href: "/anunciante",
-            },
-            {
-              key: "pedidos-loja",
-              label: "Pedidos da Loja",
-              description: "Atendimento e movimentacao comercial.",
-            },
-            {
-              key: "config-loja",
-              label: "Configuracoes da Loja",
-              description: "Perfil, horarios e contato da empresa.",
-              href: "/anunciante/meus-dados",
-            },
-          ],
-        },
-      ]
-    : []),
-  {
-    key: "faturamento",
-    label: "Faturamento",
-    icon: Wallet,
-    items: [
-      {
-        key: "extrato",
-        label: "Extrato",
-        description: "Resumo financeiro da sua conta.",
-      },
-      {
-        key: "pagamentos",
-        label: "Pagamentos",
-        description: "Movimentacoes, recebimentos e cobrancas.",
-      },
-      {
-        key: "planos",
-        label: "Planos e Assinaturas",
-        description: "Booster, destaque e planos profissionais.",
-        href: "/planos",
-      },
-    ],
-  },
-  {
-    key: "configuracoes",
-    label: "Configuracoes",
-    icon: Settings,
-    items: [
-      {
-        key: "notificacoes",
-        label: "Notificacoes",
-        description: "Alertas de anuncios, pedidos e conversas.",
-      },
-      {
-        key: "preferencias",
-        label: "Preferencias",
-        description: "Escolhas de uso, cidade e interesses.",
-      },
-      {
-        key: "ajuda",
-        label: "Ajuda",
-        description: "Suporte, orientacoes e contato.",
-      },
-    ],
-  },
-];
+  isStoreOwner: boolean,
+  planActive: boolean
+): ProfileCard[] {
+  const cards: ProfileCard[] = [
+    {
+      key: "perfil",
+      title: "Informacoes do seu perfil",
+      description: "Dados pessoais e da conta.",
+      icon: User,
+      href: "/anunciante/meus-dados",
+    },
+    {
+      key: "seguranca",
+      title: "Seguranca",
+      description: "Voce configurou a seguranca da sua conta.",
+      icon: Lock,
+      tone: "ok",
+    },
+    {
+      key: "plus",
+      title: "NorteVivo+",
+      description: "Assinatura com beneficios exclusivos.",
+      icon: MessageSquare,
+      tone: "premium",
+      visible: planActive,
+      href: "/planos",
+    },
+    {
+      key: "cartoes",
+      title: "Cartoes",
+      description: "Cartoes salvos na sua conta.",
+      icon: CreditCard,
+    },
+    {
+      key: "enderecos",
+      title: "Enderecos",
+      description: "Enderecos salvos na sua conta.",
+      icon: MapPin,
+    },
+    {
+      key: "privacidade",
+      title: "Privacidade",
+      description: "Preferencias e controle do uso dos seus dados.",
+      icon: Shield,
+    },
+    {
+      key: "comunicacoes",
+      title: "Comunicacoes",
+      description: "Escolha que tipo de informacao voce quer receber.",
+      icon: MessageSquare,
+    },
+    {
+      key: "anuncios",
+      title: "Meus anuncios",
+      description: "Gerencie seus anuncios ativos e pausados.",
+      icon: LayoutGrid,
+      href: "/anunciante",
+      visible: isAdvertiser,
+    },
+    {
+      key: "loja",
+      title: "Minha loja",
+      description: "Gerencie sua vitrine e produtos.",
+      icon: BriefcaseBusiness,
+      href: "/anunciante/meus-dados",
+      visible: isStoreOwner,
+    },
+  ];
+
+  return cards.filter(card => card.visible !== false);
+}
 
 export default function MyAccountPanel() {
-  const { user, isAuthenticated, loading, logout } = useAuth();
-  const [, navigate] = useLocation();
+  const { user, isAuthenticated, loading } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
-    conta: true,
-    compras: true,
-    anuncios: true,
-    lojas: true,
-    faturamento: true,
-    configuracoes: true,
+  const [activeSection, setActiveSection] = useState("meu-perfil");
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
+    compras: false,
+    vendas: false,
+    marketing: false,
+    emprestimos: false,
+    assinaturas: false,
+    faturamento: false,
+    "meu-perfil": true,
+    configuracoes: false,
   });
-  const [selectedItem, setSelectedItem] = useState("perfil");
 
   const { data: advertiserStats } = trpc.advertiser.stats.useQuery(undefined, {
-    enabled: isAuthenticated,
-  });
-  const { data: favorites } = trpc.advertiser.myFavorites.useQuery(undefined, {
     enabled: isAuthenticated,
   });
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="flex min-h-screen items-center justify-center bg-[#f5f5f5]">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
       </div>
     );
@@ -299,535 +263,187 @@ export default function MyAccountPanel() {
     );
   }
 
-  const listings = advertiserStats?.listings ?? [];
-  const favoriteCount = favorites?.length ?? 0;
-  const isStoreOwner = user.personType === "pj";
-  const isAdvertiser = isStoreOwner || listings.length > 0;
-  const hasBuyerSignals = favoriteCount > 0;
-  const accountTypeLabel = isStoreOwner
-    ? hasBuyerSignals
-      ? "Ambos"
-      : "Anunciante PJ"
-    : isAdvertiser
-      ? hasBuyerSignals
-        ? "Ambos"
-        : "Anunciante PF"
-      : "Comprador";
   const displayName =
     user.personType === "pj" ? user.companyName || user.name : user.name;
-  const displayNameText = displayName || "Perfil";
-  const displayInitial = displayName?.charAt(0)?.toUpperCase() || "N";
   const avatarSrc = typeof user.avatar === "string" ? user.avatar : undefined;
-  const planActive = Boolean(user.trialStartedAt);
-  const groups = ACCOUNT_GROUPS(isAdvertiser, isStoreOwner);
-  const flatItems = groups.flatMap(group => group.items);
-  const selectedDetails =
-    flatItems.find(item => item.key === selectedItem) ?? flatItems[0];
-
-  const actionCards = useMemo<ActionCard[]>(() => {
-    const cards: ActionCard[] = [
-      {
-        key: "perfil-card",
-        title: "Informacoes do seu perfil",
-        description: "Dados pessoais e da conta.",
-        icon: User,
-        href: "/anunciante/meus-dados",
-        selectedKey: "perfil",
-      },
-      {
-        key: "seguranca-card",
-        title: "Seguranca",
-        description: "Voce configurou a seguranca da sua conta.",
-        icon: Lock,
-        selectedKey: "seguranca",
-        tone: "success",
-        badge: "Protegida",
-      },
-      ...(planActive
-        ? [
-            {
-              key: "plus-card",
-              title: "NorteVivo+",
-              description: "Assinatura com beneficios exclusivos.",
-              icon: Star,
-              href: "/planos",
-              selectedKey: "planos",
-              tone: "premium" as const,
-              badge: "Ativo",
-            },
-          ]
-        : []),
-      {
-        key: "cartoes-card",
-        title: "Meus Cartoes",
-        description: "Cartoes salvos na sua conta.",
-        icon: CreditCard,
-        selectedKey: "cartoes",
-      },
-      {
-        key: "enderecos-card",
-        title: "Meus Enderecos",
-        description: "Enderecos salvos na sua conta.",
-        icon: MapPin,
-        selectedKey: "enderecos",
-      },
-      {
-        key: "privacidade-card",
-        title: "Privacidade",
-        description: "Preferencias e controle do uso dos seus dados.",
-        icon: Shield,
-        selectedKey: "privacidade",
-      },
-      {
-        key: "comunicacoes-card",
-        title: "Comunicacoes",
-        description: "Escolha que tipo de informacao quer receber.",
-        icon: MessageSquare,
-        selectedKey: "comunicacoes",
-      },
-      {
-        key: "pedidos-card",
-        title: "Meus Pedidos",
-        description: "Acompanhe suas compras e vendas.",
-        icon: ShoppingBag,
-        selectedKey: "pedidos",
-      },
-      ...(isAdvertiser
-        ? [
-            {
-              key: "anuncios-card",
-              title: "Meus Anuncios",
-              description: "Gerencie seus anuncios ativos e pausados.",
-              icon: LayoutGrid,
-              href: "/anunciante",
-              selectedKey: "ativos",
-              badge: `${listings.length}`,
-            },
-            {
-              key: "booster-card",
-              title: "Booster",
-              description: "Impulsione seus anuncios e alcance mais clientes.",
-              icon: Rocket,
-              href: "/booster",
-              selectedKey: "booster",
-            },
-          ]
-        : []),
-      ...(isStoreOwner
-        ? [
-            {
-              key: "loja-card",
-              title: "Minha Loja",
-              description: "Gerencie sua vitrine e produtos.",
-              icon: Store,
-              href: "/anunciante/meus-dados",
-              selectedKey: "config-loja",
-            },
-          ]
-        : []),
-      {
-        key: "faturamento-card",
-        title: "Faturamento",
-        description: "Visualize seu extrato e pagamentos.",
-        icon: Receipt,
-        href: "/planos",
-        selectedKey: "extrato",
-      },
-    ];
-
-    return cards;
-  }, [isAdvertiser, isStoreOwner, listings.length, planActive]);
-
-  const handleItemClick = (item: DashboardItem) => {
-    setSelectedItem(item.key);
-    setMobileMenuOpen(false);
-    if (item.href) {
-      navigate(item.href);
-    }
-  };
+  const displayInitial = displayName?.charAt(0)?.toUpperCase() || "N";
+  const isStoreOwner = user.personType === "pj";
+  const isAdvertiser = isStoreOwner || (advertiserStats?.totalListings ?? 0) > 0;
+  const sidebarItems = useMemo(
+    () => getSidebarItems(isAdvertiser, isStoreOwner),
+    [isAdvertiser, isStoreOwner]
+  );
+  const profileCards = useMemo(
+    () => getProfileCards(isAdvertiser, isStoreOwner, Boolean(user.trialStartedAt)),
+    [isAdvertiser, isStoreOwner, user.trialStartedAt]
+  );
 
   const renderSidebar = () => (
-    <div className="flex h-full flex-col rounded-[28px] border border-slate-200 bg-white shadow-sm">
-      <div className="border-b border-slate-100 px-5 py-5">
-        <p className="text-xs font-black uppercase tracking-[0.22em] text-blue-600">
-          Minha Conta
-        </p>
-        <h2 className="mt-2 font-display text-2xl font-black text-slate-900">
-          Painel Norte Vivo
-        </h2>
-        <p className="mt-2 text-sm text-slate-500">
-          Dados, compras, anuncios, loja e faturamento em um so lugar.
-        </p>
+    <div className="flex h-full flex-col bg-[#f7f7f7]">
+      <div className="flex items-center gap-4 px-6 py-7">
+        <button
+          type="button"
+          className="rounded-full p-2 text-slate-500 transition-colors hover:bg-white hover:text-slate-800"
+        >
+          <Menu className="h-6 w-6" />
+        </button>
+        <span className="text-2xl font-semibold text-slate-900">Minha conta</span>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-3 py-3">
-        {groups.map(group => {
-          const Icon = group.icon;
-          const expanded = expandedGroups[group.key] ?? true;
+      <div className="space-y-2 px-3 py-6">
+        {sidebarItems.map(item => {
+          const Icon = item.icon;
+          const isActive = item.key === activeSection;
+          const isOpen = openGroups[item.key];
+
           return (
-            <section key={group.key} className="mb-2">
+            <div key={item.key}>
               <button
                 type="button"
-                onClick={() =>
-                  setExpandedGroups(current => ({
+                onClick={() => {
+                  setActiveSection(item.key);
+                  setOpenGroups(current => ({
                     ...current,
-                    [group.key]: !expanded,
-                  }))
-                }
-                className="flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition-colors hover:bg-slate-50"
+                    [item.key]: !current[item.key],
+                  }));
+                }}
+                className={`flex w-full items-center gap-4 rounded-2xl px-4 py-3 text-left transition-colors ${
+                  isActive ? "bg-white text-blue-600" : "text-slate-600 hover:bg-white"
+                }`}
               >
-                <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-100 text-slate-700">
-                  <Icon className="h-4 w-4" />
-                </span>
-                <span className="flex-1 font-semibold text-slate-900">
-                  {group.label}
+                <div className="relative">
+                  <Icon className="h-6 w-6" />
+                  {isActive && (
+                    <span className="absolute -bottom-1 left-1/2 h-2.5 w-2.5 -translate-x-1/2 rounded-full bg-blue-500" />
+                  )}
+                </div>
+                <span className={`flex-1 text-[15px] ${isActive ? "font-semibold" : "font-medium"}`}>
+                  {item.label}
                 </span>
                 <ChevronDown
-                  className={`h-4 w-4 text-slate-400 transition-transform ${
-                    expanded ? "rotate-180" : ""
-                  }`}
+                  className={`h-5 w-5 text-slate-400 transition-transform ${isOpen ? "rotate-180" : ""}`}
                 />
               </button>
 
-              {expanded && (
-                <div className="mt-1 space-y-1 pl-3">
-                  {group.items.map(item => {
-                    const active = selectedItem === item.key;
-                    return (
-                      <button
-                        key={item.key}
-                        type="button"
-                        onClick={() => handleItemClick(item)}
-                        className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm transition-all ${
-                          active
-                            ? "bg-blue-50 font-semibold text-blue-700"
-                            : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                        }`}
+              {isOpen && item.children?.length ? (
+                <div className="ml-14 mt-1 space-y-1">
+                  {item.children.map(child =>
+                    child.href ? (
+                      <Link
+                        key={child.key}
+                        href={child.href}
+                        className="flex items-center rounded-xl px-3 py-2 text-sm text-slate-500 transition-colors hover:bg-white hover:text-slate-900"
                       >
-                        <span className="flex-1">{item.label}</span>
-                        <ChevronRight className="h-4 w-4 shrink-0" />
-                      </button>
-                    );
-                  })}
+                        {child.label}
+                      </Link>
+                    ) : (
+                      <div
+                        key={child.key}
+                        className="flex items-center rounded-xl px-3 py-2 text-sm text-slate-500"
+                      >
+                        {child.label}
+                      </div>
+                    )
+                  )}
                 </div>
-              )}
-            </section>
+              ) : null}
+            </div>
           );
         })}
-      </div>
-
-      <div className="border-t border-slate-100 px-5 py-4">
-        <button
-          type="button"
-          onClick={() => logout()}
-          className="flex w-full items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100"
-        >
-          Sair da conta
-          <ChevronRight className="h-4 w-4" />
-        </button>
       </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <Header />
-      <main className="container py-4 sm:py-6">
-        <div className="mb-4 flex items-center justify-between gap-3 lg:hidden">
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.22em] text-blue-600">
-              Minha Conta
-            </p>
-            <h1 className="font-display text-2xl font-black text-slate-900">
-              Seu painel
-            </h1>
+    <div className="min-h-screen bg-[#efefef] text-slate-900">
+      <div className="lg:grid lg:min-h-screen lg:grid-cols-[304px_minmax(0,1fr)]">
+        <aside className="hidden border-r border-slate-200 bg-[#f7f7f7] lg:block">
+          {renderSidebar()}
+        </aside>
+
+        <main className="min-w-0">
+          <div className="px-5 py-5 lg:hidden">
+            <Button
+              type="button"
+              variant="outline"
+              className="rounded-2xl bg-white"
+              onClick={() => setMobileMenuOpen(true)}
+            >
+              <Menu className="mr-2 h-4 w-4" />
+              Minha conta
+            </Button>
           </div>
-          <Button
-            type="button"
-            variant="outline"
-            className="rounded-2xl"
-            onClick={() => setMobileMenuOpen(true)}
-          >
-            <Menu className="mr-2 h-4 w-4" />
-            Menu
-          </Button>
-        </div>
 
-        <div className="grid gap-6 lg:grid-cols-[290px_minmax(0,1fr)]">
-          <aside className="hidden lg:block">{renderSidebar()}</aside>
+          <div className="px-5 pb-24 pt-4 sm:px-8 lg:px-12 lg:pt-8">
+            <section className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+              <Avatar className="h-24 w-24 border border-white shadow-sm">
+                <AvatarImage src={avatarSrc} alt={displayName || "Perfil"} />
+                <AvatarFallback className="bg-white text-2xl font-bold text-slate-700">
+                  {displayInitial}
+                </AvatarFallback>
+              </Avatar>
 
-          <div className="space-y-6">
-            <section className="rounded-[30px] border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
-              <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-                <div className="flex items-start gap-4">
-                  <Avatar className="h-20 w-20 rounded-[26px] border border-slate-200">
-                    <AvatarImage src={avatarSrc} alt={displayNameText} />
-                    <AvatarFallback className="bg-brand-gradient text-2xl font-black text-white">
-                      {displayInitial}
-                    </AvatarFallback>
-                  </Avatar>
+              <div className="min-w-0">
+                <h1 className="truncate text-[22px] font-semibold text-slate-900 sm:text-[26px]">
+                  {displayName}
+                </h1>
+                <p className="mt-1 text-lg text-slate-700">{user.email}</p>
+              </div>
+            </section>
 
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h1 className="font-display text-2xl font-black text-slate-900 sm:text-3xl">
-                        {displayName}
-                      </h1>
-                      <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">
-                        {accountTypeLabel}
-                      </span>
+            <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+              {profileCards.map(card => {
+                const Icon = card.icon;
+                const iconTone =
+                  card.tone === "ok"
+                    ? "text-slate-900"
+                    : card.tone === "premium"
+                      ? "text-slate-900"
+                      : "text-slate-900";
+
+                const cardInner = (
+                  <article className="relative rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
+                    <div className="flex items-start justify-between gap-3">
+                      <Icon className={`h-7 w-7 ${iconTone}`} />
+                      {card.tone === "ok" ? (
+                        <CircleCheck className="h-6 w-6 text-emerald-500" />
+                      ) : null}
                     </div>
-                    <p className="mt-2 flex items-center gap-2 text-sm text-slate-500">
-                      <Mail className="h-4 w-4 shrink-0" />
-                      {user.email}
+                    <h2 className="mt-12 text-[20px] font-medium text-slate-900">
+                      {card.title}
+                    </h2>
+                    <p className="mt-2 max-w-[280px] text-[16px] leading-8 text-slate-500">
+                      {card.description}
                     </p>
-                    <div className="mt-4 flex flex-wrap gap-2 text-xs text-slate-500">
-                      <span className="rounded-full bg-slate-100 px-3 py-1.5 font-semibold text-slate-600">
-                        {favoriteCount} favorito(s)
-                      </span>
-                      <span className="rounded-full bg-slate-100 px-3 py-1.5 font-semibold text-slate-600">
-                        {advertiserStats?.totalListings ?? 0} anuncio(s)
-                      </span>
-                      <span className="rounded-full bg-slate-100 px-3 py-1.5 font-semibold text-slate-600">
-                        {advertiserStats?.totalViews ?? 0} visualizacao(oes)
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                  </article>
+                );
 
-                <div className="flex flex-col gap-3 sm:flex-row">
-                  <Link href="/anunciante/meus-dados" className="block">
-                    <Button variant="outline" className="w-full rounded-2xl">
-                      <Pencil className="mr-2 h-4 w-4" />
-                      Editar Perfil
-                    </Button>
+                return card.href ? (
+                  <Link key={card.key} href={card.href} className="block">
+                    {cardInner}
                   </Link>
-                  {isAdvertiser && (
-                    <Link href="/anunciante/novo" className="block">
-                      <Button className="w-full rounded-2xl bg-orange-500 text-white hover:bg-orange-600">
-                        Novo anuncio
-                      </Button>
-                    </Link>
-                  )}
-                </div>
-              </div>
-            </section>
-
-            <section className="rounded-[30px] border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
-              <div className="flex flex-col gap-2 border-b border-slate-100 pb-5 sm:flex-row sm:items-end sm:justify-between">
-                <div>
-                  <p className="text-xs font-black uppercase tracking-[0.22em] text-blue-600">
-                    Visao Geral
-                  </p>
-                  <h2 className="mt-2 font-display text-2xl font-black text-slate-900">
-                    Acessos rapidos da sua conta
-                  </h2>
-                  <p className="mt-2 text-sm text-slate-500">
-                    Abra as partes mais importantes do seu painel sem ficar
-                    procurando menu por menu.
-                  </p>
-                </div>
-
-                <div className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
-                  <span className="font-semibold text-slate-900">
-                    Em destaque:
-                  </span>{" "}
-                  {selectedDetails.label}
-                </div>
-              </div>
-
-              <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {actionCards.map(card => {
-                  const Icon = card.icon;
-                  const toneClasses =
-                    card.tone === "success"
-                      ? "bg-emerald-50 text-emerald-700"
-                      : card.tone === "premium"
-                        ? "bg-amber-50 text-amber-700"
-                        : "bg-blue-50 text-blue-700";
-
-                  const content = (
-                    <article
-                      className="group h-full rounded-[26px] border border-slate-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
-                      onClick={() => {
-                        if (card.selectedKey) setSelectedItem(card.selectedKey);
-                      }}
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <span
-                          className={`flex h-12 w-12 items-center justify-center rounded-2xl ${toneClasses}`}
-                        >
-                          <Icon className="h-5 w-5" />
-                        </span>
-                        {card.badge && (
-                          <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-600">
-                            {card.badge}
-                          </span>
-                        )}
-                      </div>
-                      <h3 className="mt-4 font-display text-xl font-black text-slate-900">
-                        {card.title}
-                      </h3>
-                      <p className="mt-2 text-sm leading-6 text-slate-500">
-                        {card.description}
-                      </p>
-                      <div className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-blue-700">
-                        Abrir
-                        <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                      </div>
-                    </article>
-                  );
-
-                  return card.href ? (
-                    <Link key={card.key} href={card.href} className="block">
-                      {content}
-                    </Link>
-                  ) : (
-                    <button
-                      key={card.key}
-                      type="button"
-                      className="block text-left"
-                      onClick={() => {
-                        if (card.selectedKey) setSelectedItem(card.selectedKey);
-                      }}
-                    >
-                      {content}
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
-
-            <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
-              <article className="rounded-[30px] border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
-                <p className="text-xs font-black uppercase tracking-[0.22em] text-blue-600">
-                  Secao selecionada
-                </p>
-                <h2 className="mt-2 font-display text-2xl font-black text-slate-900">
-                  {selectedDetails.label}
-                </h2>
-                <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-500">
-                  {selectedDetails.description}
-                </p>
-
-                <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                  <div className="rounded-[24px] bg-slate-50 p-5">
-                    <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-400">
-                      Conta
-                    </p>
-                    <p className="mt-2 text-lg font-bold text-slate-900">
-                      {accountTypeLabel}
-                    </p>
-                    <p className="mt-2 text-sm text-slate-500">
-                      Seu painel adapta atalhos para compras, anuncios e
-                      operacao de loja conforme o tipo da conta.
-                    </p>
-                  </div>
-                  <div className="rounded-[24px] bg-slate-50 p-5">
-                    <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-400">
-                      Proximo passo
-                    </p>
-                    <p className="mt-2 text-lg font-bold text-slate-900">
-                      {isAdvertiser
-                        ? "Mantenha anuncios e perfil atualizados"
-                        : "Complete seus dados e salve favoritos"}
-                    </p>
-                    <p className="mt-2 text-sm text-slate-500">
-                      Quanto mais completa a conta, mais facil acompanhar
-                      oportunidades, vendas e contatos.
-                    </p>
-                  </div>
-                </div>
-              </article>
-
-              <aside className="space-y-4">
-                <article className="rounded-[30px] border border-slate-200 bg-white p-5 shadow-sm">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
-                      <Bell className="h-5 w-5" />
-                    </span>
-                    <div>
-                      <h3 className="font-display text-xl font-black text-slate-900">
-                        Alertas da conta
-                      </h3>
-                      <p className="text-sm text-slate-500">
-                        Resumo rapido do que importa hoje.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mt-5 space-y-3">
-                    <div className="rounded-2xl bg-slate-50 p-4">
-                      <p className="font-semibold text-slate-900">
-                        {favoriteCount > 0
-                          ? `${favoriteCount} item(ns) salvo(s) em favoritos`
-                          : "Voce ainda nao salvou favoritos"}
-                      </p>
-                      <p className="mt-1 text-sm text-slate-500">
-                        Use favoritos para acompanhar anuncios e voltar depois.
-                      </p>
-                    </div>
-                    <div className="rounded-2xl bg-slate-50 p-4">
-                      <p className="font-semibold text-slate-900">
-                        {isAdvertiser
-                          ? `${advertiserStats?.totalListings ?? 0} anuncio(s) no ar ou em gestao`
-                          : "Sua conta esta pronta para comprar ou anunciar"}
-                      </p>
-                      <p className="mt-1 text-sm text-slate-500">
-                        Acesse o painel sempre que quiser atualizar dados,
-                        contatos e publicacoes.
-                      </p>
-                    </div>
-                  </div>
-                </article>
-
-                <article className="rounded-[30px] bg-gradient-to-br from-slate-900 via-slate-900 to-orange-700 p-5 text-white shadow-lg">
-                  <p className="text-xs font-black uppercase tracking-[0.22em] text-orange-200">
-                    Norte Vivo
-                  </p>
-                  <h3 className="mt-2 font-display text-2xl font-black">
-                    Sua conta como centro de compras, anuncios e negocios.
-                  </h3>
-                  <p className="mt-3 text-sm leading-6 text-slate-200">
-                    Gerencie tudo em um painel unico e fique mais perto das
-                    oportunidades da sua cidade.
-                  </p>
-                  <div className="mt-5 grid gap-3">
-                    <Link href="/planos" className="block">
-                      <Button className="w-full rounded-2xl bg-white text-slate-900 hover:bg-slate-100">
-                        Ver planos
-                      </Button>
-                    </Link>
-                    <Link href="/anunciante/novo" className="block">
-                      <Button
-                        variant="outline"
-                        className="w-full rounded-2xl border-white/20 bg-white/10 text-white hover:bg-white/15"
-                      >
-                        Publicar anuncio
-                      </Button>
-                    </Link>
-                  </div>
-                </article>
-              </aside>
+                ) : (
+                  <div key={card.key}>{cardInner}</div>
+                );
+              })}
             </section>
           </div>
-        </div>
-      </main>
+        </main>
+      </div>
 
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-        <SheetContent side="left" className="w-[88vw] max-w-sm p-0">
-          <SheetHeader className="border-b border-slate-100 px-5 py-5 text-left">
-            <SheetTitle className="font-display text-2xl font-black text-slate-900">
-              Minha Conta
+        <SheetContent side="left" className="w-[88vw] max-w-sm border-r-0 bg-[#f7f7f7] p-0">
+          <SheetHeader className="border-b border-slate-200 px-5 py-5 text-left">
+            <SheetTitle className="text-2xl font-semibold text-slate-900">
+              Minha conta
             </SheetTitle>
             <SheetDescription>
-              Navegue pelas areas da sua conta no Norte Vivo.
+              Navegue pelas areas da sua conta.
             </SheetDescription>
           </SheetHeader>
-          <div className="h-full overflow-y-auto p-3">{renderSidebar()}</div>
+          <div className="h-full overflow-y-auto">{renderSidebar()}</div>
         </SheetContent>
       </Sheet>
-
-      <Footer />
     </div>
   );
 }

@@ -1156,18 +1156,17 @@ export default function Home() {
                   Publique agora
                 </p>
                 <h2 className="mt-3 font-display text-3xl font-black">
-                  O Norte Vivo precisa parecer vivo ja na primeira dobra.
+                  Seja lembrado em toda a regiao e venda com mais chance todos os dias.
                 </h2>
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-200 sm:text-base">
-                  Quanto mais anuncios, lojas e servicos reais aparecerem aqui,
-                  mais forte fica a percepcao comercial do portal.
+                  Quanto mais produtos e servicos voce publica, mais vezes seu negocio aparece para quem esta pronto para comprar.
                 </p>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <Link href={isAuthenticated ? "/anunciante/novo" : LOGIN_ROUTE}>
                   <Button className="h-12 w-full rounded-2xl bg-white text-slate-900 hover:bg-slate-100">
                     <Zap className="mr-2 h-4 w-4" />
-                    Anunciar agora
+                    Anuncie gratis
                   </Button>
                 </Link>
                 <Link href="/planos">

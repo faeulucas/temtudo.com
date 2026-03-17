@@ -1207,21 +1207,21 @@ export default function Home() {
         </section>
 
         <section className="container pb-14">
-          <div className="mb-6 grid gap-4 lg:grid-cols-2">
+          <div className="mb-6 grid gap-4 overflow-hidden lg:grid-cols-2">
             <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
               <div className="flex items-start gap-3">
                 <div className="rounded-2xl bg-blue-50 p-3 text-blue-700">
                   <CalendarDays className="h-6 w-6" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-600">
                     Eventos da regiao
                   </p>
-                  <h2 className="mt-2 font-display text-2xl font-black text-slate-900">
-                    O que vai acontecer perto de voce
+                  <h2 className="mt-2 text-balance font-display text-2xl font-black leading-tight text-slate-900">
+                    Agenda local para voce nao perder o que vai rolar
                   </h2>
                   <p className="mt-2 text-sm leading-6 text-slate-500">
-                    Feiras, shows, encontros e novidades para movimentar sua cidade.
+                    Feiras, shows, encontros e atracoes da regiao em um so lugar.
                   </p>
                 </div>
               </div>
@@ -1241,28 +1241,37 @@ export default function Home() {
                         <Link
                           key={item.id}
                           href={`/anuncio/${item.id}`}
-                          className="flex items-center gap-3 rounded-[22px] border border-slate-200 bg-slate-50 p-3 transition hover:border-blue-200 hover:bg-blue-50/50"
+                          className="block overflow-hidden rounded-[22px] border border-slate-200 bg-slate-50 p-3 transition hover:border-blue-200 hover:bg-blue-50/50"
                         >
-                          <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-slate-100">
-                            {image ? (
-                          <img
-                            src={image}
-                            alt={item.title}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <CalendarDays className="h-6 w-6 text-slate-400" />
-                        )}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="truncate font-display text-lg font-bold text-slate-900">
-                              {item.title}
-                            </p>
-                            <p className="mt-1 truncate text-sm text-slate-500">
-                              {[item.neighborhood, cities?.find(city => city.id === item.cityId)?.name]
-                                .filter(Boolean)
-                                .join(", ") || "Norte Pioneiro"}
-                            </p>
+                          <div className="flex items-start gap-3">
+                            <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-slate-100">
+                              {image ? (
+                                <img
+                                  src={image}
+                                  alt={item.title}
+                                  className="h-full w-full object-cover"
+                                />
+                              ) : (
+                                <CalendarDays className="h-6 w-6 text-slate-400" />
+                              )}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <span className="inline-flex rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-semibold text-blue-700">
+                                Evento local
+                              </span>
+                              <p className="mt-2 line-clamp-2 font-display text-lg font-bold leading-6 text-slate-900">
+                                {item.title}
+                              </p>
+                              <p className="mt-2 text-sm text-slate-500">
+                                {[item.neighborhood, cities?.find(city => city.id === item.cityId)?.name]
+                                  .filter(Boolean)
+                                  .join(", ") || "Norte Pioneiro"}
+                              </p>
+                              <div className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-blue-700">
+                                Ver detalhes
+                                <ArrowRight className="h-4 w-4" />
+                              </div>
+                            </div>
                           </div>
                         </Link>
                       );

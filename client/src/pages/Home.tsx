@@ -423,12 +423,8 @@ export default function Home() {
                   Marketplace + Guia Local + Lojas e Empresas
                 </div>
                 <h1 className="hidden mt-4 font-display text-3xl font-black leading-tight text-white sm:block sm:text-5xl">
-                  O shopping da cidade e os servicos locais em um so lugar.
+                  Tudo o que você precisa na sua cidade, em um só lugar.
                 </h1>
-                <p className="hidden mt-3 max-w-2xl text-sm leading-6 text-blue-50/90 sm:block sm:mt-4 sm:text-lg sm:leading-7">
-                  Encontre produtos, negocios e servicos reais do Norte
-                  Pioneiro logo na primeira busca.
-                </p>
 
                 <div className="hidden grid-cols-2 gap-3 sm:mt-6 md:grid md:grid-cols-4">
                   {MAIN_SHORTCUTS.map(item => {
@@ -532,11 +528,8 @@ export default function Home() {
                 Guia local
               </p>
               <h2 className="font-display text-3xl font-black text-slate-900">
-                Servicos locais que resolvem o dia a dia
+                {`Serviços Essenciais em ${selectedCityName}`}
               </h2>
-              <p className="mt-2 text-sm text-slate-500">
-                Atalhos rapidos para o que mais importa em {selectedCityName}.
-              </p>
             </div>
             <Link href="/guia">
               <Button variant="outline" className="rounded-2xl">
@@ -580,11 +573,8 @@ export default function Home() {
                 Lojas e empresas
               </p>
               <h2 className="font-display text-3xl font-black text-slate-900">
-                Descubra lojas, produtos e telefones perto de voce
+                Lojas e Empresas em Destaque
               </h2>
-              <p className="mt-2 text-sm text-slate-500">
-                Explore negocios locais, encontre contatos uteis e veja o que esta mais perto de voce.
-              </p>
             </div>
             <Link href="/lojas">
               <Button variant="outline" className="rounded-2xl">
@@ -779,11 +769,8 @@ export default function Home() {
                 Booster
               </p>
               <h2 className="font-display text-2xl font-black text-slate-900 sm:text-3xl">
-                Anuncios patrocinados
+                Ofertas Imperdíveis no Norte Pioneiro
               </h2>
-              <p className="mt-2 text-sm text-slate-500">
-                Mais visibilidade para ofertas impulsionadas no Norte Vivo.
-              </p>
             </div>
             <Link href="/booster">
               <Button variant="outline" className="rounded-2xl px-4 py-2 text-sm">
@@ -887,101 +874,104 @@ export default function Home() {
           )}
         </section>
 
-        <section className="container py-5 sm:py-8">
-          <div className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-end sm:justify-between">
+        <section className="container py-6 sm:py-10">
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-violet-600">
-                Mao de obra local
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-600">
+                Feed de novidades
               </p>
               <h2 className="font-display text-3xl font-black text-slate-900">
-                Precisando de um servico? Contrate agora mesmo
+                Novidades e Oportunidades Recentes
               </h2>
-              <p className="mt-2 text-sm text-slate-500">
-                Encontre prestadores com perfil ativo, cidade visivel e contato rapido por WhatsApp.
-              </p>
             </div>
-            <Link href="/busca?q=servicos">
-              <Button variant="outline" className="rounded-2xl px-4 py-2 text-sm">
-                Ver servicos
+            <Link href="/busca">
+              <Button variant="outline" className="rounded-2xl">
+                Ver mais
               </Button>
             </Link>
           </div>
 
-          {serviceProviders.length > 0 ? (
-            <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 xl:grid xl:grid-cols-4 xl:overflow-visible xl:pb-0">
-              {serviceProviders.map(item => {
-                const displayName =
-                  item.seller?.companyName?.trim() ||
-                  item.seller?.name?.trim() ||
-                  item.title;
-                const cityName =
-                  cities?.find(city => city.id === item.seller?.cityId)?.name ||
-                  cities?.find(city => city.id === item.cityId)?.name ||
-                  "Norte Pioneiro";
-                const whatsappNumber = item.seller?.whatsapp || item.whatsapp;
-                const whatsappHref = whatsappNumber
-                  ? `https://wa.me/55${whatsappNumber.replace(/\D/g, "")}`
-                  : null;
-
-                return (
-                  <article
-                    key={item.id}
-                    className="min-w-[82%] snap-center rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm sm:min-w-[300px] sm:rounded-[28px] xl:min-w-0"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[20px] bg-slate-100 text-lg font-black text-blue-700">
-                        {item.seller?.avatar ? (
+          {recentListings.length > 0 ? (
+            <>
+              <div className="space-y-3 md:hidden">
+                {recentListings.slice(0, 6).map(listing => {
+                  const listingMedia = listing as typeof listing & {
+                    images?: { url: string; isPrimary?: boolean | null }[];
+                  };
+                  const image =
+                    listingMedia.images?.find(photo => photo.isPrimary)?.url ||
+                    listingMedia.images?.[0]?.url;
+                  return (
+                    <Link
+                      key={listing.id}
+                      href={`/anuncio/${listing.id}`}
+                      className="flex items-center gap-3 rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm"
+                    >
+                      <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-slate-100">
+                        {image ? (
                           <img
-                            src={item.seller.avatar}
-                            alt={displayName}
+                            src={image}
+                            alt={listing.title}
                             className="h-full w-full object-cover"
                           />
                         ) : (
-                          displayName.charAt(0).toUpperCase()
+                          <div className="flex h-full w-full items-center justify-center bg-slate-100">
+                            <LayoutGrid className="h-5 w-5 text-slate-400" />
+                          </div>
                         )}
                       </div>
                       <div className="min-w-0">
-                        <p className="truncate font-display text-xl font-bold text-slate-900">
-                          {displayName}
+                        <p className="truncate font-display text-lg font-bold text-slate-900">
+                          {listing.title}
                         </p>
-                        <p className="mt-1 truncate text-sm text-slate-500">
-                          {cities?.find(city => city.id === item.seller?.cityId)?.name ||
-                            cityName}
+                        <p className="mt-1 text-base font-black text-orange-600">
+                          {formatListingPrice(listing.price, listing.priceType)}
+                        </p>
+                        <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px]">
+                          <span className="rounded-full bg-slate-100 px-2.5 py-1 font-semibold text-slate-600">
+                            {getPriceTypeLabel(listing.priceType)}
+                          </span>
+                          <span className="rounded-full bg-blue-50 px-2.5 py-1 font-semibold text-blue-700">
+                            {listing.type === "food"
+                              ? "Comida"
+                              : listing.type === "service"
+                                ? "Servico"
+                                : listing.type === "property"
+                                  ? "Imovel"
+                                  : listing.type === "vehicle"
+                                    ? "Veiculo"
+                                    : "Produto"}
+                          </span>
+                        </div>
+                        <p className="mt-2 truncate text-xs text-slate-500">
+                          {[listing.neighborhood, cities?.find(city => city.id === listing.cityId)?.name]
+                            .filter(Boolean)
+                            .join(", ") || "Norte Pioneiro"}
                         </p>
                       </div>
-                    </div>
-                    <div className="mt-4 flex items-center gap-2 text-sm text-slate-500">
-                      <MapPin className="h-4 w-4 text-slate-400" />
-                      <span>{cityName}</span>
-                    </div>
-                    {whatsappHref ? (
-                      <a
-                        href={whatsappHref}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700"
-                      >
-                        <Phone className="h-4 w-4" />
-                        WhatsApp
-                      </a>
-                    ) : (
-                      <Link
-                        href={`/anuncio/${item.id}`}
-                        className="mt-4 inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700"
-                      >
-                        <ArrowRight className="h-4 w-4" />
-                        Ver perfil
-                      </Link>
-                    )}
-                  </article>
-                );
-              })}
-            </div>
+                    </Link>
+                  );
+                })}
+              </div>
+
+              <div className="hidden grid-cols-2 gap-4 md:grid md:grid-cols-4 xl:grid-cols-5">
+              {recentListings.map(listing => (
+                <ListingCard
+                  key={listing.id}
+                  {...listing}
+                  cityName={cities?.find(city => city.id === listing.cityId)?.name}
+                  categoryName={
+                    categories?.find(category => category.id === listing.categoryId)?.name
+                  }
+                />
+              ))}
+              </div>
+            </>
           ) : (
-            <div className="rounded-[28px] border border-dashed border-slate-200 bg-white p-8 text-center">
-              <HeartHandshake className="mx-auto h-10 w-10 text-violet-300" />
+            <div className="rounded-[28px] border border-dashed border-slate-200 bg-white p-12 text-center">
+              <LayoutGrid className="mx-auto h-12 w-12 text-slate-300" />
               <p className="mt-4 text-slate-500">
-                Os primeiros prestadores com contato rapido aparecerao aqui.
+                Assim que novos anuncios entrarem no portal, a Home vai refletir isso aqui.
               </p>
             </div>
           )}
@@ -995,11 +985,8 @@ export default function Home() {
                   O que comer hoje
                 </p>
                 <h2 className="font-display text-3xl font-black text-slate-900">
-                  O que tem pra comer hoje perto de mim?
+                  Bateu a fome? Peça agora nas melhores lojas.
                 </h2>
-                <p className="mt-2 text-sm text-slate-500">
-                  Mostramos aqui so lanches e pedidos de lojas abertas agora na sua regiao.
-                </p>
               </div>
               <Link href="/busca?q=lanche">
                 <Button variant="outline" className="rounded-2xl">
@@ -1110,107 +1097,98 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="container py-6 sm:py-10">
-          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <section className="container py-5 sm:py-8">
+          <div className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-600">
-                Feed de novidades
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-violet-600">
+                Explore por categoria
               </p>
               <h2 className="font-display text-3xl font-black text-slate-900">
-                Ultimos anuncios publicados
+                Encontre Profissionais e Prestadores de Serviço
               </h2>
-              <p className="mt-2 text-sm text-slate-500">
-                Novidades para manter a Home viva e em movimento.
-              </p>
             </div>
-            <Link href="/busca">
-              <Button variant="outline" className="rounded-2xl">
-                Ver mais
+            <Link href="/busca?q=servicos">
+              <Button variant="outline" className="rounded-2xl px-4 py-2 text-sm">
+                Ver servicos
               </Button>
             </Link>
           </div>
 
-          {recentListings.length > 0 ? (
-            <>
-              <div className="space-y-3 md:hidden">
-                {recentListings.slice(0, 6).map(listing => {
-                  const listingMedia = listing as typeof listing & {
-                    images?: { url: string; isPrimary?: boolean | null }[];
-                  };
-                  const image =
-                    listingMedia.images?.find(photo => photo.isPrimary)?.url ||
-                    listingMedia.images?.[0]?.url;
-                  return (
-                    <Link
-                      key={listing.id}
-                      href={`/anuncio/${listing.id}`}
-                      className="flex items-center gap-3 rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm"
-                    >
-                      <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-slate-100">
-                        {image ? (
+          {serviceProviders.length > 0 ? (
+            <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 xl:grid xl:grid-cols-4 xl:overflow-visible xl:pb-0">
+              {serviceProviders.map(item => {
+                const displayName =
+                  item.seller?.companyName?.trim() ||
+                  item.seller?.name?.trim() ||
+                  item.title;
+                const cityName =
+                  cities?.find(city => city.id === item.seller?.cityId)?.name ||
+                  cities?.find(city => city.id === item.cityId)?.name ||
+                  "Norte Pioneiro";
+                const whatsappNumber = item.seller?.whatsapp || item.whatsapp;
+                const whatsappHref = whatsappNumber
+                  ? `https://wa.me/55${whatsappNumber.replace(/\D/g, "")}`
+                  : null;
+
+                return (
+                  <article
+                    key={item.id}
+                    className="min-w-[82%] snap-center rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm sm:min-w-[300px] sm:rounded-[28px] xl:min-w-0"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[20px] bg-slate-100 text-lg font-black text-blue-700">
+                        {item.seller?.avatar ? (
                           <img
-                            src={image}
-                            alt={listing.title}
+                            src={item.seller.avatar}
+                            alt={displayName}
                             className="h-full w-full object-cover"
                           />
                         ) : (
-                          <div className="flex h-full w-full items-center justify-center bg-slate-100">
-                            <LayoutGrid className="h-5 w-5 text-slate-400" />
-                          </div>
+                          displayName.charAt(0).toUpperCase()
                         )}
                       </div>
                       <div className="min-w-0">
-                        <p className="truncate font-display text-lg font-bold text-slate-900">
-                          {listing.title}
+                        <p className="truncate font-display text-xl font-bold text-slate-900">
+                          {displayName}
                         </p>
-                        <p className="mt-1 text-base font-black text-orange-600">
-                          {formatListingPrice(listing.price, listing.priceType)}
-                        </p>
-                        <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px]">
-                          <span className="rounded-full bg-slate-100 px-2.5 py-1 font-semibold text-slate-600">
-                            {getPriceTypeLabel(listing.priceType)}
-                          </span>
-                          <span className="rounded-full bg-blue-50 px-2.5 py-1 font-semibold text-blue-700">
-                            {listing.type === "food"
-                              ? "Comida"
-                              : listing.type === "service"
-                                ? "Servico"
-                                : listing.type === "property"
-                                  ? "Imovel"
-                                  : listing.type === "vehicle"
-                                    ? "Veiculo"
-                                    : "Produto"}
-                          </span>
-                        </div>
-                        <p className="mt-2 truncate text-xs text-slate-500">
-                          {[listing.neighborhood, cities?.find(city => city.id === listing.cityId)?.name]
-                            .filter(Boolean)
-                            .join(", ") || "Norte Pioneiro"}
+                        <p className="mt-1 truncate text-sm text-slate-500">
+                          {cities?.find(city => city.id === item.seller?.cityId)?.name ||
+                            cityName}
                         </p>
                       </div>
-                    </Link>
-                  );
-                })}
-              </div>
-
-              <div className="hidden grid-cols-2 gap-4 md:grid md:grid-cols-4 xl:grid-cols-5">
-              {recentListings.map(listing => (
-                <ListingCard
-                  key={listing.id}
-                  {...listing}
-                  cityName={cities?.find(city => city.id === listing.cityId)?.name}
-                  categoryName={
-                    categories?.find(category => category.id === listing.categoryId)?.name
-                  }
-                />
-              ))}
-              </div>
-            </>
+                    </div>
+                    <div className="mt-4 flex items-center gap-2 text-sm text-slate-500">
+                      <MapPin className="h-4 w-4 text-slate-400" />
+                      <span>{cityName}</span>
+                    </div>
+                    {whatsappHref ? (
+                      <a
+                        href={whatsappHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700"
+                      >
+                        <Phone className="h-4 w-4" />
+                        WhatsApp
+                      </a>
+                    ) : (
+                      <Link
+                        href={`/anuncio/${item.id}`}
+                        className="mt-4 inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700"
+                      >
+                        <ArrowRight className="h-4 w-4" />
+                        Ver perfil
+                      </Link>
+                    )}
+                  </article>
+                );
+              })}
+            </div>
           ) : (
-            <div className="rounded-[28px] border border-dashed border-slate-200 bg-white p-12 text-center">
-              <LayoutGrid className="mx-auto h-12 w-12 text-slate-300" />
+            <div className="rounded-[28px] border border-dashed border-slate-200 bg-white p-8 text-center">
+              <HeartHandshake className="mx-auto h-10 w-10 text-violet-300" />
               <p className="mt-4 text-slate-500">
-                Assim que novos anuncios entrarem no portal, a Home vai refletir isso aqui.
+                Os primeiros prestadores com contato rapido aparecerao aqui.
               </p>
             </div>
           )}

@@ -168,7 +168,7 @@ export default function Header({
     else navigate(`/busca?q=${encodeURIComponent(searchQ)}`);
   };
 
-  const searchPlaceholder = `Buscar "${animatedQuery || searchSuggestions[0] || "produto"}"`;
+  const searchPlaceholder = "Buscar produtos, serviços ou empresas...";
 
   return (
     <header className="sticky top-0 z-50 max-w-full overflow-x-clip border-b border-slate-200 bg-white/95 backdrop-blur">

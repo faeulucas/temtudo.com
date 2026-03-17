@@ -271,8 +271,8 @@ export default function Header({
                     <p className="text-xs text-slate-500">{user?.email}</p>
                   </div>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate("/anunciante")}>
-                    <LayoutDashboard className="mr-2 h-4 w-4" /> Meu Painel
+                  <DropdownMenuItem onClick={() => navigate("/minha-conta")}>
+                    <LayoutDashboard className="mr-2 h-4 w-4" /> Minha Conta
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/favoritos")}>
                     <Heart className="mr-2 h-4 w-4" /> Favoritos

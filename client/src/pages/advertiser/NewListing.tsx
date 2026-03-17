@@ -27,14 +27,35 @@ type ListingImageDraft = {
 };
 
 const TYPE_CATEGORY_MATCHERS: Record<string, (slug: string) => boolean> = {
-  service: slug => slug === "servicos-gerais",
+  service: slug => ["servicos-gerais", "eventos"].includes(slug),
   vehicle: slug => ["veiculos", "motos", "carros", "autopecas"].includes(slug),
   property: slug => slug === "imoveis",
   food: slug => slug === "delivery",
   job: slug => slug === "empregos",
   product: slug =>
-    !["servicos-gerais", "veiculos", "motos", "carros", "autopecas", "imoveis", "delivery", "empregos"].includes(slug),
+    !["servicos-gerais", "veiculos", "motos", "carros", "autopecas", "imoveis", "delivery", "empregos", "eventos"].includes(slug),
 };
+
+type ListingExtraData = {
+  jobCompany?: string;
+  jobSalary?: string;
+  jobMode?: string;
+  jobRequirements?: string;
+  eventDate?: string;
+  eventTime?: string;
+  eventVenue?: string;
+  eventOrganizer?: string;
+  eventTicketType?: string;
+};
+
+function parseListingExtraData(value?: string | null): ListingExtraData {
+  if (!value) return {};
+  try {
+    return JSON.parse(value) as ListingExtraData;
+  } catch {
+    return {};
+  }
+}
 
 function formatCurrencyFromCents(cents: number) {
   return (cents / 100).toLocaleString("pt-BR", {
@@ -75,6 +96,7 @@ export default function NewListing() {
   const [cityId, setCityId] = useState("");
   const [neighborhood, setNeighborhood] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
+  const [extraData, setExtraData] = useState<ListingExtraData>({});
   const [images, setImages] = useState<ListingImageDraft[]>([]);
   const [uploading, setUploading] = useState(false);
   const [didHydrateForm, setDidHydrateForm] = useState(false);
@@ -101,6 +123,7 @@ export default function NewListing() {
     setCityId(listing.cityId ? String(listing.cityId) : "");
     setNeighborhood(listing.neighborhood ?? "");
     setWhatsapp(listing.whatsapp ?? "");
+    setExtraData(parseListingExtraData((listing as { extraDataJson?: string | null }).extraDataJson));
     setImages(
       (listing.images ?? []).map(image => ({
         url: image.url,
@@ -122,6 +145,8 @@ export default function NewListing() {
   const showVehicleCondition = type === "vehicle";
 
   const isFoodListing = type === "food";
+  const isJobCategory = selectedCategory?.slug === "empregos";
+  const isEventCategory = selectedCategory?.slug === "eventos";
 
   useEffect(() => {
     if (!filteredCategories.length) {
@@ -217,6 +242,28 @@ export default function NewListing() {
     const payload = {
       title: title.trim(),
       description: description.trim() || undefined,
+      extraDataJson:
+        isJobCategory || isEventCategory
+          ? JSON.stringify({
+              ...(isJobCategory
+                ? {
+                    jobCompany: extraData.jobCompany || undefined,
+                    jobSalary: extraData.jobSalary || undefined,
+                    jobMode: extraData.jobMode || undefined,
+                    jobRequirements: extraData.jobRequirements || undefined,
+                  }
+                : {}),
+              ...(isEventCategory
+                ? {
+                    eventDate: extraData.eventDate || undefined,
+                    eventTime: extraData.eventTime || undefined,
+                    eventVenue: extraData.eventVenue || undefined,
+                    eventOrganizer: extraData.eventOrganizer || undefined,
+                    eventTicketType: extraData.eventTicketType || undefined,
+                  }
+                : {}),
+            })
+          : undefined,
       price: parseCurrencyInput(price),
       priceType: priceType as any,
       type: type as any,
@@ -297,6 +344,14 @@ export default function NewListing() {
                 ? isEditing
                   ? "Editar Item do Cardapio"
                   : "Cadastrar Item do Cardapio"
+                : isJobCategory
+                  ? isEditing
+                    ? "Editar Vaga"
+                    : "Publicar Vaga"
+                  : isEventCategory
+                    ? isEditing
+                      ? "Editar Evento"
+                      : "Publicar Evento"
                 : isEditing
                   ? "Editar Anuncio"
                   : "Criar Novo Anuncio"}
@@ -304,6 +359,10 @@ export default function NewListing() {
             <p className="text-blue-100 text-sm">
               {isFoodListing
                 ? "Cadastre cada lanche, bebida, combo ou promocao como um item separado da sua loja."
+                : isJobCategory
+                  ? "Preencha os dados da oportunidade para aparecer na area de vagas do Norte Vivo."
+                  : isEventCategory
+                    ? "Divulgue eventos, feiras e encontros para ganhar visibilidade na regiao."
                 : isEditing
                   ? "Atualize as informacoes do seu produto ou servico"
                   : "Preencha as informacoes do seu produto ou servico"}
@@ -319,7 +378,13 @@ export default function NewListing() {
 
               <div>
                 <label className="text-sm font-semibold text-gray-700 mb-1.5 block">
-                  {isFoodListing ? "Nome do item *" : "Titulo do anuncio *"}
+                  {isFoodListing
+                    ? "Nome do item *"
+                    : isJobCategory
+                      ? "Titulo da vaga *"
+                      : isEventCategory
+                        ? "Nome do evento *"
+                        : "Titulo do anuncio *"}
                 </label>
                 <input
                   type="text"
@@ -328,6 +393,10 @@ export default function NewListing() {
                   placeholder={
                     isFoodListing
                       ? "Ex: X-Salada especial, Combo casal, Marmita executiva..."
+                      : isJobCategory
+                        ? "Ex: Vaga para atendente, auxiliar administrativo, vendedor..."
+                        : isEventCategory
+                          ? "Ex: Feira de artesanato, show beneficente, encontro de motos..."
                       : "Ex: Nome claro e direto do que voce esta anunciando..."
                   }
                   maxLength={200}
@@ -338,7 +407,13 @@ export default function NewListing() {
 
               <div>
                 <label className="text-sm font-semibold text-gray-700 mb-1.5 block">
-                  {isFoodListing ? "Descricao do item" : "Descricao"}
+                  {isFoodListing
+                    ? "Descricao do item"
+                    : isJobCategory
+                      ? "Descricao da vaga"
+                      : isEventCategory
+                        ? "Descricao do evento"
+                        : "Descricao"}
                 </label>
                 <textarea
                   value={description}
@@ -346,6 +421,10 @@ export default function NewListing() {
                   placeholder={
                     isFoodListing
                       ? "Ingredientes, tamanho, acompanhamentos, observacoes e diferenciais..."
+                      : isJobCategory
+                        ? "Atividades, requisitos, horario, beneficios e instrucoes para candidatura..."
+                        : isEventCategory
+                          ? "Programacao, publico esperado, atracoes e informacoes importantes..."
                       : "Descreva seu produto ou servico com detalhes..."
                   }
                   rows={4}
@@ -438,6 +517,152 @@ export default function NewListing() {
                   <p className="mt-1 text-xs text-gray-400">
                     Informe se o carro ou a moto anunciada e nova ou usada.
                   </p>
+                </div>
+              )}
+
+              {isJobCategory && (
+                <div className="grid grid-cols-1 gap-4 rounded-2xl border border-emerald-100 bg-emerald-50/40 p-4 sm:grid-cols-2">
+                  <div>
+                    <label className="text-sm font-semibold text-gray-700 mb-1.5 block">
+                      Empresa
+                    </label>
+                    <input
+                      type="text"
+                      value={extraData.jobCompany ?? ""}
+                      onChange={event =>
+                        setExtraData(current => ({ ...current, jobCompany: event.target.value }))
+                      }
+                      placeholder="Nome da empresa"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-700 mb-1.5 block">
+                      Salario
+                    </label>
+                    <input
+                      type="text"
+                      value={extraData.jobSalary ?? ""}
+                      onChange={event =>
+                        setExtraData(current => ({ ...current, jobSalary: event.target.value }))
+                      }
+                      placeholder="Ex: R$ 1.800,00"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-700 mb-1.5 block">
+                      Modalidade
+                    </label>
+                    <Select
+                      value={extraData.jobMode ?? ""}
+                      onValueChange={value =>
+                        setExtraData(current => ({ ...current, jobMode: value }))
+                      }
+                    >
+                      <SelectTrigger className="rounded-xl bg-white">
+                        <SelectValue placeholder="Selecionar..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Presencial">Presencial</SelectItem>
+                        <SelectItem value="Remoto">Remoto</SelectItem>
+                        <SelectItem value="Hibrido">Hibrido</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="text-sm font-semibold text-gray-700 mb-1.5 block">
+                      Requisitos
+                    </label>
+                    <textarea
+                      value={extraData.jobRequirements ?? ""}
+                      onChange={event =>
+                        setExtraData(current => ({ ...current, jobRequirements: event.target.value }))
+                      }
+                      placeholder="Experiencia, horario, cursos, habilidades..."
+                      rows={3}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white transition-all resize-none"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {isEventCategory && (
+                <div className="grid grid-cols-1 gap-4 rounded-2xl border border-blue-100 bg-blue-50/40 p-4 sm:grid-cols-2">
+                  <div>
+                    <label className="text-sm font-semibold text-gray-700 mb-1.5 block">
+                      Data do evento
+                    </label>
+                    <input
+                      type="date"
+                      value={extraData.eventDate ?? ""}
+                      onChange={event =>
+                        setExtraData(current => ({ ...current, eventDate: event.target.value }))
+                      }
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-700 mb-1.5 block">
+                      Horario
+                    </label>
+                    <input
+                      type="time"
+                      value={extraData.eventTime ?? ""}
+                      onChange={event =>
+                        setExtraData(current => ({ ...current, eventTime: event.target.value }))
+                      }
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-700 mb-1.5 block">
+                      Local
+                    </label>
+                    <input
+                      type="text"
+                      value={extraData.eventVenue ?? ""}
+                      onChange={event =>
+                        setExtraData(current => ({ ...current, eventVenue: event.target.value }))
+                      }
+                      placeholder="Praca, clube, salao, parque..."
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-700 mb-1.5 block">
+                      Ingresso
+                    </label>
+                    <Select
+                      value={extraData.eventTicketType ?? ""}
+                      onValueChange={value =>
+                        setExtraData(current => ({ ...current, eventTicketType: value }))
+                      }
+                    >
+                      <SelectTrigger className="rounded-xl bg-white">
+                        <SelectValue placeholder="Selecionar..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Gratuito">Gratuito</SelectItem>
+                        <SelectItem value="Pago">Pago</SelectItem>
+                        <SelectItem value="Lista">Lista</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="text-sm font-semibold text-gray-700 mb-1.5 block">
+                      Organizador
+                    </label>
+                    <input
+                      type="text"
+                      value={extraData.eventOrganizer ?? ""}
+                      onChange={event =>
+                        setExtraData(current => ({ ...current, eventOrganizer: event.target.value }))
+                      }
+                      placeholder="Nome da empresa, igreja, equipe ou organizador"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white transition-all"
+                    />
+                  </div>
                 </div>
               )}
             </div>

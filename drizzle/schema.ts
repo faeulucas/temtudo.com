@@ -98,6 +98,7 @@ export const listings = mysqlTable("listings", {
   cityId: int("cityId"),
   title: varchar("title", { length: 200 }).notNull(),
   description: text("description"),
+  extraDataJson: text("extraDataJson"),
   price: decimal("price", { precision: 12, scale: 2 }),
   priceType: mysqlEnum("priceType", [
     "fixed",

@@ -174,6 +174,20 @@ const defaultCategoryCatalog = [
     color: "#0f766e",
     sortOrder: 9,
   },
+  {
+    name: "Empregos",
+    slug: "empregos",
+    icon: "BriefcaseBusiness",
+    color: "#16a34a",
+    sortOrder: 10,
+  },
+  {
+    name: "Eventos",
+    slug: "eventos",
+    icon: "CalendarDays",
+    color: "#2563eb",
+    sortOrder: 11,
+  },
 ];
 
 async function ensureDefaultCategories(
@@ -1443,6 +1457,7 @@ export const appRouter = router({
         z.object({
           title: z.string().min(5).max(200),
           description: z.string().optional(),
+          extraDataJson: z.string().optional(),
           price: z.number().optional(),
           priceType: z
             .enum(["fixed", "negotiable", "free", "on_request"])
@@ -1478,6 +1493,7 @@ export const appRouter = router({
           id: z.number(),
           title: z.string().min(5).max(200).optional(),
           description: z.string().optional(),
+          extraDataJson: z.string().optional(),
           price: z.number().optional(),
           priceType: z
             .enum(["fixed", "negotiable", "free", "on_request"])

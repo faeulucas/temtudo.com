@@ -53,6 +53,13 @@ export const CATEGORY_SUBCATEGORY_OPTIONS: Record<string, string[]> = {
     "Temporario",
     "Meio periodo",
   ],
+  eventos: [
+    "Show",
+    "Feira",
+    "Workshop",
+    "Festa",
+    "Encontro",
+  ],
 };
 
 export function getSubcategoryOptionsBySlug(slug?: string | null) {
@@ -63,5 +70,6 @@ export function getSubcategoryOptionsBySlug(slug?: string | null) {
 export function getSubcategoryFieldLabel(slug?: string | null) {
   if (slug === "delivery") return "Tipo do item *";
   if (slug === "empregos") return "Tipo da vaga *";
+  if (slug === "eventos") return "Tipo do evento *";
   return "Subcategoria *";
 }

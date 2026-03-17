@@ -49,6 +49,19 @@ async function ensureAppSchema() {
       );
     }
 
+    const [listingExtraDataColumns] = await connection.query(
+      "SHOW COLUMNS FROM listings LIKE 'extraDataJson'"
+    );
+
+    if (
+      Array.isArray(listingExtraDataColumns) &&
+      listingExtraDataColumns.length === 0
+    ) {
+      await connection.query(
+        "ALTER TABLE listings ADD COLUMN extraDataJson text NULL AFTER description"
+      );
+    }
+
     const [bannerUrlColumns] = await connection.query(
       "SHOW COLUMNS FROM users LIKE 'bannerUrl'"
     );

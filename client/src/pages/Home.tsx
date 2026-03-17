@@ -43,6 +43,7 @@ type HomeHighlightListing = {
   subcategory?: string | null;
   whatsapp?: string | null;
   price?: string | null;
+  extraDataJson?: string | null;
   viewCount?: number | null;
   images?: { url: string; isPrimary?: boolean | null }[];
   seller?: {
@@ -58,6 +59,15 @@ type HomeHighlightListing = {
     isOpenNow?: boolean | null;
   } | null;
 };
+
+function parseHomeExtraData(value?: string | null) {
+  if (!value) return {};
+  try {
+    return JSON.parse(value) as Record<string, string>;
+  } catch {
+    return {};
+  }
+}
 
 const GUIDE_SHORTCUTS = [
   {
@@ -1236,6 +1246,7 @@ export default function Home() {
                       const image =
                         media.images?.find(image => image.isPrimary)?.url ||
                         media.images?.[0]?.url;
+                      const extra = parseHomeExtraData(item.extraDataJson);
 
                       return (
                         <Link
@@ -1267,6 +1278,11 @@ export default function Home() {
                                   .filter(Boolean)
                                   .join(", ") || "Norte Pioneiro"}
                               </p>
+                              {(extra.eventDate || extra.eventVenue) && (
+                                <p className="mt-1 truncate text-xs font-medium text-blue-700">
+                                  {[extra.eventDate, extra.eventVenue].filter(Boolean).join(" · ")}
+                                </p>
+                              )}
                               <div className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-blue-700">
                                 Ver detalhes
                                 <ArrowRight className="h-4 w-4" />
@@ -1315,6 +1331,7 @@ export default function Home() {
                       const image =
                         media.images?.find(image => image.isPrimary)?.url ||
                         media.images?.[0]?.url;
+                      const extra = parseHomeExtraData(item.extraDataJson);
 
                       return (
                         <Link
@@ -1342,6 +1359,11 @@ export default function Home() {
                                 .filter(Boolean)
                                 .join(", ") || "Norte Pioneiro"}
                             </p>
+                            {(extra.jobSalary || extra.jobMode) && (
+                              <p className="mt-1 truncate text-xs font-medium text-emerald-700">
+                                {[extra.jobSalary, extra.jobMode].filter(Boolean).join(" · ")}
+                              </p>
+                            )}
                           </div>
                         </Link>
                       );

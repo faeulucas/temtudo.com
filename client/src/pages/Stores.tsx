@@ -203,6 +203,7 @@ export default function StoresPage() {
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Buscar lojas e empresas..."
+                aria-label="Buscar lojas e empresas"
                 className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition focus:border-orange-300 focus:bg-white"
               />
             </div>
@@ -327,6 +328,8 @@ export default function StoresPage() {
                             href={whatsappHref}
                             target="_blank"
                             rel="noopener noreferrer"
+                            aria-label={`Falar com ${displayName} no WhatsApp`}
+                            title={`Falar com ${displayName} no WhatsApp`}
                           >
                             <Button className="rounded-2xl bg-green-500 text-white hover:bg-green-600">
                               <MessageCircle className="h-4 w-4" />

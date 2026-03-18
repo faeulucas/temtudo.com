@@ -1,4 +1,4 @@
-const CACHE_NAME = "norte-vivo-pwa-v4";
+const CACHE_NAME = "norte-vivo-pwa-v5";
 const APP_SHELL = [
   "/",
   "/manifest.webmanifest",
@@ -57,7 +57,6 @@ self.addEventListener("fetch", event => {
     return;
   }
 
-  const url = new URL(request.url);
   const isVersionedAsset =
     url.pathname.startsWith("/assets/") ||
     request.destination === "script" ||

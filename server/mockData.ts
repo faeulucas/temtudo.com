@@ -243,245 +243,42 @@ export const mockUsers = [
   },
 ];
 
-export const mockListings = [
-  {
-    id: 1,
-    userId: 1,
-    categoryId: 2,
-    subcategory: "Marmita",
-    itemCondition: null,
-    cityId: 1,
-    title: "Prato executivo com entrega rapida",
-    description: "Almoco caseiro com marmita, suco e entrega no centro.",
-    price: "24.90",
-    priceType: "fixed",
-    type: "food" as ListingType,
-    neighborhood: "Centro",
-    whatsapp: "43999990001",
-    status: "active",
-    isFeatured: true,
-    isBoosted: true,
-    boostExpiresAt: new Date("2026-04-01"),
-    viewCount: 184,
-    contactCount: 37,
-    favoriteCount: 12,
-    expiresAt: new Date("2026-04-30"),
-    createdAt: new Date("2026-03-08"),
-    updatedAt: new Date("2026-03-08"),
-  },
-  {
-    id: 2,
-    userId: 1,
-    categoryId: 2,
-    subcategory: "Pizza",
-    itemCondition: null,
-    cityId: 1,
-    title: "Pizza grande com borda recheada",
-    description: "Pedido online com entrega noturna em Ibaiti.",
-    price: "59.90",
-    priceType: "fixed",
-    type: "food" as ListingType,
-    neighborhood: "Centro",
-    whatsapp: "43999990001",
-    status: "active",
-    isFeatured: false,
-    isBoosted: true,
-    boostExpiresAt: new Date("2026-04-01"),
-    viewCount: 133,
-    contactCount: 24,
-    favoriteCount: 9,
-    expiresAt: new Date("2026-04-30"),
-    createdAt: new Date("2026-03-07"),
-    updatedAt: new Date("2026-03-07"),
-  },
-  {
-    id: 3,
-    userId: 2,
-    categoryId: 4,
-    subcategory: "Carro",
-    itemCondition: "Usado",
-    cityId: 1,
-    title: "Troca de oleo e revisao completa",
-    description: "Servico rapido para carros populares e utilitarios.",
-    price: "120.00",
-    priceType: "negotiable",
-    type: "service" as ListingType,
-    neighborhood: "Vila Nova",
-    whatsapp: "43999990002",
-    status: "active",
-    isFeatured: false,
-    isBoosted: false,
-    boostExpiresAt: null,
-    viewCount: 88,
-    contactCount: 14,
-    favoriteCount: 5,
-    expiresAt: new Date("2026-04-30"),
-    createdAt: new Date("2026-03-05"),
-    updatedAt: new Date("2026-03-05"),
-  },
-  {
-    id: 4,
-    userId: 2,
-    categoryId: 5,
-    subcategory: "Casa",
-    itemCondition: null,
-    cityId: 3,
-    title: "Casa com 2 quartos perto do centro",
-    description: "Imovel pronto para morar, com garagem e quintal.",
-    price: "185000.00",
-    priceType: "fixed",
-    type: "property" as ListingType,
-    neighborhood: "Jardim Novo",
-    whatsapp: "43999990002",
-    status: "active",
-    isFeatured: true,
-    isBoosted: false,
-    boostExpiresAt: null,
-    viewCount: 62,
-    contactCount: 10,
-    favoriteCount: 3,
-    expiresAt: new Date("2026-04-30"),
-    createdAt: new Date("2026-03-03"),
-    updatedAt: new Date("2026-03-03"),
-  },
-  {
-    id: 5,
-    userId: 2,
-    categoryId: 3,
-    subcategory: "Montagem",
-    itemCondition: null,
-    cityId: 4,
-    title: "Montagem de moveis e pequenos reparos",
-    description: "Atendimento em domicilio para casas e comercios.",
-    price: "80.00",
-    priceType: "negotiable",
-    type: "service" as ListingType,
-    neighborhood: "Centro",
-    whatsapp: "43999990002",
-    status: "active",
-    isFeatured: false,
-    isBoosted: false,
-    boostExpiresAt: null,
-    viewCount: 41,
-    contactCount: 6,
-    favoriteCount: 2,
-    expiresAt: new Date("2026-04-30"),
-    createdAt: new Date("2026-03-01"),
-    updatedAt: new Date("2026-03-01"),
-  },
-  {
-    id: 6,
-    userId: 1,
-    categoryId: 7,
-    subcategory: "Vaga CLT",
-    itemCondition: null,
-    cityId: 1,
-    title: "Vaga para atendente no periodo da noite",
-    description: "Restaurante procura atendente com boa comunicacao para inicio imediato.",
-    extraDataJson: JSON.stringify({
-      company: "Sabor da Praca",
-      salary: "1800",
-      workMode: "Presencial",
-      contractType: "CLT",
-      requirements: "Boa comunicacao e disponibilidade noturna",
-    }),
-    price: null,
-    priceType: "on_request",
-    type: "job" as ListingType,
-    neighborhood: "Centro",
-    whatsapp: "43999990001",
-    status: "active",
-    isFeatured: false,
-    isBoosted: false,
-    boostExpiresAt: null,
-    viewCount: 36,
-    contactCount: 7,
-    favoriteCount: 2,
-    expiresAt: new Date("2026-04-30"),
-    createdAt: new Date("2026-03-10"),
-    updatedAt: new Date("2026-03-10"),
-  },
-  {
-    id: 7,
-    userId: 1,
-    categoryId: 8,
-    subcategory: "Feira",
-    itemCondition: null,
-    cityId: 1,
-    title: "Feira gastronomica na praca central neste sabado",
-    description: "Comida, musica ao vivo e expositores locais durante todo o dia.",
-    extraDataJson: JSON.stringify({
-      eventDate: "2026-03-21",
-      eventTime: "17:00",
-      venue: "Praca Central",
-      organizer: "Associacao Comercial",
-      ticketType: "Gratuito",
-    }),
-    price: null,
-    priceType: "free",
-    type: "service" as ListingType,
-    neighborhood: "Centro",
-    whatsapp: "43999990001",
-    status: "active",
-    isFeatured: true,
-    isBoosted: false,
-    boostExpiresAt: null,
-    viewCount: 58,
-    contactCount: 10,
-    favoriteCount: 5,
-    expiresAt: new Date("2026-04-30"),
-    createdAt: new Date("2026-03-11"),
-    updatedAt: new Date("2026-03-11"),
-  },
-];
+export const mockListings: Array<{
+  id: number;
+  userId: number;
+  categoryId: number;
+  subcategory: string | null;
+  itemCondition: string | null;
+  cityId: number | null;
+  title: string;
+  description: string | null;
+  extraDataJson?: string;
+  price: string | null;
+  priceType: "fixed" | "negotiable" | "free" | "on_request";
+  type: ListingType;
+  neighborhood: string | null;
+  whatsapp: string | null;
+  status: "pending" | "active" | "paused" | "sold" | "rejected" | "expired";
+  isFeatured: boolean;
+  isBoosted: boolean;
+  boostExpiresAt: Date | null;
+  viewCount: number;
+  contactCount: number;
+  favoriteCount: number;
+  expiresAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+}> = [];
 
-export const mockListingImages = [
-  {
-    id: 1,
-    listingId: 1,
-    url: "https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=900&q=80",
-    fileKey: null,
-    isPrimary: true,
-    sortOrder: 0,
-    createdAt: new Date("2026-03-08"),
-  },
-  {
-    id: 2,
-    listingId: 2,
-    url: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=900&q=80",
-    fileKey: null,
-    isPrimary: true,
-    sortOrder: 0,
-    createdAt: new Date("2026-03-07"),
-  },
-  {
-    id: 3,
-    listingId: 4,
-    url: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=900&q=80",
-    fileKey: null,
-    isPrimary: true,
-    sortOrder: 0,
-    createdAt: new Date("2026-03-03"),
-  },
-  {
-    id: 4,
-    listingId: 6,
-    url: "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=900&q=80",
-    fileKey: null,
-    isPrimary: true,
-    sortOrder: 0,
-    createdAt: new Date("2026-03-10"),
-  },
-  {
-    id: 5,
-    listingId: 7,
-    url: "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=900&q=80",
-    fileKey: null,
-    isPrimary: true,
-    sortOrder: 0,
-    createdAt: new Date("2026-03-11"),
-  },
-];
+export const mockListingImages: Array<{
+  id: number;
+  listingId: number;
+  url: string;
+  fileKey: string | null;
+  isPrimary: boolean | null;
+  sortOrder: number | null;
+  createdAt: Date;
+}> = [];
 
 export function attachMockSellerPreviewToListings<T extends { userId: number }>(
   items: T[]

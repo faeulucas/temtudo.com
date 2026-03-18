@@ -9,6 +9,12 @@ import {
   toLocalOpenId,
   verifyPassword,
 } from "./_core/localAuth";
+import {
+  createLocalUser,
+  findLocalUserByEmail,
+  sanitizeUser,
+  upsertLocalUser,
+} from "./_core/localAuthStore";
 import { sdk } from "./_core/sdk";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
@@ -395,152 +401,6 @@ async function ensureIbaitiInstitutionDirectory(
   db: NonNullable<Awaited<ReturnType<typeof getDb>>>
 ) {
   await ensureDefaultCategories(db);
-
-  await db.execute(sql`
-    INSERT INTO cities (name, state, slug, isActive)
-    VALUES ('Ibaiti', 'PR', 'ibaiti', true)
-    ON DUPLICATE KEY UPDATE
-      name = VALUES(name),
-      state = VALUES(state),
-      isActive = true
-  `);
-
-  const [ibaitiCity] = await db
-    .select({ id: cities.id })
-    .from(cities)
-    .where(eq(cities.slug, "ibaiti"))
-    .limit(1);
-
-  if (!ibaitiCity) {
-    throw new TRPCError({
-      code: "INTERNAL_SERVER_ERROR",
-      message: "Nao foi possivel localizar a cidade de Ibaiti.",
-    });
-  }
-
-  await db.execute(sql`
-    INSERT INTO users (
-      openId,
-      name,
-      role,
-      personType,
-      companyName,
-      bio,
-      cityId,
-      neighborhood,
-      isVerified,
-      loginMethod,
-      createdAt,
-      updatedAt,
-      lastSignedIn
-    )
-    VALUES (
-      ${IBAITI_DIRECTORY_OPEN_ID},
-      ${IBAITI_DIRECTORY_NAME},
-      'advertiser',
-      'pj',
-      ${IBAITI_DIRECTORY_COMPANY},
-      'Perfil criado pelo portal para reunir hospitais, escolas, seguranca e servicos essenciais de Ibaiti.',
-      ${ibaitiCity.id},
-      'Centro',
-      true,
-      'system',
-      now(),
-      now(),
-      now()
-    )
-    ON DUPLICATE KEY UPDATE
-      name = VALUES(name),
-      role = 'advertiser',
-      personType = 'pj',
-      companyName = VALUES(companyName),
-      bio = VALUES(bio),
-      cityId = VALUES(cityId),
-      neighborhood = VALUES(neighborhood),
-      isVerified = true,
-      loginMethod = 'system',
-      updatedAt = now(),
-      lastSignedIn = now()
-  `);
-
-  const directoryUser = await getUserByOpenId(IBAITI_DIRECTORY_OPEN_ID);
-  if (!directoryUser) {
-    throw new TRPCError({
-      code: "INTERNAL_SERVER_ERROR",
-      message: "Nao foi possivel preparar o perfil publico de Ibaiti.",
-    });
-  }
-
-  const categoryRows = await db
-    .select({ id: categories.id, slug: categories.slug })
-    .from(categories)
-    .where(
-      inArray(
-        categories.slug,
-        ibaitiInstitutionCatalog.map(item => item.categorySlug)
-      )
-    );
-
-  const categoryIdBySlug = new Map(
-    categoryRows.map(item => [item.slug, item.id] as const)
-  );
-
-  for (const entry of ibaitiInstitutionCatalog) {
-    const categoryId = categoryIdBySlug.get(entry.categorySlug);
-    if (!categoryId) continue;
-
-    const [existingListing] = await db
-      .select({ id: listings.id })
-      .from(listings)
-      .where(
-        and(
-          eq(listings.userId, directoryUser.id),
-          eq(listings.title, entry.title)
-        )
-      )
-      .limit(1);
-
-    if (existingListing) {
-      await db
-        .update(listings)
-        .set({
-          categoryId,
-          subcategory: entry.subcategory,
-          cityId: ibaitiCity.id,
-          title: entry.title,
-          description: entry.description,
-          price: null,
-          priceType: "on_request",
-          type: "service",
-          neighborhood: entry.neighborhood,
-          whatsapp: null,
-          status: "active",
-          isBoosted: false,
-          isFeatured: false,
-          expiresAt: DIRECTORY_LISTING_EXPIRY,
-        })
-        .where(eq(listings.id, existingListing.id));
-      continue;
-    }
-
-    await db.insert(listings).values({
-      userId: directoryUser.id,
-      categoryId,
-      subcategory: entry.subcategory,
-      cityId: ibaitiCity.id,
-      title: entry.title,
-      description: entry.description,
-      price: null,
-      priceType: "on_request",
-      type: "service",
-      neighborhood: entry.neighborhood,
-      whatsapp: null,
-      status: "active",
-      isBoosted: false,
-      isFeatured: false,
-      expiresAt: DIRECTORY_LISTING_EXPIRY,
-    });
-  }
 }
 
 async function resolveInsertId(
@@ -578,8 +438,7 @@ export const appRouter = router({
       const db = await getDb();
 
       if (!db) {
-        const { passwordHash: _passwordHash, ...safeUser } = opts.ctx.user;
-        return safeUser;
+        return sanitizeUser(opts.ctx.user);
       }
 
       const [freshUser] = await db
@@ -606,14 +465,12 @@ export const appRouter = router({
       )
       .mutation(async ({ ctx, input }) => {
         const db = await getDb();
-        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
-
         const email = normalizeAuthEmail(input.email);
-        const [existingUser] = await db
-          .select()
-          .from(users)
-          .where(eq(users.email, email))
-          .limit(1);
+        const existingUser = db
+          ? (
+              await db.select().from(users).where(eq(users.email, email)).limit(1)
+            )[0]
+          : findLocalUserByEmail(email);
 
         if (existingUser) {
           throw new TRPCError({
@@ -625,14 +482,13 @@ export const appRouter = router({
         const openId = toLocalOpenId(email);
         const now = new Date();
         const trialStartedAt = new Date();
-
-        const result = await db.insert(users).values({
+        const userPayload = {
           openId,
           name: input.name.trim(),
           email,
           passwordHash: hashPassword(input.password),
           loginMethod: "local",
-          role: "advertiser",
+          role: "advertiser" as const,
           personType: input.personType,
           whatsapp: input.whatsapp?.trim() || null,
           cpfCnpj: input.cpfCnpj?.trim() || null,
@@ -643,7 +499,9 @@ export const appRouter = router({
           trialStartedAt,
           trialUsed: false,
           lastSignedIn: now,
-        });
+        };
+        const result = db ? await db.insert(users).values(userPayload) : null;
+        const localUser = db ? null : createLocalUser(userPayload);
 
         const sessionToken = await sdk.createSessionToken(openId, {
           name: input.name.trim(),
@@ -656,7 +514,7 @@ export const appRouter = router({
 
         return {
           success: true as const,
-          userId: await resolveInsertId(db, result),
+          userId: db && result ? await resolveInsertId(db, result) : localUser!.id,
         };
       }),
     login: publicProcedure
@@ -668,14 +526,12 @@ export const appRouter = router({
       )
       .mutation(async ({ ctx, input }) => {
         const db = await getDb();
-        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
-
         const email = normalizeAuthEmail(input.email);
-        const [user] = await db
-          .select()
-          .from(users)
-          .where(eq(users.email, email))
-          .limit(1);
+        const user = db
+          ? (
+              await db.select().from(users).where(eq(users.email, email)).limit(1)
+            )[0]
+          : findLocalUserByEmail(email);
 
         if (!user || !verifyPassword(input.password, user.passwordHash)) {
           throw new TRPCError({
@@ -700,10 +556,41 @@ export const appRouter = router({
           maxAge: ONE_YEAR_MS,
         });
 
-        await db
-          .update(users)
-          .set({ lastSignedIn: new Date() })
-          .where(eq(users.id, user.id));
+        if (db) {
+          await db
+            .update(users)
+            .set({ lastSignedIn: new Date() })
+            .where(eq(users.id, user.id));
+        } else {
+          upsertLocalUser({
+            openId: user.openId,
+            email: user.email,
+            name: user.name,
+            passwordHash: user.passwordHash,
+            loginMethod: user.loginMethod,
+            role: user.role,
+            phone: user.phone,
+            whatsapp: user.whatsapp,
+            avatar: user.avatar,
+            bannerUrl: user.bannerUrl,
+            bio: user.bio,
+            openingHoursJson: user.openingHoursJson,
+            personType: user.personType,
+            cpfCnpj: user.cpfCnpj,
+            companyName: user.companyName,
+            cityId: user.cityId,
+            neighborhood: user.neighborhood,
+            planId: user.planId,
+            planExpiresAt: user.planExpiresAt,
+            trialStartedAt: user.trialStartedAt,
+            trialUsed: user.trialUsed,
+            isVerified: user.isVerified,
+            isBanned: user.isBanned,
+            createdAt: user.createdAt,
+            updatedAt: new Date(),
+            lastSignedIn: new Date(),
+          });
+        }
 
         return { success: true as const };
       }),

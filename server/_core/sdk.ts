@@ -7,6 +7,7 @@ import { SignJWT, jwtVerify } from "jose";
 import type { User } from "../../drizzle/schema";
 import * as db from "../db";
 import { ENV } from "./env";
+import { findLocalUserByOpenId, upsertLocalUser } from "./localAuthStore";
 import type {
   ExchangeTokenRequest,
   ExchangeTokenResponse,
@@ -30,11 +31,17 @@ const GET_USER_INFO_WITH_JWT_PATH = `/webdev.v1.WebDevAuthPublicService/GetUserI
 
 class OAuthService {
   constructor(private client: ReturnType<typeof axios.create>) {
-    console.log("[OAuth] Initialized with baseURL:", ENV.oAuthServerUrl);
-    if (!ENV.oAuthServerUrl) {
-      console.error(
-        "[OAuth] ERROR: OAUTH_SERVER_URL is not configured! Set OAUTH_SERVER_URL environment variable."
+    if (ENV.oAuthServerUrl) {
+      console.log("[OAuth] Initialized with baseURL:", ENV.oAuthServerUrl);
+      return;
+    }
+
+    if (ENV.isProduction) {
+      console.warn(
+        "[OAuth] OAUTH_SERVER_URL is not configured. External OAuth login is disabled."
       );
+    } else {
+      console.log("[OAuth] Running without external OAuth server; local auth only.");
     }
   }
 
@@ -275,6 +282,10 @@ class SDKServer {
     const signedInAt = new Date();
     let user = await db.getUserByOpenId(sessionUserId);
 
+    if (!user && session.openId.startsWith("local:")) {
+      user = findLocalUserByOpenId(session.openId);
+    }
+
     // If user not in DB, sync from OAuth server automatically
     if (!user) {
       if (session.openId.startsWith("local:") || !ENV.oAuthServerUrl) {
@@ -301,10 +312,42 @@ class SDKServer {
       throw ForbiddenError("User not found");
     }
 
-    await db.upsertUser({
-      openId: user.openId,
-      lastSignedIn: signedInAt,
-    });
+    const hasDatabase = Boolean(ENV.databaseUrl);
+    if (hasDatabase) {
+      await db.upsertUser({
+        openId: user.openId,
+        lastSignedIn: signedInAt,
+      });
+    } else {
+      user = upsertLocalUser({
+        openId: user.openId,
+        email: user.email,
+        name: user.name,
+        passwordHash: user.passwordHash,
+        loginMethod: user.loginMethod,
+        role: user.role,
+        phone: user.phone,
+        whatsapp: user.whatsapp,
+        avatar: user.avatar,
+        bannerUrl: user.bannerUrl,
+        bio: user.bio,
+        openingHoursJson: user.openingHoursJson,
+        personType: user.personType,
+        cpfCnpj: user.cpfCnpj,
+        companyName: user.companyName,
+        cityId: user.cityId,
+        neighborhood: user.neighborhood,
+        planId: user.planId,
+        planExpiresAt: user.planExpiresAt,
+        trialStartedAt: user.trialStartedAt,
+        trialUsed: user.trialUsed,
+        isVerified: user.isVerified,
+        isBanned: user.isBanned,
+        createdAt: user.createdAt,
+        updatedAt: signedInAt,
+        lastSignedIn: signedInAt,
+      });
+    }
 
     return user;
   }

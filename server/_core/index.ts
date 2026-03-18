@@ -111,11 +111,41 @@ async function startServer() {
     serveStatic(app);
   }
 
-  const port = parseInt(process.env.PORT || "3000", 10);
+  const initialPort = parseInt(process.env.PORT || "3000", 10);
 
-  server.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}/`);
-  });
+  const listenOnPort = (port: number): Promise<void> =>
+    new Promise((resolve, reject) => {
+      const handleError = (error: NodeJS.ErrnoException) => {
+        server.off("listening", handleListening);
+        reject(error);
+      };
+
+      const handleListening = () => {
+        server.off("error", handleError);
+        console.log(`Server running on http://localhost:${port}/`);
+        resolve();
+      };
+
+      server.once("error", handleError);
+      server.once("listening", handleListening);
+      server.listen(port);
+    });
+
+  let port = initialPort;
+  while (true) {
+    try {
+      await listenOnPort(port);
+      break;
+    } catch (error) {
+      const listenError = error as NodeJS.ErrnoException;
+      if (listenError.code !== "EADDRINUSE") {
+        throw error;
+      }
+
+      port += 1;
+      console.warn(`Port ${port - 1} is busy, using port ${port} instead`);
+    }
+  }
 }
 
 startServer().catch(console.error);

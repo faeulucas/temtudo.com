@@ -16,26 +16,26 @@ type SegmentMetric = {
   helper: string;
 };
 
+const SLUG_TO_SEGMENT_MAP: Record<string, BusinessSegment> = {
+  delivery: "food",
+  restaurantes: "food",
+  lanchonetes: "food",
+  pizzarias: "food",
+  veiculos: "vehicles",
+  autopecas: "vehicles",
+  motos: "vehicles",
+  carros: "vehicles",
+  "moda-acessorios": "fashion",
+  roupas: "fashion",
+  calcados: "fashion",
+  eletronicos: "electronics",
+  informatica: "electronics",
+  celulares: "electronics",
+};
+
 export function getSegmentFromCategorySlug(slug?: string | null): BusinessSegment {
   if (!slug) return "generic";
-
-  if (["delivery", "restaurantes", "lanchonetes", "pizzarias"].includes(slug)) {
-    return "food";
-  }
-
-  if (["veiculos", "autopecas", "motos", "carros"].includes(slug)) {
-    return "vehicles";
-  }
-
-  if (["moda-acessorios", "roupas", "calcados"].includes(slug)) {
-    return "fashion";
-  }
-
-  if (["eletronicos", "informatica", "celulares"].includes(slug)) {
-    return "electronics";
-  }
-
-  return "generic";
+  return SLUG_TO_SEGMENT_MAP[slug] ?? "generic";
 }
 
 export const SEGMENT_CONTENT: Record<

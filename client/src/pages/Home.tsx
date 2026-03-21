@@ -6,6 +6,8 @@ import { LOGIN_ROUTE } from "@/const";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ListingCard from "@/components/ListingCard";
+import ListingCardCompact from "@/components/ListingCardCompact";
+import AppInstallBanner from "@/components/AppInstallBanner";
 import { Button } from "@/components/ui/button";
 import { getStorefrontHref } from "@/lib/storefront";
 import {
@@ -145,6 +147,41 @@ const PILLARS = [
   },
 ];
 
+const QUICK_SEGMENTS = [
+  { label: "Seja d+", icon: "🍬" },
+  { label: "Lanches", icon: "🍔" },
+  { label: "Pizza", icon: "🍕" },
+  { label: "Burguer", icon: "🍔" },
+  { label: "Porções", icon: "🍟" },
+  { label: "Marmita", icon: "🥡" },
+  { label: "Sushi", icon: "🍣" },
+];
+
+const FILTER_CHIPS = ["Filtros", "Entrega grátis", "Promoções"];
+
+const PROMO_BANNERS = [
+  {
+    id: "club-cupom",
+    title: "clube de cupons",
+    subtitle: "receba cupons exclusivos e economize todo mês!",
+    cta: "ver ofertas",
+    href: "/busca?q=promo",
+  },
+  {
+    id: "mega-off",
+    title: "35% OFF",
+    subtitle: "os rangos que são sucesso com cupom: ESTRELAS",
+    cta: "usar cupom",
+    href: "/busca?q=estrelas",
+  },
+];
+
+const COLLECTION_CARD = {
+  title: "coleções de lojas e promos",
+  href: "/busca?q=promocoes",
+  cardTitle: "Promos que adoramos",
+  cardSubtitle: "sei que seu hobby é pagar no precinho",
+};
 function isServiceProviderListing(
   item: HomeHighlightListing,
   categoryName?: string
@@ -297,6 +334,9 @@ export default function Home() {
   const { isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
   const [selectedCity, setSelectedCity] = useState<number | null>(null);
+  const [activeCategoryId, setActiveCategoryId] = useState<number | "all">(
+    "all"
+  );
 
   const { data: categories } = trpc.public.categories.useQuery();
   const { data: cities } = trpc.public.cities.useQuery();
@@ -317,6 +357,15 @@ export default function Home() {
   const recentListings = (recent ?? []) as HomeHighlightListing[];
   const selectedCityName =
     cities?.find((city) => city.id === selectedCity)?.name ?? "sua cidade";
+  const primaryListings =
+    featuredListings.length > 0 ? featuredListings : recentListings;
+  const visibleListings =
+    activeCategoryId === "all"
+      ? primaryListings
+      : primaryListings.filter((item) => item.categoryId === activeCategoryId);
+  const openNearby = visibleListings
+    .filter((item) => item.seller?.isOpenNow)
+    .slice(0, 12);
 
   const companyHighlights = useMemo(
     () =>
@@ -435,6 +484,188 @@ export default function Home() {
       />
 
       <main className="pb-24 md:pb-0">
+        <AppInstallBanner
+          title="Use o aplicativo"
+          subtitle="Acesso rápido e fácil no app"
+          ctaLabel="Abrir"
+          ctaHref="/app"
+        />
+        {/* PWA-style home layout */}
+        <section className="bg-white">
+          <div className="container space-y-4 pt-4 pb-2 sm:pt-6">
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              <button
+                type="button"
+                onClick={() => setActiveCategoryId("all")}
+                className={`shrink-0 rounded-2xl border px-4 py-2 text-sm font-semibold transition ${
+                  activeCategoryId === "all"
+                    ? "border-orange-300 bg-orange-50 text-orange-700"
+                    : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+                }`}
+              >
+                Tudo
+              </button>
+              {(categories ?? []).map((category) => (
+                <button
+                  key={category.id}
+                  type="button"
+                  onClick={() => setActiveCategoryId(category.id)}
+                  className={`shrink-0 rounded-2xl border px-4 py-2 text-sm font-semibold transition ${
+                    activeCategoryId === category.id
+                      ? "border-orange-300 bg-orange-50 text-orange-700"
+                      : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+                  }`}
+                >
+                  {category.name}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex gap-3 overflow-x-auto pb-1">
+              {QUICK_SEGMENTS.map((item) => (
+                <div
+                  key={item.label}
+                  className="flex min-w-[76px] flex-col items-center gap-2 rounded-2xl bg-slate-50 px-3 py-3 text-center text-xs font-semibold text-slate-700"
+                >
+                  <span className="text-2xl leading-none">{item.icon}</span>
+                  <span className="leading-tight">{item.label}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {FILTER_CHIPS.map((chip) => (
+                <button
+                  key={chip}
+                  type="button"
+                  className="shrink-0 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700"
+                  disabled
+                  title="Filtros em breve"
+                >
+                  {chip}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="container space-y-4 pb-4">
+            <div className="flex gap-3 overflow-x-auto pb-1">
+              {PROMO_BANNERS.map((banner) => (
+                <Link
+                  key={banner.id}
+                  href={banner.href}
+                  className="block min-w-[280px] flex-1 rounded-2xl bg-slate-50 px-4 py-4 shadow-sm transition hover:shadow-md"
+                >
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                    {banner.title}
+                  </p>
+                  <p className="mt-2 text-lg font-bold text-slate-900">
+                    {banner.subtitle}
+                  </p>
+                  <div className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-orange-600">
+                    {banner.cta}
+                    <ArrowRight className="h-4 w-4" />
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            <div className="flex items-center justify-between px-1">
+              <h3 className="text-lg font-bold text-slate-900">
+                {COLLECTION_CARD.title}
+              </h3>
+              <Link
+                href={COLLECTION_CARD.href}
+                className="text-sm font-semibold text-orange-600"
+              >
+                ver tudo
+              </Link>
+            </div>
+            <Link
+              href={COLLECTION_CARD.href}
+              className="block rounded-2xl bg-slate-900 text-white"
+            >
+              <div className="rounded-2xl bg-gradient-to-br from-slate-900 via-purple-800 to-purple-600 p-4">
+                <p className="text-xl font-extrabold leading-tight">
+                  {COLLECTION_CARD.cardTitle}
+                </p>
+                <p className="mt-2 text-sm text-slate-100">
+                  {COLLECTION_CARD.cardSubtitle}
+                </p>
+              </div>
+            </Link>
+          </div>
+
+          <div className="container pb-6">
+            <div className="space-y-3">
+              {visibleListings.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-4 text-sm text-slate-500">
+                  Nada encontrado nessa categoria por enquanto.
+                </div>
+              ) : (
+                visibleListings.map((item) => {
+                  const image =
+                    item.images?.find((img) => img.isPrimary)?.url ||
+                    item.images?.[0]?.url;
+                  return (
+                    <ListingCardCompact
+                      key={item.id}
+                      id={item.id}
+                      title={item.title}
+                      price={item.price}
+                      priceType={item.priceType}
+                      neighborhood={item.neighborhood ?? undefined}
+                      cityName={cities?.find((c) => c.id === item.cityId)?.name}
+                      images={image ? [{ url: image, isPrimary: true }] : []}
+                      seller={item.seller}
+                      type={item.type}
+                      isBoosted={Boolean(item.viewCount && item.viewCount > 100)}
+                    />
+                  );
+                })
+              )}
+            </div>
+          </div>
+
+          {openNearby.length > 0 && (
+            <div className="container pb-6">
+              <div className="mb-3 flex items-center justify-between px-1">
+                <h3 className="text-lg font-bold text-slate-900">
+                  Perto de você
+                </h3>
+                <Link
+                  href="/busca"
+                  className="text-sm font-semibold text-orange-600"
+                >
+                  ver todos
+                </Link>
+              </div>
+              <div className="space-y-3">
+                {openNearby.map((item) => {
+                  const image =
+                    item.images?.find((img) => img.isPrimary)?.url ||
+                    item.images?.[0]?.url;
+                  return (
+                    <ListingCardCompact
+                      key={`near-${item.id}`}
+                      id={item.id}
+                      title={item.title}
+                      price={item.price}
+                      priceType={item.priceType}
+                      neighborhood={item.neighborhood ?? undefined}
+                      cityName={cities?.find((c) => c.id === item.cityId)?.name}
+                      images={image ? [{ url: image, isPrimary: true }] : []}
+                      seller={item.seller}
+                      type={item.type}
+                      isBoosted
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </section>
+
         <section className="container pt-3 sm:pt-6">
           <div className="overflow-hidden rounded-[32px] bg-[linear-gradient(135deg,#0f172a_0%,#1d4ed8_45%,#f97316_130%)] px-5 py-6 text-white shadow-[0_20px_70px_rgba(15,23,42,0.18)] sm:px-8 sm:py-10 lg:px-10 lg:py-12">
             <div className="mx-auto max-w-6xl">

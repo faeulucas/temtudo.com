@@ -23,6 +23,12 @@ const footerCities = [
   { label: "Jacarezinho", slug: "jacarezinho" },
 ];
 
+const socialLinks = {
+  facebook: import.meta.env.VITE_FACEBOOK_URL || "https://www.facebook.com",
+  instagram: import.meta.env.VITE_INSTAGRAM_URL || "https://www.instagram.com",
+  whatsapp: import.meta.env.VITE_WHATSAPP_URL || "https://wa.me/5543999999999",
+};
+
 export default function Footer() {
   const [isPwaMode, setIsPwaMode] = useState(false);
 
@@ -175,27 +181,33 @@ export default function Footer() {
 
             <div className="flex gap-3">
               <a
-                href="#"
+                href={socialLinks.facebook}
                 aria-label="Facebook do Norte Vivo"
                 title="Facebook do Norte Vivo"
+                target="_blank"
+                rel="noreferrer"
                 className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-800 transition-colors hover:bg-blue-600"
               >
                 <Facebook className="h-4 w-4" />
               </a>
 
               <a
-                href="#"
+                href={socialLinks.instagram}
                 aria-label="Instagram do Norte Vivo"
                 title="Instagram do Norte Vivo"
+                target="_blank"
+                rel="noreferrer"
                 className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-800 transition-colors hover:bg-pink-600"
               >
                 <Instagram className="h-4 w-4" />
               </a>
 
               <a
-                href="#"
+                href={socialLinks.whatsapp}
                 aria-label="WhatsApp do Norte Vivo"
                 title="WhatsApp do Norte Vivo"
+                target="_blank"
+                rel="noreferrer"
                 className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-800 transition-colors hover:bg-green-600"
               >
                 <MessageCircle className="h-4 w-4" />

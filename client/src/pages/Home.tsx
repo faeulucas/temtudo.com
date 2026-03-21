@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -77,43 +77,43 @@ function parseHomeExtraData(value?: string | null) {
 
 const GUIDE_SHORTCUTS = [
   {
-    title: "SaÃºde",
-    description: "Hospitais, clÃ­nicas e farmÃ¡cias",
+    title: "Saúde",
+    description: "Hospitais, clínicas e farmácias",
     href: "/busca?q=saude",
     icon: Stethoscope,
     tone: "bg-emerald-50 text-emerald-700",
   },
   {
-    title: "SeguranÃ§a",
-    description: "PolÃ­cia, apoio e serviÃ§os Ãºteis",
+    title: "Segurança",
+    description: "Polícia, apoio e serviços úteis",
     href: "/busca?q=seguranca",
     icon: Shield,
     tone: "bg-blue-50 text-blue-700",
   },
   {
-    title: "EmergÃªncias",
-    description: "Atalhos rÃ¡pidos para urgÃªncias",
+    title: "Emergências",
+    description: "Atalhos rápidos para urgências",
     href: "/busca?q=emergencia",
     icon: Ambulance,
     tone: "bg-rose-50 text-rose-700",
   },
   {
     title: "Oficinas",
-    description: "MecÃ¢nicos, eletricistas e reparos",
+    description: "Mecânicos, eletricistas e reparos",
     href: "/busca?q=oficina",
     icon: Wrench,
     tone: "bg-amber-50 text-amber-700",
   },
   {
-    title: "ServiÃ§os",
-    description: "Prestadores e negÃ³cios locais",
+    title: "Serviços",
+    description: "Prestadores e negócios locais",
     href: "/busca?q=servicos",
     icon: HeartHandshake,
     tone: "bg-violet-50 text-violet-700",
   },
   {
     title: "Empresas",
-    description: "Lojas, comÃ©rcios e contatos Ãºteis",
+    description: "Lojas, comércios e contatos úteis",
     href: "/lojas",
     icon: Building2,
     tone: "bg-slate-100 text-slate-700",
@@ -123,7 +123,7 @@ const GUIDE_SHORTCUTS = [
 const PILLARS = [
   {
     label: "Guia Local",
-    description: "Encontre telefones, serviÃ§os e empresas da sua cidade.",
+    description: "Encontre telefones, serviços e empresas da sua cidade.",
     href: "/guia",
     icon: MapPin,
     badge: "Informativo local",
@@ -132,7 +132,7 @@ const PILLARS = [
   },
   {
     label: "Marketplace Regional",
-    description: "Descubra produtos, ofertas e oportunidades perto de vocÃª.",
+    description: "Descubra produtos, ofertas e oportunidades perto de você.",
     href: "/busca",
     icon: ShoppingCart,
     badge: "Compra e venda",
@@ -141,23 +141,23 @@ const PILLARS = [
   },
   {
     label: "Crie sua Loja",
-    description: "Monte sua vitrine online e apareÃ§a para novos clientes.",
+    description: "Monte sua vitrine online e apareça para novos clientes.",
     href: "/lojas",
     icon: Store,
-    badge: "Para quem nÃ£o tem site",
+    badge: "Para quem não tem site",
     tone:
       "border-slate-800 bg-slate-900 text-white hover:bg-slate-800 hover:shadow-lg",
   },
 ];
 
 const QUICK_SEGMENTS = [
-  { label: "Seja d+", icon: "ðŸ¬" },
-  { label: "Lanches", icon: "ðŸ”" },
-  { label: "Pizza", icon: "ðŸ•" },
-  { label: "Burguer", icon: "ðŸ”" },
-  { label: "PorÃ§Ãµes", icon: "ðŸŸ" },
-  { label: "Marmita", icon: "ðŸ¥¡" },
-  { label: "Sushi", icon: "ðŸ£" },
+  { label: "Seja d+", icon: "✨" },
+  { label: "Lanches", icon: "🥪" },
+  { label: "Pizza", icon: "🍕" },
+  { label: "Burguer", icon: "🍔" },
+  { label: "Porções", icon: "🍟" },
+  { label: "Marmita", icon: "🍱" },
+  { label: "Sushi", icon: "🍣" },
 ];
 
 const MOBILE_TABS = [
@@ -165,45 +165,45 @@ const MOBILE_TABS = [
   { label: "Restaurantes", href: "/busca?type=food", icon: Utensils },
   { label: "Mercados", href: "/busca?q=mercado", icon: ShoppingCart },
   { label: "Lojas", href: "/lojas", icon: Store },
-  { label: "ServiÃ§os", href: "/busca?q=servicos", icon: Wrench },
+  { label: "Serviços", href: "/busca?q=servicos", icon: Wrench },
   { label: "Guia local", href: "/guia", icon: MapPin },
 ];
 
 const CATEGORY_SHORTCUTS = [
-  { label: "PromoÃ§Ãµes", href: "/busca?q=promo", icon: Percent, tone: "bg-orange-50 text-orange-700" },
+  { label: "Promoções", href: "/busca?q=promo", icon: Percent, tone: "bg-orange-50 text-orange-700" },
   { label: "Delivery", href: "/busca?type=food", icon: Utensils, tone: "bg-rose-50 text-rose-700" },
   { label: "Mercado", href: "/busca?q=mercado", icon: ShoppingCart, tone: "bg-amber-50 text-amber-700" },
   { label: "Lojas", href: "/lojas", icon: Store, tone: "bg-indigo-50 text-indigo-700" },
-  { label: "ServiÃ§os", href: "/busca?q=servicos", icon: Wrench, tone: "bg-emerald-50 text-emerald-700" },
-  { label: "ImÃ³veis", href: "/busca?type=property", icon: Building2, tone: "bg-blue-50 text-blue-700" },
+  { label: "Serviços", href: "/busca?q=servicos", icon: Wrench, tone: "bg-emerald-50 text-emerald-700" },
+  { label: "Imóveis", href: "/busca?type=property", icon: Building2, tone: "bg-blue-50 text-blue-700" },
   { label: "Eventos", href: "/busca?q=eventos", icon: CalendarDays, tone: "bg-purple-50 text-purple-700" },
   { label: "Empregos", href: "/busca?type=job", icon: BriefcaseBusiness, tone: "bg-cyan-50 text-cyan-700" },
 ];
 
-const FILTER_CHIPS = ["Filtros", "Entrega grÃ¡tis", "PromoÃ§Ãµes"];
+const FILTER_CHIPS = ["Filtros", "Entrega grátis", "Promoções"];
 
 const PROMO_BANNERS = [
   {
     id: "club-cupom",
     title: "clube de cupons",
-    subtitle: "receba cupons exclusivos e economize todo mÃªs!",
+    subtitle: "receba cupons exclusivos e economize todo mês!",
     cta: "ver ofertas",
     href: "/busca?q=promo",
   },
   {
     id: "mega-off",
     title: "35% OFF",
-    subtitle: "os rangos que sÃ£o sucesso com cupom: ESTRELAS",
+    subtitle: "os rangos que são sucesso com cupom: ESTRELAS",
     cta: "usar cupom",
     href: "/busca?q=estrelas",
   },
 ];
 
 const COLLECTION_CARD = {
-  title: "coleÃ§Ãµes de lojas e promos",
+  title: "coleções de lojas e promos",
   href: "/busca?q=promocoes",
   cardTitle: "Promos que adoramos",
-  cardSubtitle: "sei que seu hobby Ã© pagar no precinho",
+  cardSubtitle: "sei que seu hobby é pagar no precinho",
 };
 function isServiceProviderListing(
   item: HomeHighlightListing,
@@ -294,7 +294,7 @@ function isEventListing(item: HomeHighlightListing, categoryName?: string) {
 }
 
 function formatListingPrice(price?: string | null, priceType?: string | null) {
-  if (!price || priceType === "free") return "GrÃ¡tis";
+  if (!price || priceType === "free") return "Grátis";
   if (priceType === "on_request") return "Sob consulta";
 
   const formatted = `R$ ${Number(price).toLocaleString("pt-BR", {
@@ -307,10 +307,10 @@ function formatListingPrice(price?: string | null, priceType?: string | null) {
 }
 
 function getPriceTypeLabel(priceType?: string | null) {
-  if (priceType === "negotiable") return "NegociÃ¡vel";
+  if (priceType === "negotiable") return "Negociável";
   if (priceType === "on_request") return "Sob consulta";
-  if (priceType === "free") return "GrÃ¡tis";
-  return "PreÃ§o fixo";
+  if (priceType === "free") return "Grátis";
+  return "Preço fixo";
 }
 
 function SectionHeader({
@@ -513,7 +513,7 @@ export default function Home() {
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-                    Sua região
+                    Sua regi�o
                   </p>
                   <p className="text-base font-bold text-slate-900">{selectedCityName}</p>
                 </div>
@@ -539,7 +539,7 @@ export default function Home() {
                 onClick={() => handleSearch("")}
               >
                 <Search className="h-4 w-4 text-orange-600" />
-                Buscar produtos, lojas e serviços
+                Buscar produtos, lojas e servi�os
               </button>
 
               <div className="flex gap-2 overflow-x-auto pb-1">
@@ -603,7 +603,7 @@ export default function Home() {
 
           <AppInstallBanner
             title="Use o aplicativo"
-            subtitle="Acesso rápido e fácil no app"
+            subtitle="Acesso r�pido e f�cil no app"
             ctaLabel="Abrir"
             ctaHref="/app"
           />
@@ -621,10 +621,10 @@ export default function Home() {
                       Norte Vivo app
                     </p>
                     <h2 className="mt-1 font-display text-2xl font-black text-slate-900">
-                      Tudo da sua cidade na mão
+                      Tudo da sua cidade na m�o
                     </h2>
                     <p className="mt-2 text-sm leading-6 text-slate-600">
-                      Guia local, lojas, serviços e delivery em um app leve.
+                      Guia local, lojas, servi�os e delivery em um app leve.
                     </p>
                   </div>
                 </div>
@@ -644,7 +644,7 @@ export default function Home() {
                       className="h-11 w-full rounded-2xl border-slate-300 text-slate-900 hover:bg-slate-50"
                     >
                       <Store className="mr-2 h-4 w-4" />
-                      Divulgar negócio
+                      Divulgar neg�cio
                     </Button>
                   </Link>
                 </div>
@@ -697,7 +697,7 @@ export default function Home() {
 
               <div className="rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-semibold text-slate-900">Atalhos rápidos</p>
+                  <p className="text-sm font-semibold text-slate-900">Atalhos r�pidos</p>
                   <Link href="/busca" className="text-xs font-semibold text-orange-600">
                     ver todos
                   </Link>
@@ -760,7 +760,7 @@ export default function Home() {
               <div className="rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-semibold text-slate-900">
-                    Serviços & empresas
+                    Servi�os & empresas
                   </p>
                   <Link href="/guia" className="text-xs font-semibold text-orange-600">
                     ver guia
@@ -874,7 +874,7 @@ export default function Home() {
                 <div className="mt-3 space-y-3">
                   {eventListings.length === 0 && jobListings.length === 0 ? (
                     <p className="text-sm text-slate-500">
-                      Divulgue próximos eventos e vagas para eles aparecerem aqui.
+                      Divulgue pr�ximos eventos e vagas para eles aparecerem aqui.
                     </p>
                   ) : (
                     <>
@@ -917,7 +917,7 @@ export default function Home() {
                                 <p className="mt-1 text-xs font-semibold text-blue-700">
                                   {[extra.eventDate, extra.eventVenue]
                                     .filter(Boolean)
-                                    .join(" · ")}
+                                    .join(" � ")}
                                 </p>
                               )}
                             </div>
@@ -964,7 +964,7 @@ export default function Home() {
                                 <p className="mt-1 text-xs font-semibold text-emerald-700">
                                   {[extra.jobSalary, extra.jobMode]
                                     .filter(Boolean)
-                                    .join(" · ")}
+                                    .join(" � ")}
                                 </p>
                               )}
                             </div>
@@ -1036,11 +1036,11 @@ export default function Home() {
                   </div>
 
                   <h1 className="mt-4 font-display text-3xl font-black leading-tight text-white sm:text-5xl">
-                    Tudo da sua cidade em um sÃ³ lugar.
+                    Tudo da sua cidade em um só lugar.
                   </h1>
 
                   <p className="mt-4 max-w-2xl text-sm leading-7 text-blue-50/90 sm:text-lg">
-                    Encontre empresas, serviÃ§os e produtos da sua regiÃ£o ou crie
+                    Encontre empresas, serviços e produtos da sua região ou crie
                     sua loja online e comece a aparecer para novos clientes em{" "}
                     <span className="font-bold text-white">
                       {selectedCityName}
@@ -1067,8 +1067,8 @@ export default function Home() {
 
                   <div className="mt-6 grid gap-3 sm:grid-cols-3">
                     {[
-                      "Buscar serviÃ§os locais",
-                      "Encontrar lojas da regiÃ£o",
+                      "Buscar serviços locais",
+                      "Encontrar lojas da região",
                       "Ver produtos em destaque",
                     ].map((suggestion) => (
                       <button
@@ -1088,19 +1088,19 @@ export default function Home() {
                       <p className="text-2xl font-black text-white">
                         {featuredListings.length || recentListings.length}
                       </p>
-                      <p className="text-sm text-blue-100">AnÃºncios ativos</p>
+                      <p className="text-sm text-blue-100">Anúncios ativos</p>
                     </div>
                     <div className="rounded-[22px] bg-white/10 p-4 backdrop-blur-sm">
                       <p className="text-2xl font-black text-white">
                         {companyHighlights.length}
                       </p>
-                      <p className="text-sm text-blue-100">Lojas visÃ­veis</p>
+                      <p className="text-sm text-blue-100">Lojas visíveis</p>
                     </div>
                     <div className="rounded-[22px] bg-white/10 p-4 backdrop-blur-sm">
                       <p className="text-2xl font-black text-white">
                         {serviceProviders.length}
                       </p>
-                      <p className="text-sm text-blue-100">ServiÃ§os</p>
+                      <p className="text-sm text-blue-100">Serviços</p>
                     </div>
                     <div className="rounded-[22px] bg-white/10 p-4 backdrop-blur-sm">
                       <p className="text-2xl font-black text-white">
@@ -1149,7 +1149,7 @@ export default function Home() {
 
                   <div className="mt-5 rounded-[22px] bg-white/10 p-4">
                     <p className="text-base font-semibold text-white">
-                      Tem uma loja e ainda nÃ£o tem site?
+                      Tem uma loja e ainda não tem site?
                     </p>
                     <p className="mt-1 text-sm leading-6 text-blue-50/90">
                       Crie sua vitrine, publique seus produtos e receba contatos
@@ -1165,8 +1165,8 @@ export default function Home() {
         <section className="container py-8 sm:py-10">
           <SectionHeader
             eyebrow="3 formas de usar"
-            title="Escolha a melhor porta de entrada para o que vocÃª precisa"
-            description="A Home agora guia melhor o usuÃ¡rio: primeiro ele entende o produto, depois escolhe como navegar dentro da plataforma."
+            title="Escolha a melhor porta de entrada para o que você precisa"
+            description="A Home agora guia melhor o usuário: primeiro ele entende o produto, depois escolhe como navegar dentro da plataforma."
           />
 
           <div className="grid gap-4 lg:grid-cols-3">
@@ -1222,7 +1222,7 @@ export default function Home() {
           <SectionHeader
             eyebrow="Destaques da semana"
             title="Produtos patrocinados com mais visibilidade"
-            description="Essa Ã© a Ã¡rea comercial mais forte da plataforma. Aqui ficam os anÃºncios impulsionados para gerar clique e venda."
+            description="Essa é a área comercial mais forte da plataforma. Aqui ficam os anúncios impulsionados para gerar clique e venda."
             actionHref="/booster"
             actionLabel="Ver destaques"
           />
@@ -1275,7 +1275,7 @@ export default function Home() {
                               listing.subcategory,
                             ]
                               .filter(Boolean)
-                              .join(" Â· ")}
+                              .join(" · ")}
                           </div>
 
                           <h3 className="mt-3 line-clamp-2 text-lg font-bold leading-6 text-slate-900">
@@ -1321,7 +1321,7 @@ export default function Home() {
             <div className="rounded-[28px] border border-dashed border-amber-200 bg-white p-10 text-center">
               <Zap className="mx-auto h-12 w-12 text-amber-300" />
               <p className="mt-4 text-slate-500">
-                Assim que houver anÃºncios impulsionados, eles aparecerÃ£o aqui.
+                Assim que houver anúncios impulsionados, eles aparecerão aqui.
               </p>
             </div>
           )}
@@ -1330,8 +1330,8 @@ export default function Home() {
         <section id="guia-local" className="container py-8 sm:py-10">
           <SectionHeader
             eyebrow="Guia local"
-            title={`ServiÃ§os e contatos essenciais em ${selectedCityName}`}
-            description="O guia precisa ser Ãºtil de verdade. Ele deve resolver rÃ¡pido a busca por telefones, empresas e contatos da cidade."
+            title={`Serviços e contatos essenciais em ${selectedCityName}`}
+            description="O guia precisa ser útil de verdade. Ele deve resolver rápido a busca por telefones, empresas e contatos da cidade."
             actionHref="/guia"
             actionLabel="Abrir guia local"
           />
@@ -1370,8 +1370,8 @@ export default function Home() {
         <section id="lojas-empresas" className="container py-2 sm:py-4">
           <SectionHeader
             eyebrow="Lojas em destaque"
-            title="NegÃ³cios locais que jÃ¡ podem vender online pelo Norte Vivo"
-            description="Aqui estÃ¡ seu diferencial mais forte: dar presenÃ§a digital para quem vende na regiÃ£o, mesmo sem ter site prÃ³prio."
+            title="Negócios locais que já podem vender online pelo Norte Vivo"
+            description="Aqui está seu diferencial mais forte: dar presença digital para quem vende na região, mesmo sem ter site próprio."
             actionHref="/lojas"
             actionLabel="Ver lojas"
           />
@@ -1390,7 +1390,7 @@ export default function Home() {
                   const subtitle =
                     categories?.find((category) => category.id === item.categoryId)?.name ||
                     item.subcategory ||
-                    "NegÃ³cio local";
+                    "Negócio local";
 
                   return (
                     <Link
@@ -1427,7 +1427,7 @@ export default function Home() {
                         </div>
 
                         <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-500">
-                          ConheÃ§a a loja, veja os produtos publicados e fale
+                          Conheça a loja, veja os produtos publicados e fale
                           direto com quem vende.
                         </p>
 
@@ -1467,7 +1467,7 @@ export default function Home() {
                   const subtitle =
                     categories?.find((category) => category.id === item.categoryId)?.name ||
                     item.subcategory ||
-                    "NegÃ³cio local";
+                    "Negócio local";
 
                   return (
                     <article
@@ -1532,7 +1532,7 @@ export default function Home() {
 
                         <p className="mt-4 line-clamp-2 text-sm leading-6 text-slate-500">
                           Veja a vitrine da loja, os itens publicados e os canais
-                          de contato disponÃ­veis.
+                          de contato disponíveis.
                         </p>
 
                         <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-500">
@@ -1544,7 +1544,7 @@ export default function Home() {
                           {(item.seller?.whatsapp || item.whatsapp) && (
                             <span className="inline-flex items-center gap-1.5 text-emerald-700">
                               <Phone className="h-4 w-4" />
-                              WhatsApp disponÃ­vel
+                              WhatsApp disponível
                             </span>
                           )}
                         </div>
@@ -1563,7 +1563,7 @@ export default function Home() {
             <div className="rounded-[28px] border border-dashed border-slate-200 bg-white p-10 text-center">
               <Building2 className="mx-auto h-12 w-12 text-slate-300" />
               <p className="mt-4 text-slate-500">
-                As primeiras lojas e empresas aparecerÃ£o aqui.
+                As primeiras lojas e empresas aparecerão aqui.
               </p>
             </div>
           )}
@@ -1573,7 +1573,7 @@ export default function Home() {
           <SectionHeader
             eyebrow="Marketplace regional"
             title="Novidades e oportunidades recentes"
-            description="Depois que o usuÃ¡rio entende o produto, ele entra no fluxo natural de descoberta: anÃºncios, produtos e oportunidades da regiÃ£o."
+            description="Depois que o usuário entende o produto, ele entra no fluxo natural de descoberta: anúncios, produtos e oportunidades da região."
             actionHref="/busca"
             actionLabel="Ver mais"
           />
@@ -1623,11 +1623,11 @@ export default function Home() {
                             {listing.type === "food"
                               ? "Comida"
                               : listing.type === "service"
-                              ? "ServiÃ§o"
+                              ? "Serviço"
                               : listing.type === "property"
-                              ? "ImÃ³vel"
+                              ? "Imóvel"
                               : listing.type === "vehicle"
-                              ? "VeÃ­culo"
+                              ? "Veículo"
                               : "Produto"}
                           </span>
                         </div>
@@ -1662,7 +1662,7 @@ export default function Home() {
             <div className="rounded-[28px] border border-dashed border-slate-200 bg-white p-12 text-center">
               <LayoutGrid className="mx-auto h-12 w-12 text-slate-300" />
               <p className="mt-4 text-slate-500">
-                Assim que novos anÃºncios entrarem no portal, a Home vai refletir
+                Assim que novos anúncios entrarem no portal, a Home vai refletir
                 isso aqui.
               </p>
             </div>
@@ -1673,8 +1673,8 @@ export default function Home() {
           <div className="container">
             <SectionHeader
               eyebrow="O que comer hoje"
-              title="Bateu a fome? PeÃ§a agora nas melhores lojas abertas"
-              description="Essa seÃ§Ã£o ajuda o usuÃ¡rio no dia a dia e aumenta recorrÃªncia de visita ao site."
+              title="Bateu a fome? Peça agora nas melhores lojas abertas"
+              description="Essa seção ajuda o usuário no dia a dia e aumenta recorrência de visita ao site."
               actionHref="/busca?q=lanche"
               actionLabel="Ver lanches"
             />
@@ -1774,7 +1774,7 @@ export default function Home() {
               <div className="rounded-[28px] bg-white p-10 text-center shadow-sm">
                 <ShoppingBag className="mx-auto h-12 w-12 text-orange-200" />
                 <p className="mt-4 text-slate-500">
-                  Assim que houver lanches de lojas abertas agora, eles aparecerÃ£o aqui.
+                  Assim que houver lanches de lojas abertas agora, eles aparecerão aqui.
                 </p>
               </div>
             )}
@@ -1783,11 +1783,11 @@ export default function Home() {
 
         <section className="container py-8 sm:py-10">
           <SectionHeader
-            eyebrow="ServiÃ§os locais"
-            title="Profissionais e prestadores com contato rÃ¡pido"
-            description="Essa seÃ§Ã£o ajuda a transformar o site em utilidade diÃ¡ria para a cidade, nÃ£o sÃ³ em vitrine de anÃºncios."
+            eyebrow="Serviços locais"
+            title="Profissionais e prestadores com contato rápido"
+            description="Essa seção ajuda a transformar o site em utilidade diária para a cidade, não só em vitrine de anúncios."
             actionHref="/busca?q=servicos"
-            actionLabel="Ver serviÃ§os"
+            actionLabel="Ver serviços"
           />
 
           {serviceProviders.length > 0 ? (
@@ -1866,7 +1866,7 @@ export default function Home() {
             <div className="rounded-[28px] border border-dashed border-slate-200 bg-white p-8 text-center">
               <HeartHandshake className="mx-auto h-10 w-10 text-violet-300" />
               <p className="mt-4 text-slate-500">
-                Os primeiros prestadores com contato rÃ¡pido aparecerÃ£o aqui.
+                Os primeiros prestadores com contato rápido aparecerão aqui.
               </p>
             </div>
           )}
@@ -1882,10 +1882,10 @@ export default function Home() {
 
                 <div className="min-w-0">
                   <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-600">
-                    Eventos da regiÃ£o
+                    Eventos da região
                   </p>
                   <p className="mt-2 text-sm leading-6 text-slate-500">
-                    Feiras, shows, encontros e atraÃ§Ãµes locais em um sÃ³ lugar.
+                    Feiras, shows, encontros e atrações locais em um só lugar.
                   </p>
                 </div>
               </div>
@@ -1937,7 +1937,7 @@ export default function Home() {
                               <p className="mt-1 truncate text-xs font-medium text-blue-700">
                                 {[extra.eventDate, extra.eventVenue]
                                   .filter(Boolean)
-                                  .join(" Â· ")}
+                                  .join(" · ")}
                               </p>
                             )}
 
@@ -1954,8 +1954,8 @@ export default function Home() {
               ) : (
                 <div className="mt-5 rounded-[22px] border border-dashed border-slate-200 bg-slate-50 p-5">
                   <p className="text-sm leading-6 text-slate-500">
-                    Ainda nÃ£o hÃ¡ eventos publicados. Use o Norte Vivo para
-                    divulgar a prÃ³xima atraÃ§Ã£o da sua regiÃ£o.
+                    Ainda não há eventos publicados. Use o Norte Vivo para
+                    divulgar a próxima atração da sua região.
                   </p>
                 </div>
               )}
@@ -1972,7 +1972,7 @@ export default function Home() {
                     Vagas de emprego
                   </p>
                   <p className="mt-2 text-sm leading-6 text-slate-500">
-                    Vagas locais, trabalhos rÃ¡pidos e oportunidades reais da regiÃ£o.
+                    Vagas locais, trabalhos rápidos e oportunidades reais da região.
                   </p>
                 </div>
               </div>
@@ -2018,7 +2018,7 @@ export default function Home() {
                             <p className="mt-1 truncate text-xs font-medium text-emerald-700">
                               {[extra.jobSalary, extra.jobMode]
                                 .filter(Boolean)
-                                .join(" Â· ")}
+                                .join(" · ")}
                             </p>
                           )}
                         </div>
@@ -2029,8 +2029,8 @@ export default function Home() {
               ) : (
                 <div className="mt-5 rounded-[22px] border border-dashed border-slate-200 bg-slate-50 p-5">
                   <p className="text-sm leading-6 text-slate-500">
-                    Ainda nÃ£o hÃ¡ vagas publicadas. Em breve essa Ã¡rea pode reunir
-                    empregos e freelas da regiÃ£o.
+                    Ainda não há vagas publicadas. Em breve essa área pode reunir
+                    empregos e freelas da região.
                   </p>
                 </div>
               )}
@@ -2047,12 +2047,12 @@ export default function Home() {
                 </p>
 
                 <h2 className="mt-3 font-display text-3xl font-black">
-                  Sua loja pode aparecer para toda a regiÃ£o, mesmo sem ter site.
+                  Sua loja pode aparecer para toda a região, mesmo sem ter site.
                 </h2>
 
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-200 sm:text-base">
-                  Cadastre produtos, serviÃ§os, contatos, horÃ¡rio de funcionamento
-                  e impulsione o que vocÃª quer vender com mais destaque dentro da
+                  Cadastre produtos, serviços, contatos, horário de funcionamento
+                  e impulsione o que você quer vender com mais destaque dentro da
                   plataforma.
                 </p>
               </div>
@@ -2061,7 +2061,7 @@ export default function Home() {
                 <Link href={isAuthenticated ? "/anunciante/novo" : LOGIN_ROUTE}>
                   <Button className="h-12 w-full rounded-2xl bg-white text-slate-900 hover:bg-slate-100">
                     <Store className="mr-2 h-4 w-4" />
-                    Criar anÃºncio
+                    Criar anúncio
                   </Button>
                 </Link>
 

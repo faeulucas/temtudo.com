@@ -585,7 +585,7 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="container mt-3 grid grid-cols-4 gap-2">
+          <div className="container mt-3 grid grid-cols-3 gap-3 sm:grid-cols-4">
             {CATEGORY_SHORTCUTS.map((item) => {
               const Icon = item.icon;
               return (

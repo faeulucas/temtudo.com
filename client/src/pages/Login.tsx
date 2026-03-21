@@ -86,10 +86,143 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,#fff7ed_0%,#ffffff_18%,#f8fafc_100%)]">
-      <Header />
+      <div className="hidden md:block">
+        <Header />
+      </div>
 
       <main className="container py-6 sm:py-10">
-        <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
+        {/* Mobile / PWA simples */}
+        <div className="md:hidden">
+          <div className="mx-auto max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="text-center">
+              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-orange-600">
+                {mode === "login" ? "Entrar" : "Criar conta"}
+              </p>
+              <h1 className="mt-2 text-2xl font-black text-slate-900">
+                {mode === "login" ? "Acesse sua conta" : "Cadastre-se no Norte Vivo"}
+              </h1>
+              <p className="mt-2 text-sm text-slate-500">
+                {mode === "login"
+                  ? "Use seu e-mail e senha para continuar."
+                  : "Leva menos de 1 minuto para começar a anunciar."}
+              </p>
+            </div>
+
+            <div className="mt-5 flex gap-2 rounded-full bg-slate-100 p-1 text-sm font-semibold">
+              <button
+                type="button"
+                onClick={() => setMode("login")}
+                className={`flex-1 rounded-full py-2 ${
+                  mode === "login" ? "bg-white shadow text-slate-900" : "text-slate-500"
+                }`}
+              >
+                Entrar
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode("register")}
+                className={`flex-1 rounded-full py-2 ${
+                  mode === "register" ? "bg-white shadow text-slate-900" : "text-slate-500"
+                }`}
+              >
+                Criar conta
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="mt-6 space-y-3">
+              {mode === "register" && (
+                <>
+                  <Input
+                    placeholder="Seu nome"
+                    value={name}
+                    onChange={(event) => setName(event.target.value)}
+                    required
+                  />
+                  <Select
+                    value={personType}
+                    onValueChange={(value: "pf" | "pj") => setPersonType(value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Tipo de conta" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pf">Pessoa física</SelectItem>
+                      <SelectItem value="pj">Pessoa jurídica</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {personType === "pj" && (
+                    <Input
+                      placeholder="Nome da empresa"
+                      value={companyName}
+                      onChange={(event) => setCompanyName(event.target.value)}
+                    />
+                  )}
+                  <Input
+                    placeholder="WhatsApp (opcional)"
+                    value={whatsapp}
+                    onChange={(event) => setWhatsapp(event.target.value)}
+                  />
+                </>
+              )}
+
+              <Input
+                type="email"
+                placeholder="E-mail"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                required
+              />
+              <Input
+                type="password"
+                placeholder="Senha"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                required
+              />
+
+              {errorMessage && (
+                <p className="text-sm font-semibold text-rose-600">{errorMessage}</p>
+              )}
+
+              <Button
+                type="submit"
+                className="h-12 w-full rounded-full bg-orange-500 text-white hover:bg-orange-600"
+                disabled={isPending}
+              >
+                {isPending ? "Enviando..." : mode === "login" ? "Entrar" : "Criar conta"}
+              </Button>
+
+              {mode === "login" ? (
+                <div className="flex justify-between text-sm text-slate-600">
+                  <Link href="/redefinir-senha" className="font-semibold text-orange-600">
+                    Esqueci minha senha
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => setMode("register")}
+                    className="font-semibold text-slate-700"
+                  >
+                    Criar conta
+                  </button>
+                </div>
+              ) : (
+                <div className="text-center text-sm text-slate-600">
+                  Já tem conta?{" "}
+                  <button
+                    type="button"
+                    onClick={() => setMode("login")}
+                    className="font-semibold text-orange-600"
+                  >
+                    Entrar
+                  </button>
+                </div>
+              )}
+            </form>
+          </div>
+        </div>
+
+        {/* Desktop completo */}
+        <div className="hidden gap-6 md:grid lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
           <section className="rounded-[32px] bg-[linear-gradient(135deg,#0f172a_0%,#1d4ed8_50%,#f97316_130%)] p-6 text-white shadow-[0_20px_70px_rgba(15,23,42,0.18)] sm:p-8">
             <div className="max-w-xl">
               <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white">

@@ -554,14 +554,6 @@ export default function Home() {
                 ))}
               </div>
 
-              <button
-                className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-800 shadow-sm"
-                onClick={() => handleSearch("")}
-              >
-                <Search className="h-4 w-4 text-orange-600" />
-                Buscar em tudo
-              </button>
-
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {["Favoritos", "Cupons", "Serviços", "Mercados"].map((chip) => (
                   <button

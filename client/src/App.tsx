@@ -29,6 +29,7 @@ import StoresPage from "./pages/Stores";
 import BoosterPage from "./pages/Booster";
 import MyAccountPanel from "./pages/account/MyAccountPanel";
 import StorefrontPage from "./pages/Storefront";
+import IconsPreview from "./pages/dev/IconsPreview";
 
 function ScrollToTop() {
   const [location] = useLocation();
@@ -72,6 +73,7 @@ function Router() {
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/painel-admin" component={AdminDashboard} />
       <Route path="/favoritos" component={FavoritesPage} />
+      <Route path="/dev/icons" component={IconsPreview} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

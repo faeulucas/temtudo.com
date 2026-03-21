@@ -120,6 +120,23 @@ const GUIDE_SHORTCUTS = [
   },
 ];
 
+function CategoryIcon({ emoji, image, alt }: { emoji: string; image?: string; alt: string }) {
+  if (image) {
+    return (
+      <img
+        src={image}
+        alt={alt}
+        className="h-11 w-11 object-contain"
+        loading="lazy"
+        onError={(e) => {
+          (e.target as HTMLImageElement).style.display = "none";
+        }}
+      />
+    );
+  }
+  return <span className="text-xl">{emoji}</span>;
+}
+
 const PILLARS = [
   {
     label: "Guia Local",
@@ -170,14 +187,62 @@ const MOBILE_TABS = [
 ];
 
 const CATEGORY_SHORTCUTS = [
-  { label: "Promoções", href: "/busca?q=promo", emoji: "🧧", tone: "bg-orange-50 text-orange-700" },
-  { label: "Delivery", href: "/busca?type=food", emoji: "🍽️", tone: "bg-rose-50 text-rose-700" },
-  { label: "Mercado", href: "/busca?q=mercado", emoji: "🛒", tone: "bg-amber-50 text-amber-700" },
-  { label: "Lojas", href: "/lojas", emoji: "🏬", tone: "bg-indigo-50 text-indigo-700" },
-  { label: "Serviços", href: "/busca?q=servicos", emoji: "🛠️", tone: "bg-emerald-50 text-emerald-700" },
-  { label: "Imóveis", href: "/busca?type=property", emoji: "🏡", tone: "bg-blue-50 text-blue-700" },
-  { label: "Eventos", href: "/busca?q=eventos", emoji: "📅", tone: "bg-purple-50 text-purple-700" },
-  { label: "Empregos", href: "/busca?type=job", emoji: "💼", tone: "bg-cyan-50 text-cyan-700" },
+  {
+    label: "Promoções",
+    href: "/busca?q=promo",
+    emoji: "🧧",
+    image: "/icons/things/promo.webp",
+    tone: "bg-orange-50 text-orange-700",
+  },
+  {
+    label: "Delivery",
+    href: "/busca?type=food",
+    emoji: "🍽️",
+    image: "/icons/things/delivery.webp",
+    tone: "bg-rose-50 text-rose-700",
+  },
+  {
+    label: "Mercado",
+    href: "/busca?q=mercado",
+    emoji: "🛒",
+    image: "/icons/things/market.webp",
+    tone: "bg-amber-50 text-amber-700",
+  },
+  {
+    label: "Lojas",
+    href: "/lojas",
+    emoji: "🏬",
+    image: "/icons/things/store.webp",
+    tone: "bg-indigo-50 text-indigo-700",
+  },
+  {
+    label: "Serviços",
+    href: "/busca?q=servicos",
+    emoji: "🛠️",
+    image: "/icons/things/services.webp",
+    tone: "bg-emerald-50 text-emerald-700",
+  },
+  {
+    label: "Imóveis",
+    href: "/busca?type=property",
+    emoji: "🏡",
+    image: "/icons/things/realestate.webp",
+    tone: "bg-blue-50 text-blue-700",
+  },
+  {
+    label: "Eventos",
+    href: "/busca?q=eventos",
+    emoji: "📅",
+    image: "/icons/things/events.webp",
+    tone: "bg-purple-50 text-purple-700",
+  },
+  {
+    label: "Empregos",
+    href: "/busca?type=job",
+    emoji: "💼",
+    image: "/icons/things/jobs.webp",
+    tone: "bg-cyan-50 text-cyan-700",
+  },
 ];
 
 const FILTER_CHIPS = ["Filtros", "Entrega grátis", "Promoções"];
@@ -545,9 +610,9 @@ export default function Home() {
                   className="flex min-h-[88px] flex-col items-center justify-between rounded-2xl border border-slate-100 bg-white p-3 text-center shadow-sm transition hover:border-orange-200 hover:shadow-md"
                 >
                   <span
-                    className={`flex h-11 w-11 items-center justify-center rounded-2xl text-xl ${item.tone}`}
+                    className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-white ${item.tone} shadow-[0_6px_16px_rgba(15,23,42,0.06)]`}
                   >
-                    {item.emoji}
+                    <CategoryIcon emoji={item.emoji} image={item.image} alt={item.label} />
                   </span>
                   <span className="text-[12px] font-semibold leading-tight text-slate-800">
                     {item.label}
@@ -614,16 +679,16 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {PILLARS.map((item) => {
                   return (
                     <Link
                       key={`mobile-${item.label}`}
                       href={item.href}
-                      className="rounded-[24px] border border-slate-200 bg-slate-50 p-4 shadow-[0_6px_18px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5"
+                      className="rounded-[28px] border border-slate-200 bg-slate-50 p-5 shadow-[0_8px_22px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5"
                     >
                       <div className="flex items-start gap-3">
-                        <div className="rounded-xl bg-white px-3 py-2 text-lg">
+                        <div className="rounded-2xl bg-white px-3 py-2 text-xl shadow-[0_4px_12px_rgba(15,23,42,0.06)]">
                           {item.emoji}
                         </div>
                         <div className="min-w-0">
@@ -633,7 +698,7 @@ export default function Home() {
                           <h3 className="mt-1 font-display text-lg font-black text-slate-900">
                             {item.label}
                           </h3>
-                          <p className="mt-1 text-xs leading-5 text-slate-600">
+                          <p className="mt-2 text-sm leading-6 text-slate-600">
                             {item.description}
                           </p>
                         </div>

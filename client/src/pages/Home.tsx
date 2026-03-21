@@ -125,7 +125,7 @@ const PILLARS = [
     label: "Guia Local",
     description: "Encontre telefones, serviços e empresas da sua cidade.",
     href: "/guia",
-    icon: MapPin,
+    emoji: "🧭",
     badge: "Informativo local",
     tone:
       "border-blue-200 bg-white text-slate-900 hover:border-blue-300 hover:shadow-lg",
@@ -134,7 +134,7 @@ const PILLARS = [
     label: "Marketplace Regional",
     description: "Descubra produtos, ofertas e oportunidades perto de você.",
     href: "/busca",
-    icon: ShoppingCart,
+    emoji: "🛍️",
     badge: "Compra e venda",
     tone:
       "border-orange-200 bg-orange-500 text-white hover:bg-orange-600 hover:shadow-lg",
@@ -143,7 +143,7 @@ const PILLARS = [
     label: "Crie sua Loja",
     description: "Monte sua vitrine online e apareça para novos clientes.",
     href: "/lojas",
-    icon: Store,
+    emoji: "🏪",
     badge: "Para quem não tem site",
     tone:
       "border-slate-800 bg-slate-900 text-white hover:bg-slate-800 hover:shadow-lg",
@@ -161,12 +161,12 @@ const QUICK_SEGMENTS = [
 ];
 
 const MOBILE_TABS = [
-  { label: "Tudo", href: "/", icon: LayoutGrid },
-  { label: "Restaurantes", href: "/busca?type=food", icon: Utensils },
-  { label: "Mercados", href: "/busca?q=mercado", icon: ShoppingCart },
-  { label: "Lojas", href: "/lojas", icon: Store },
-  { label: "Serviços", href: "/busca?q=servicos", icon: Wrench },
-  { label: "Guia local", href: "/guia", icon: MapPin },
+  { label: "Tudo", href: "/", emoji: "✨" },
+  { label: "Restaurantes", href: "/busca?type=food", emoji: "🍽️" },
+  { label: "Mercados", href: "/busca?q=mercado", emoji: "🛒" },
+  { label: "Lojas", href: "/lojas", emoji: "🏪" },
+  { label: "Serviços", href: "/busca?q=servicos", emoji: "🛠️" },
+  { label: "Guia local", href: "/guia", emoji: "🧭" },
 ];
 
 const CATEGORY_SHORTCUTS = [
@@ -526,16 +526,16 @@ export default function Home() {
                 <div className="flex items-center gap-2">
                   <Link href={isAuthenticated ? "/anunciante" : LOGIN_ROUTE}>
                     <button className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-900 shadow-sm">
-                      <LayoutGrid className="h-5 w-5" />
+                      <span className="text-lg">🧭</span>
                     </button>
                   </Link>
                   <Link href={isAuthenticated ? "/favoritos" : LOGIN_ROUTE}>
                     <button className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-900 shadow-sm">
-                      <Star className="h-5 w-5" />
+                      <span className="text-lg">⭐</span>
                     </button>
                   </Link>
                   <button className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-900 shadow-sm">
-                    <Bell className="h-5 w-5" />
+                    <span className="text-lg">🔔</span>
                   </button>
                 </div>
               </div>
@@ -550,14 +550,13 @@ export default function Home() {
 
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {MOBILE_TABS.map((tab) => {
-                  const Icon = tab.icon;
                   return (
                     <Link
                       key={tab.label}
                       href={tab.href}
                       className="flex min-w-[112px] items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 shadow-sm transition hover:border-orange-200 hover:bg-orange-50"
                     >
-                      <Icon className="h-4 w-4" />
+                      <span className="text-base">{tab.emoji}</span>
                       <span className="truncate">{tab.label}</span>
                     </Link>
                   );
@@ -665,7 +664,6 @@ export default function Home() {
 
               <div className="grid grid-cols-2 gap-3">
                 {PILLARS.map((item) => {
-                  const Icon = item.icon;
                   return (
                     <Link
                       key={`mobile-${item.label}`}
@@ -673,8 +671,8 @@ export default function Home() {
                       className="rounded-[24px] border border-slate-200 bg-slate-50 p-4 shadow-[0_6px_18px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5"
                     >
                       <div className="flex items-start gap-3">
-                        <div className="rounded-xl bg-white p-3 text-slate-900">
-                          <Icon className="h-5 w-5" />
+                        <div className="rounded-xl bg-white px-3 py-2 text-lg">
+                          {item.emoji}
                         </div>
                         <div className="min-w-0">
                           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
@@ -1029,7 +1027,7 @@ export default function Home() {
               <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
                 <div>
                   <div className="inline-flex items-center gap-2 rounded-full bg-white/12 px-4 py-2 text-sm font-semibold text-white">
-                    <BadgeCheck className="h-4 w-4" />
+                    <span>🛡️</span>
                     Guia local + marketplace + lojas online
                   </div>
 
@@ -1051,13 +1049,13 @@ export default function Home() {
                       className="h-12 rounded-2xl bg-white px-6 text-slate-900 hover:bg-slate-100"
                       onClick={() => handleSearch("")}
                     >
-                      <Search className="mr-2 h-4 w-4" />
+                      <span className="mr-2 text-base">🔍</span>
                       Explorar agora
                     </Button>
 
                     <Link href={isAuthenticated ? "/anunciante/novo" : LOGIN_ROUTE}>
                       <Button className="h-12 rounded-2xl bg-orange-500 px-6 text-white hover:bg-orange-600">
-                        <Store className="mr-2 h-4 w-4" />
+                        <span className="mr-2 text-base">🏪</span>
                         Criar minha loja
                       </Button>
                     </Link>
@@ -1076,7 +1074,7 @@ export default function Home() {
                         className="flex items-center justify-between rounded-2xl bg-white/10 px-4 py-3 text-left text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/16"
                       >
                         <span>{suggestion}</span>
-                        <ArrowRight className="h-4 w-4 shrink-0" />
+                        <span className="shrink-0 text-base">➡️</span>
                       </button>
                     ))}
                   </div>
@@ -1116,7 +1114,6 @@ export default function Home() {
 
                   <div className="mt-4 space-y-3">
                     {PILLARS.map((item) => {
-                      const Icon = item.icon;
                       return (
                         <Link
                           key={item.label}
@@ -1124,8 +1121,8 @@ export default function Home() {
                           className={`block rounded-[24px] border p-4 transition ${item.tone}`}
                         >
                           <div className="flex items-start gap-4">
-                            <div className="rounded-2xl bg-black/10 p-3">
-                              <Icon className="h-5 w-5" />
+                            <div className="rounded-2xl bg-black/10 p-3 text-lg">
+                              {item.emoji}
                             </div>
 
                             <div className="min-w-0">
@@ -1169,7 +1166,6 @@ export default function Home() {
 
           <div className="grid gap-4 lg:grid-cols-3">
             {PILLARS.map((item) => {
-              const Icon = item.icon;
               const isDark =
                 item.label === "Marketplace Regional" || item.label === "Crie sua Loja";
 
@@ -1186,8 +1182,8 @@ export default function Home() {
                   }`}
                 >
                   <div className="flex items-start justify-between gap-4">
-                    <div className="rounded-2xl bg-black/10 p-3">
-                      <Icon className="h-6 w-6" />
+                    <div className="rounded-2xl bg-black/10 p-3 text-xl">
+                      {item.emoji}
                     </div>
                     <span className="rounded-full bg-black/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em]">
                       {item.badge}

@@ -24,14 +24,20 @@ export default function AppInstallBanner({
 
   useEffect(() => {
     const dismissed = localStorage.getItem(storageKey);
-    if (!dismissed) setVisible(true);
+    const isStandalone =
+      window.matchMedia?.("(display-mode: standalone)")?.matches ||
+      // iOS Safari standalone
+      (navigator as any).standalone === true;
+    const isMobile = window.matchMedia?.("(max-width: 768px)")?.matches;
+
+    if (!dismissed && isMobile && !isStandalone) setVisible(true);
   }, [storageKey]);
 
   if (!visible) return null;
 
   return (
-    <div className="container">
-      <div className="mb-4 flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+    <div className="px-4 pb-3 md:hidden">
+      <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
         <button
           type="button"
           className="text-slate-400 transition hover:text-slate-600"
@@ -46,11 +52,7 @@ export default function AppInstallBanner({
 
         <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-slate-100">
           {iconUrl ? (
-            <img
-              src={iconUrl}
-              alt="App"
-              className="h-full w-full object-cover"
-            />
+            <img src={iconUrl} alt="App" className="h-full w-full object-cover" />
           ) : (
             <span className="text-lg font-bold text-slate-700">App</span>
           )}

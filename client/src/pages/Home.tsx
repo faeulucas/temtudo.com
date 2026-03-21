@@ -500,6 +500,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,#fff7ed_0%,#ffffff_18%,#f8fafc_100%)]">
+      <AppInstallBanner
+        title="Use o aplicativo"
+        subtitle="Acesso rápido e fácil no app"
+        ctaLabel="Abrir"
+        ctaHref="/app"
+      />
       <Header
         selectedCity={selectedCity}
         onCityChange={setSelectedCity}
@@ -600,13 +606,6 @@ export default function Home() {
               );
             })}
           </div>
-
-          <AppInstallBanner
-            title="Use o aplicativo"
-            subtitle="Acesso rápido e fácil no app"
-            ctaLabel="Abrir"
-            ctaHref="/app"
-          />
 
           <section className="bg-white">
             <div className="container space-y-6 pt-4 pb-8">

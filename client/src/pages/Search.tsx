@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import {
+  ArrowLeft,
   ChevronDown,
   Filter,
   LayoutGrid,
@@ -176,16 +177,72 @@ export default function SearchPage() {
 
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,#fff7ed_0%,#ffffff_18%,#f8fafc_100%)]">
-      <Header
-        selectedCity={cityId}
-        onCityChange={setCityId}
-        onSearch={(value) => {
-          setQ(value);
-          setPage(1);
-        }}
-      />
+      {/* Mobile minimalist search */}
+      <div className="md:hidden">
+        <div className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
+          <form onSubmit={handleSearch} className="flex items-center gap-3 px-4 py-3">
+            <button
+              type="button"
+              aria-label="Voltar"
+              onClick={() => navigate("/")}
+              className="rounded-full p-2 text-slate-700 hover:bg-slate-100"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <div className="relative flex-1">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input
+                type="search"
+                value={q}
+                onChange={(event) => setQ(event.target.value)}
+                placeholder="busque por loja ou categoria"
+                className="w-full rounded-full border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-4 text-sm font-semibold text-slate-800 shadow-inner outline-none placeholder:text-slate-400 focus:border-orange-300 focus:bg-white"
+              />
+            </div>
+            <button
+              type="submit"
+              className="rounded-full bg-orange-500 px-3 py-2 text-sm font-bold text-white shadow hover:bg-orange-600"
+            >
+              Buscar
+            </button>
+          </form>
+        </div>
 
-      <main className="pb-24 md:pb-0">
+        <div className="flex flex-col items-center gap-4 px-6 pb-10 pt-6">
+          <p className="text-lg font-black text-slate-900">Onde quer pedir hoje?</p>
+          <div className="relative flex h-52 w-full max-w-sm items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-orange-50 via-white to-slate-50">
+            <div className="text-6xl leading-none">🍔</div>
+            <div className="absolute right-10 top-6 text-4xl">🧃</div>
+            <div className="absolute left-8 top-10 text-4xl">🥗</div>
+            <div className="absolute right-6 bottom-6 text-4xl">🍌</div>
+            <div className="absolute left-6 bottom-6 text-4xl">🔍</div>
+          </div>
+          <div className="flex w-full max-w-sm flex-wrap gap-2">
+            {QUICK_SEARCHES.slice(0, 5).map((item) => (
+              <button
+                key={item.label}
+                type="button"
+                onClick={() => applyQuickSearch(item.value)}
+                className="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm"
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="hidden md:block">
+        <Header
+          selectedCity={cityId}
+          onCityChange={setCityId}
+          onSearch={(value) => {
+            setQ(value);
+            setPage(1);
+          }}
+        />
+
+        <main className="pb-24 md:pb-0">
         <section className="container pt-3 sm:pt-6">
           <div className="overflow-hidden rounded-[32px] bg-[linear-gradient(135deg,#0f172a_0%,#1d4ed8_45%,#f97316_130%)] p-5 text-white shadow-[0_20px_70px_rgba(15,23,42,0.18)] sm:p-8 lg:p-10">
             <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
@@ -632,6 +689,7 @@ export default function SearchPage() {
           </section>
         </div>
       </main>
+      </div>
 
       <Footer />
     </div>

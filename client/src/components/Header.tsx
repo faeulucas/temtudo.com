@@ -216,7 +216,7 @@ export default function Header({
       : `Buscar ${animatedQuery || "produtos, serviços ou empresas"}...`;
 
   return (
-    <header className="sticky top-0 z-50 max-w-full overflow-x-clip border-b border-slate-200 bg-white/95 backdrop-blur">
+    <header className="sticky top-0 z-50 hidden max-w-full overflow-x-clip border-b border-slate-200 bg-white/95 backdrop-blur md:block">
       <div className="container">
         <div className="hidden items-center gap-4 py-3 xl:flex">
           <Link href="/" className="flex shrink-0 items-center gap-2">

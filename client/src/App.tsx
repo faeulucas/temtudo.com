@@ -1,11 +1,12 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import MobileBottomNav from "./components/MobileBottomNav";
 import PwaInstallPrompt from "./components/PwaInstallPrompt";
+import MobileTopBar from "./components/MobileTopBar";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import HomePage from "./pages/Home";
 import SearchPage from "./pages/Search";
@@ -78,6 +79,17 @@ function Router() {
 }
 
 function App() {
+  const [location] = useLocation();
+
+  const hideMobileChrome = useMemo(
+    () =>
+      location.startsWith("/login") ||
+      location.startsWith("/entrar") ||
+      location.startsWith("/cadastro") ||
+      location.startsWith("/redefinir-senha"),
+    [location]
+  );
+
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light">
@@ -85,8 +97,9 @@ function App() {
           <ScrollToTop />
           <Toaster />
           <PwaInstallPrompt />
+          {!hideMobileChrome && <MobileTopBar />}
           <Router />
-          <MobileBottomNav />
+          {!hideMobileChrome && <MobileBottomNav />}
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

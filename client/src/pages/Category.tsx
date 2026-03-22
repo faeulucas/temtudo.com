@@ -5,7 +5,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ListingCard from "@/components/ListingCard";
 import { getCashbackRuleBySlug } from "@/lib/cashback";
-import { ChevronRight, Tag } from "lucide-react";
+import { ChevronRight } from "lucide-react";
+import { CategorySvgIcon } from "@/components/CategorySvgIcon";
 
 export default function CategoryPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -38,8 +39,16 @@ export default function CategoryPage() {
         </div>
 
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${category?.color}20` || "#EEF2FF" }}>
-            <Tag className="w-5 h-5" style={{ color: category?.color || "#4F46E5" }} />
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center"
+            style={{ backgroundColor: `${category?.color}20` || "#EEF2FF" }}
+          >
+            <CategorySvgIcon
+              name={category?.icon ?? "ShoppingBag"}
+              alt={category?.name || slug}
+              className="w-5 h-5"
+              fallback={<span className="h-2 w-2 rounded-full bg-slate-500" />}
+            />
           </div>
           <h1 className="font-display text-2xl font-bold text-gray-900">{category?.name || slug}</h1>
         </div>
@@ -85,7 +94,11 @@ export default function CategoryPage() {
           </div>
         ) : (
           <div className="text-center py-20 bg-white rounded-2xl">
-            <Tag className="w-16 h-16 text-gray-200 mx-auto mb-4" />
+            <CategorySvgIcon
+              name={category?.icon ?? "ShoppingBag"}
+              alt={category?.name || slug}
+              className="w-16 h-16 mx-auto mb-4 opacity-60"
+            />
             <h3 className="font-display font-bold text-gray-700 text-xl mb-2">Nenhum anúncio nesta categoria</h3>
             <p className="text-gray-500">Seja o primeiro a anunciar aqui!</p>
           </div>

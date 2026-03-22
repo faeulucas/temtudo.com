@@ -7,7 +7,6 @@ import {
   Ambulance,
   ArrowRight,
   Briefcase,
-  Building2,
   ChevronRight,
   HeartHandshake,
   MapPin,
@@ -19,6 +18,7 @@ import {
   LayoutGrid,
   Phone,
 } from "lucide-react";
+import { CategorySvgIcon } from "@/components/CategorySvgIcon";
 import { Link, useParams } from "wouter";
 
 const CITY_GUIDE_SHORTCUTS = [
@@ -312,7 +312,12 @@ export default function CityPage() {
                 href={`/busca?q=${encodeURIComponent(category.name)}&city=${city?.id || ""}`}
               >
                 <span className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-200">
-                  <Building2 className="h-4 w-4 text-blue-600" />
+                  <CategorySvgIcon
+                    name={category.icon ?? "ShoppingBag"}
+                    alt={category.name}
+                    className="h-4 w-4 text-blue-600"
+                    fallback={<span className="h-2 w-2 rounded-full bg-blue-600" />}
+                  />
                   {category.name}
                 </span>
               </Link>

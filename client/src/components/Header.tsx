@@ -20,12 +20,9 @@ import {
 } from "@/components/ui/select";
 import {
   Bell,
-  Briefcase,
   Car,
   ChevronDown,
   Heart,
-  HeartHandshake,
-  Home,
   LayoutDashboard,
   LogOut,
   MapPin,
@@ -36,11 +33,11 @@ import {
   Shield,
   ShoppingBag,
   Store,
-  Stethoscope,
   User,
   Wrench,
   Zap,
 } from "lucide-react";
+import { CategorySvgIcon } from "@/components/CategorySvgIcon";
 
 interface HeaderProps {
   selectedCity?: number | null;
@@ -58,58 +55,58 @@ const HEADER_PILLS = [
   {
     label: "Saúde",
     href: "/busca?q=saude",
-    icon: Stethoscope,
+    iconName: "Cross",
     tone: "bg-emerald-50 text-emerald-700",
   },
   {
     label: "Educação",
     href: "/busca?q=educacao",
-    icon: Briefcase,
+    iconName: "Building2",
     tone: "bg-orange-50 text-orange-700",
   },
   {
     label: "Delivery",
     href: "/categoria/delivery",
-    icon: ShoppingBag,
+    iconName: "ShoppingBag",
     tone: "bg-amber-50 text-amber-700",
   },
   {
     label: "Imóveis",
     href: "/busca?q=imoveis",
-    icon: Home,
+    iconName: "Home",
     tone: "bg-cyan-50 text-cyan-700",
   },
   {
     label: "Veículos",
     href: "/busca?q=veiculos",
-    icon: Car,
+    iconName: "Car",
     tone: "bg-blue-50 text-blue-700",
   },
   {
     label: "Serviços",
     href: "/busca?q=servicos",
-    icon: Wrench,
+    iconName: "Wrench",
     tone: "bg-violet-50 text-violet-700",
   },
   {
     label: "Lojas",
     href: "/lojas",
-    icon: Store,
+    iconName: "ShoppingBag",
     tone: "bg-blue-50 text-blue-700",
   },
   {
     label: "Guia",
     href: "/guia",
-    icon: HeartHandshake,
+    iconName: "CalendarDays",
     tone: "bg-indigo-50 text-indigo-700",
   },
 ];
 
 const PWA_TOP_TABS = [
-  { label: "Tudo", href: "/busca", icon: Zap, tone: "text-slate-900" },
-  { label: "Veículos", href: "/busca?q=veiculos", icon: Car, tone: "text-slate-700" },
-  { label: "Imóveis", href: "/busca?q=imoveis", icon: Home, tone: "text-slate-700" },
-  { label: "Produtos", href: "/busca", icon: ShoppingBag, tone: "text-slate-700" },
+  { label: "Tudo", href: "/busca", iconName: "CalendarDays", tone: "text-slate-900" },
+  { label: "Veículos", href: "/busca?q=veiculos", iconName: "Car", tone: "text-slate-700" },
+  { label: "Imóveis", href: "/busca?q=imoveis", iconName: "Home", tone: "text-slate-700" },
+  { label: "Produtos", href: "/busca", iconName: "ShoppingBag", tone: "text-slate-700" },
 ];
 
 const PWA_ACTION_PILLS = [
@@ -413,30 +410,30 @@ export default function Header({
 
               <div className="overflow-x-auto scrollbar-hide">
                 <div className="flex w-max min-w-full items-end gap-6 border-b border-slate-100 pb-2">
-                  {PWA_TOP_TABS.map((item, index) => {
-                    const Icon = item.icon;
-                    return (
-                      <Link
-                        key={item.label}
-                        href={item.href}
-                        className={`flex min-w-[64px] flex-col items-center gap-1 text-xs font-medium ${item.tone}`}
-                      >
-                        <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-slate-100">
-                          <Icon
-                            className={`h-5 w-5 ${
-                              index === 0 ? "text-orange-500" : item.tone
-                            }`}
-                          />
-                        </span>
-                        <span>{item.label}</span>
-                        <span
-                          className={`mt-1 h-0.5 w-10 rounded-full ${
-                            index === 0 ? "bg-slate-900" : "bg-transparent"
+                  {PWA_TOP_TABS.map((item, index) => (
+                    <Link
+                      key={item.label}
+                      href={item.href}
+                      className={`flex min-w-[64px] flex-col items-center gap-1 text-xs font-medium ${item.tone}`}
+                    >
+                      <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-slate-100">
+                        <CategorySvgIcon
+                          name={item.iconName}
+                          alt={item.label}
+                          className={`h-5 w-5 ${
+                            index === 0 ? "text-orange-500" : item.tone
                           }`}
+                          fallback={<Zap className="h-5 w-5 text-orange-500" />}
                         />
-                      </Link>
-                    );
-                  })}
+                      </span>
+                      <span>{item.label}</span>
+                      <span
+                        className={`mt-1 h-0.5 w-10 rounded-full ${
+                          index === 0 ? "bg-slate-900" : "bg-transparent"
+                        }`}
+                      />
+                    </Link>
+                  ))}
                 </div>
               </div>
 
@@ -562,7 +559,6 @@ export default function Header({
           <div className="overflow-x-auto py-2 sm:py-3 scrollbar-hide">
             <div className="flex w-max items-center gap-2 motion-safe:animate-pill-marquee">
               {[...HEADER_PILLS, ...HEADER_PILLS, ...HEADER_PILLS].map((item, index) => {
-                const Icon = item.icon;
                 const href =
                   item.label === "Favoritos" && !isAuthenticated
                     ? LOGIN_ROUTE
@@ -575,7 +571,11 @@ export default function Header({
                     className="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
                   >
                     <span className={`inline-flex rounded-full p-2 ${item.tone}`}>
-                      <Icon className="h-4 w-4" />
+                      <CategorySvgIcon
+                        name={item.iconName}
+                        alt={item.label}
+                        className="h-4 w-4"
+                      />
                     </span>
                     {item.label}
                   </Link>

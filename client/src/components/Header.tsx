@@ -38,6 +38,7 @@ import {
   Zap,
 } from "lucide-react";
 import { CategorySvgIcon } from "@/components/CategorySvgIcon";
+import { thingsIcon } from "@/lib/cloudinary";
 
 interface HeaderProps {
   selectedCity?: number | null;

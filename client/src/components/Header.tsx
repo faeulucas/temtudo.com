@@ -103,10 +103,10 @@ const HEADER_PILLS = [
 ];
 
 const PWA_TOP_TABS = [
-  { label: "Tudo", href: "/busca", iconName: "CalendarDays", tone: "text-slate-900" },
-  { label: "Veículos", href: "/busca?q=veiculos", iconName: "Car", tone: "text-slate-700" },
-  { label: "Imóveis", href: "/busca?q=imoveis", iconName: "Home", tone: "text-slate-700" },
-  { label: "Produtos", href: "/busca", iconName: "ShoppingBag", tone: "text-slate-700" },
+  { label: "Tudo", href: "/busca", image: thingsIcon("promo"), emoji: "✨", tone: "text-slate-900" },
+  { label: "Restaurantes", href: "/busca?type=food", image: thingsIcon("delivery"), emoji: "🍽️", tone: "text-slate-700" },
+  { label: "Mercado", href: "/busca?q=mercado", image: thingsIcon("market"), emoji: "🛒", tone: "text-slate-700" },
+  { label: "Lojas", href: "/lojas", image: thingsIcon("store"), emoji: "🏬", tone: "text-slate-700" },
 ];
 
 const PWA_ACTION_PILLS = [
@@ -417,13 +417,11 @@ export default function Header({
                       className={`flex min-w-[64px] flex-col items-center gap-1 text-xs font-medium ${item.tone}`}
                     >
                       <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-slate-100">
-                        <CategorySvgIcon
-                          name={item.iconName}
+                        <CategoryIcon
+                          image={item.image}
+                          fallbackImage={item.image}
+                          emoji={item.emoji}
                           alt={item.label}
-                          className={`h-5 w-5 ${
-                            index === 0 ? "text-orange-500" : item.tone
-                          }`}
-                          fallback={<Zap className="h-5 w-5 text-orange-500" />}
                         />
                       </span>
                       <span>{item.label}</span>

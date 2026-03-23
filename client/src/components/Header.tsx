@@ -38,7 +38,7 @@ import {
   Zap,
 } from "lucide-react";
 import { CategorySvgIcon } from "@/components/CategorySvgIcon";
-import { thingsIcon } from "@/lib/cloudinary";
+import { thingsIcon, cloudinaryFile } from "@/lib/cloudinary";
 
 interface HeaderProps {
   selectedCity?: number | null;
@@ -104,10 +104,38 @@ const HEADER_PILLS = [
 ];
 
 const PWA_TOP_TABS = [
-  { label: "Tudo", href: "/busca", image: thingsIcon("promo"), emoji: "✨", tone: "text-slate-900" },
-  { label: "Restaurantes", href: "/busca?type=food", image: thingsIcon("delivery"), emoji: "🍽️", tone: "text-slate-700" },
-  { label: "Mercado", href: "/busca?q=mercado", image: thingsIcon("market"), emoji: "🛒", tone: "text-slate-700" },
-  { label: "Lojas", href: "/lojas", image: thingsIcon("store"), emoji: "🏬", tone: "text-slate-700" },
+  {
+    label: "Tudo",
+    href: "/busca",
+    image: thingsIcon("promo"),
+    fallbackImage: cloudinaryFile("promo", "png"),
+    emoji: "✨",
+    tone: "text-slate-900",
+  },
+  {
+    label: "Restaurantes",
+    href: "/busca?type=food",
+    image: thingsIcon("delivery"),
+    fallbackImage: cloudinaryFile("delivery", "png"),
+    emoji: "🍽️",
+    tone: "text-slate-700",
+  },
+  {
+    label: "Mercado",
+    href: "/busca?q=mercado",
+    image: thingsIcon("market"),
+    fallbackImage: cloudinaryFile("market", "png"),
+    emoji: "🛒",
+    tone: "text-slate-700",
+  },
+  {
+    label: "Lojas",
+    href: "/lojas",
+    image: thingsIcon("store"),
+    fallbackImage: cloudinaryFile("store", "png"),
+    emoji: "🏬",
+    tone: "text-slate-700",
+  },
 ];
 
 function TabIcon({ image, emoji, alt }: { image?: string; emoji: string; alt: string }) {
@@ -434,7 +462,7 @@ export default function Header({
                     className={`flex min-w-[64px] flex-col items-center gap-1 text-xs font-medium ${item.tone}`}
                   >
                     <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-slate-100">
-                        <TabIcon image={item.image} emoji={item.emoji} alt={item.label} />
+                        <TabIcon image={item.image || item.fallbackImage} emoji={item.emoji} alt={item.label} />
                     </span>
                     <span>{item.label}</span>
                     <span

@@ -10,7 +10,7 @@ import ListingCardCompact from "@/components/ListingCardCompact";
 import AppInstallBanner from "@/components/AppInstallBanner";
 import { Button } from "@/components/ui/button";
 import { getStorefrontHref } from "@/lib/storefront";
-import { guideIcon, thingsIcon } from "@/lib/cloudinary";
+import { guideIcon, thingsIcon, cloudinaryFile } from "@/lib/cloudinary";
 import {
   Ambulance,
   ArrowRight,
@@ -217,7 +217,7 @@ const CATEGORY_SHORTCUTS = [
     href: "/busca?q=promo",
     emoji: "🧧",
     image: thingsIcon("promo"),
-    fallbackImage: "/icons/things/promo.webp",
+    fallbackImage: cloudinaryFile("promo", "png") ?? "/icons/things/promo.webp",
     tone: "bg-orange-50 text-orange-700",
   },
   {
@@ -225,7 +225,7 @@ const CATEGORY_SHORTCUTS = [
     href: "/busca?type=food",
     emoji: "🍽️",
     image: thingsIcon("delivery"),
-    fallbackImage: "/icons/things/delivery.webp",
+    fallbackImage: cloudinaryFile("delivery", "png") ?? "/icons/things/delivery.webp",
     tone: "bg-rose-50 text-rose-700",
   },
   {
@@ -233,7 +233,7 @@ const CATEGORY_SHORTCUTS = [
     href: "/busca?q=mercado",
     emoji: "🛒",
     image: thingsIcon("market"),
-    fallbackImage: "/icons/things/market.webp",
+    fallbackImage: cloudinaryFile("market", "png") ?? "/icons/things/market.webp",
     tone: "bg-amber-50 text-amber-700",
   },
   {
@@ -241,7 +241,7 @@ const CATEGORY_SHORTCUTS = [
     href: "/lojas",
     emoji: "🏬",
     image: thingsIcon("store"),
-    fallbackImage: "/icons/things/store.webp",
+    fallbackImage: cloudinaryFile("store", "png") ?? "/icons/things/store.webp",
     tone: "bg-indigo-50 text-indigo-700",
   },
   {
@@ -249,7 +249,7 @@ const CATEGORY_SHORTCUTS = [
     href: "/busca?q=servicos",
     emoji: "🛠️",
     image: thingsIcon("services"),
-    fallbackImage: "/icons/things/services.webp",
+    fallbackImage: cloudinaryFile("services", "png") ?? "/icons/things/services.webp",
     tone: "bg-emerald-50 text-emerald-700",
   },
   {
@@ -257,7 +257,7 @@ const CATEGORY_SHORTCUTS = [
     href: "/busca?type=property",
     emoji: "🏡",
     image: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774225930/imoveis_y8nbie.png",
-    fallbackImage: thingsIcon("realestate") ?? "/icons/things/realestate.webp",
+    fallbackImage: cloudinaryFile("realestate", "png") ?? thingsIcon("realestate") ?? "/icons/things/realestate.webp",
     tone: "bg-blue-50 text-blue-700",
   },
   {
@@ -265,7 +265,7 @@ const CATEGORY_SHORTCUTS = [
     href: "/busca?q=eventos",
     emoji: "📅",
     image: thingsIcon("events"),
-    fallbackImage: "/icons/things/events.webp",
+    fallbackImage: cloudinaryFile("events", "png") ?? "/icons/things/events.webp",
     tone: "bg-purple-50 text-purple-700",
   },
   {
@@ -273,7 +273,7 @@ const CATEGORY_SHORTCUTS = [
     href: "/busca?type=job",
     emoji: "💼",
     image: thingsIcon("jobs"),
-    fallbackImage: "/icons/things/jobs.webp",
+    fallbackImage: cloudinaryFile("jobs", "png") ?? "/icons/things/jobs.webp",
     tone: "bg-cyan-50 text-cyan-700",
   },
 ];

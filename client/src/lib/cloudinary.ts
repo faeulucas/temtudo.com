@@ -24,7 +24,12 @@ export function guideIcon(id: string, size = 160) {
 }
 
 // Generic helper for the category/things icons
-export function thingsIcon(id: string, size = 200) {
-  const url = cloudinaryUrl(`${baseFolder}/${id}.webp`, { w: size, h: size });
+export function thingsIcon(id: string, size = 200, ext: "webp" | "png" = "webp") {
+  const url = cloudinaryUrl(`${baseFolder}/${id}.${ext}`, { w: size, h: size });
   return url;
+}
+
+// Explicit helper to request a file with chosen extension
+export function cloudinaryFile(id: string, ext: "webp" | "png" = "webp", size = 200) {
+  return cloudinaryUrl(`${baseFolder}/${id}.${ext}`, { w: size, h: size });
 }

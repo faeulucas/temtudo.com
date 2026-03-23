@@ -16,6 +16,12 @@ export function cloudinaryUrl(publicId: string, opts?: { w?: number; h?: number 
   return `${prefix}/${publicId}`;
 }
 
+// Direct URL without transforms (useful to bypass cache issues or unknown versions)
+export function cloudinaryRaw(publicId: string) {
+  if (!cloudName) return undefined;
+  return `https://res.cloudinary.com/${cloudName}/image/upload/${publicId}`;
+}
+
 // Shortcut for our guide icons
 export function guideIcon(id: string, size = 160) {
   // expects files like guide-health.webp inside baseFolder
@@ -32,4 +38,8 @@ export function thingsIcon(id: string, size = 200, ext: "webp" | "png" = "webp")
 // Explicit helper to request a file with chosen extension
 export function cloudinaryFile(id: string, ext: "webp" | "png" = "webp", size = 200) {
   return cloudinaryUrl(`${baseFolder}/${id}.${ext}`, { w: size, h: size });
+}
+
+export function cloudinaryDirect(id: string, ext: "webp" | "png" = "png") {
+  return cloudinaryRaw(`${baseFolder}/${id}.${ext}`);
 }

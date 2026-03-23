@@ -38,7 +38,7 @@ import {
   Zap,
 } from "lucide-react";
 import { CategorySvgIcon } from "@/components/CategorySvgIcon";
-import { thingsIcon, cloudinaryFile } from "@/lib/cloudinary";
+import { thingsIcon, cloudinaryFile, cloudinaryDirect } from "@/lib/cloudinary";
 
 interface HeaderProps {
   selectedCity?: number | null;
@@ -107,32 +107,32 @@ const PWA_TOP_TABS = [
   {
     label: "Tudo",
     href: "/busca",
-    image: thingsIcon("promo"),
-    fallbackImage: cloudinaryFile("promo", "png"),
+    image: cloudinaryFile("promo", "webp") || cloudinaryDirect("promo", "png"),
+    fallbackImage: cloudinaryDirect("promo", "png") || thingsIcon("promo"),
     emoji: "✨",
     tone: "text-slate-900",
   },
   {
     label: "Restaurantes",
     href: "/busca?type=food",
-    image: thingsIcon("delivery"),
-    fallbackImage: cloudinaryFile("delivery", "png"),
+    image: cloudinaryFile("delivery", "webp") || cloudinaryDirect("delivery", "png"),
+    fallbackImage: cloudinaryDirect("delivery", "png") || thingsIcon("delivery"),
     emoji: "🍽️",
     tone: "text-slate-700",
   },
   {
     label: "Mercado",
     href: "/busca?q=mercado",
-    image: thingsIcon("market"),
-    fallbackImage: cloudinaryFile("market", "png"),
+    image: cloudinaryFile("market", "webp") || cloudinaryDirect("market", "png"),
+    fallbackImage: cloudinaryDirect("market", "png") || thingsIcon("market"),
     emoji: "🛒",
     tone: "text-slate-700",
   },
   {
     label: "Lojas",
     href: "/lojas",
-    image: thingsIcon("store"),
-    fallbackImage: cloudinaryFile("store", "png"),
+    image: cloudinaryFile("store", "webp") || cloudinaryDirect("store", "png"),
+    fallbackImage: cloudinaryDirect("store", "png") || thingsIcon("store"),
     emoji: "🏬",
     tone: "text-slate-700",
   },

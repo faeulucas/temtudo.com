@@ -10,7 +10,7 @@ import ListingCardCompact from "@/components/ListingCardCompact";
 import AppInstallBanner from "@/components/AppInstallBanner";
 import { Button } from "@/components/ui/button";
 import { getStorefrontHref } from "@/lib/storefront";
-import { guideIcon, thingsIcon, cloudinaryFile } from "@/lib/cloudinary";
+import { guideIcon, thingsIcon, cloudinaryFile, cloudinaryDirect } from "@/lib/cloudinary";
 import {
   Ambulance,
   ArrowRight,
@@ -216,40 +216,40 @@ const CATEGORY_SHORTCUTS = [
     label: "Promoções",
     href: "/busca?q=promo",
     emoji: "🧧",
-    image: thingsIcon("promo"),
-    fallbackImage: cloudinaryFile("promo", "png") ?? "/icons/things/promo.webp",
+    image: cloudinaryFile("promo", "webp") || cloudinaryDirect("promo", "png"),
+    fallbackImage: cloudinaryDirect("promo", "png") || thingsIcon("promo") || "/icons/things/promo.webp",
     tone: "bg-orange-50 text-orange-700",
   },
   {
     label: "Delivery",
     href: "/busca?type=food",
     emoji: "🍽️",
-    image: thingsIcon("delivery"),
-    fallbackImage: cloudinaryFile("delivery", "png") ?? "/icons/things/delivery.webp",
+    image: cloudinaryFile("delivery", "webp") || cloudinaryDirect("delivery", "png"),
+    fallbackImage: cloudinaryDirect("delivery", "png") || thingsIcon("delivery") || "/icons/things/delivery.webp",
     tone: "bg-rose-50 text-rose-700",
   },
   {
     label: "Mercado",
     href: "/busca?q=mercado",
     emoji: "🛒",
-    image: thingsIcon("market"),
-    fallbackImage: cloudinaryFile("market", "png") ?? "/icons/things/market.webp",
+    image: cloudinaryFile("market", "webp") || cloudinaryDirect("market", "png"),
+    fallbackImage: cloudinaryDirect("market", "png") || thingsIcon("market") || "/icons/things/market.webp",
     tone: "bg-amber-50 text-amber-700",
   },
   {
     label: "Lojas",
     href: "/lojas",
     emoji: "🏬",
-    image: thingsIcon("store"),
-    fallbackImage: cloudinaryFile("store", "png") ?? "/icons/things/store.webp",
+    image: cloudinaryFile("store", "webp") || cloudinaryDirect("store", "png"),
+    fallbackImage: cloudinaryDirect("store", "png") || thingsIcon("store") || "/icons/things/store.webp",
     tone: "bg-indigo-50 text-indigo-700",
   },
   {
     label: "Serviços",
     href: "/busca?q=servicos",
     emoji: "🛠️",
-    image: thingsIcon("services"),
-    fallbackImage: cloudinaryFile("services", "png") ?? "/icons/things/services.webp",
+    image: cloudinaryFile("services", "webp") || cloudinaryDirect("services", "png"),
+    fallbackImage: cloudinaryDirect("services", "png") || thingsIcon("services") || "/icons/things/services.webp",
     tone: "bg-emerald-50 text-emerald-700",
   },
   {
@@ -257,23 +257,27 @@ const CATEGORY_SHORTCUTS = [
     href: "/busca?type=property",
     emoji: "🏡",
     image: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774225930/imoveis_y8nbie.png",
-    fallbackImage: cloudinaryFile("realestate", "png") ?? thingsIcon("realestate") ?? "/icons/things/realestate.webp",
+    fallbackImage:
+      cloudinaryDirect("realestate", "png") ||
+      cloudinaryFile("realestate", "webp") ||
+      thingsIcon("realestate") ||
+      "/icons/things/realestate.webp",
     tone: "bg-blue-50 text-blue-700",
   },
   {
     label: "Eventos",
     href: "/busca?q=eventos",
     emoji: "📅",
-    image: thingsIcon("events"),
-    fallbackImage: cloudinaryFile("events", "png") ?? "/icons/things/events.webp",
+    image: cloudinaryFile("events", "webp") || cloudinaryDirect("events", "png"),
+    fallbackImage: cloudinaryDirect("events", "png") || thingsIcon("events") || "/icons/things/events.webp",
     tone: "bg-purple-50 text-purple-700",
   },
   {
     label: "Empregos",
     href: "/busca?type=job",
     emoji: "💼",
-    image: thingsIcon("jobs"),
-    fallbackImage: cloudinaryFile("jobs", "png") ?? "/icons/things/jobs.webp",
+    image: cloudinaryFile("jobs", "webp") || cloudinaryDirect("jobs", "png"),
+    fallbackImage: cloudinaryDirect("jobs", "png") || thingsIcon("jobs") || "/icons/things/jobs.webp",
     tone: "bg-cyan-50 text-cyan-700",
   },
 ];

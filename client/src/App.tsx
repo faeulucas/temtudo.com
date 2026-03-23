@@ -30,6 +30,13 @@ import BoosterPage from "./pages/Booster";
 import MyAccountPanel from "./pages/account/MyAccountPanel";
 import StorefrontPage from "./pages/Storefront";
 import IconsPreview from "./pages/dev/IconsPreview";
+import PromotionsPage from "./pages/topics/Promotions";
+import DeliveryPage from "./pages/topics/Delivery";
+import MarketPage from "./pages/topics/Market";
+import ServicesPage from "./pages/topics/Services";
+import RealEstatePage from "./pages/topics/RealEstate";
+import EventsPage from "./pages/topics/Events";
+import JobsPage from "./pages/topics/Jobs";
 
 function ScrollToTop() {
   const [location] = useLocation();
@@ -59,6 +66,13 @@ function Router() {
       <Route path="/categoria/:slug" component={CategoryPage} />
       <Route path="/cidade/:slug" component={CityPage} />
       <Route path="/planos" component={PlansPage} />
+      <Route path="/promocoes" component={PromotionsPage} />
+      <Route path="/delivery" component={DeliveryPage} />
+      <Route path="/mercado" component={MarketPage} />
+      <Route path="/servicos" component={ServicesPage} />
+      <Route path="/imoveis" component={RealEstatePage} />
+      <Route path="/eventos" component={EventsPage} />
+      <Route path="/empregos" component={JobsPage} />
       <Route path="/como-funciona" component={HowItWorksPage} />
       <Route path="/termos" component={TermsPage} />
       <Route path="/privacidade" component={PrivacyPage} />

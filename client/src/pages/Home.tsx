@@ -249,7 +249,7 @@ const MOBILE_TABS = [
 const CATEGORY_SHORTCUTS = [
   {
     label: "Promoções",
-    href: "/busca?q=promo",
+    href: "/promocoes",
     emoji: "🧧",
     image: CLOUD_ICONS.promocoes,
     fallbackImage: CLOUD_ICONS.promocoes,
@@ -257,7 +257,7 @@ const CATEGORY_SHORTCUTS = [
   },
   {
     label: "Delivery",
-    href: "/busca?type=food",
+    href: "/delivery",
     emoji: "🍽️",
     image: CLOUD_ICONS.delivery,
     fallbackImage: CLOUD_ICONS.delivery,
@@ -265,7 +265,7 @@ const CATEGORY_SHORTCUTS = [
   },
   {
     label: "Mercado",
-    href: "/busca?q=mercado",
+    href: "/mercado",
     emoji: "🛒",
     image: CLOUD_ICONS.mercado,
     fallbackImage: CLOUD_ICONS.mercado,
@@ -281,7 +281,7 @@ const CATEGORY_SHORTCUTS = [
   },
   {
     label: "Serviços",
-    href: "/busca?q=servicos",
+    href: "/servicos",
     emoji: "🛠️",
     image: CLOUD_ICONS.servicos,
     fallbackImage: CLOUD_ICONS.servicos,
@@ -289,7 +289,7 @@ const CATEGORY_SHORTCUTS = [
   },
   {
     label: "Imóveis",
-    href: "/busca?type=property",
+    href: "/imoveis",
     emoji: "🏡",
     image: CLOUD_ICONS.imoveis,
     fallbackImage: CLOUD_ICONS.imoveis,
@@ -297,7 +297,7 @@ const CATEGORY_SHORTCUTS = [
   },
   {
     label: "Eventos",
-    href: "/busca?q=eventos",
+    href: "/eventos",
     emoji: "📅",
     image: CLOUD_ICONS.eventos,
     fallbackImage: CLOUD_ICONS.eventos,
@@ -305,7 +305,7 @@ const CATEGORY_SHORTCUTS = [
   },
   {
     label: "Empregos",
-    href: "/busca?type=job",
+    href: "/empregos",
     emoji: "💼",
     image: CLOUD_ICONS.empregos,
     fallbackImage: CLOUD_ICONS.empregos,

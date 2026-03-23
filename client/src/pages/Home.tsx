@@ -204,13 +204,34 @@ const PILLARS = [
 ];
 
 const QUICK_SEGMENTS = [
-  { label: "Seja d+", icon: "🩷" },
-  { label: "Lanches", icon: "🥪" },
-  { label: "Pizza", icon: "🍕" },
-  { label: "Burguer", icon: "🍔" },
-  { label: "Porções", icon: "🍟" },
-  { label: "Marmita", icon: "🍱" },
-  { label: "Sushi", icon: "🍣" },
+  { label: "Seja d+", emoji: "🩷" },
+  {
+    label: "Lanches",
+    emoji: "🥪",
+    image: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/lanches_wfp564.png",
+  },
+  {
+    label: "Pizza",
+    emoji: "🍕",
+    image: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229865/pizza_xslxqr.png",
+  },
+  {
+    label: "Burguer",
+    emoji: "🍔",
+    image: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/hamburguer_uq4feq.png",
+  },
+  {
+    label: "Porções",
+    emoji: "🍟",
+  },
+  {
+    label: "Marmita",
+    emoji: "🍱",
+  },
+  {
+    label: "Sushi",
+    emoji: "🍣",
+  },
 ];
 
 const MOBILE_TABS = [
@@ -760,19 +781,31 @@ export default function Home() {
                   </Link>
                 </div>
 
-                <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
-                  {QUICK_SEGMENTS.map((item) => (
-                    <button
-                      key={item.label}
-                      type="button"
-                      onClick={() => handleSearch(item.label)}
-                      className="inline-flex shrink-0 items-center gap-2 rounded-full bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-800"
-                    >
-                      <span className="text-lg leading-none">{item.icon}</span>
-                      {item.label}
-                    </button>
-                  ))}
-                </div>
+              <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+                {QUICK_SEGMENTS.map((item) => (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={() => handleSearch(item.label)}
+                    className="inline-flex shrink-0 items-center gap-2 rounded-full bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-800"
+                  >
+                    {item.image ? (
+                      <img
+                        src={item.image}
+                        alt={item.label}
+                        className="h-5 w-5 object-contain"
+                        loading="lazy"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                    ) : (
+                      <span className="text-lg leading-none">{item.emoji}</span>
+                    )}
+                    {item.label}
+                  </button>
+                ))}
+              </div>
               </div>
 
               <div className="rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm">

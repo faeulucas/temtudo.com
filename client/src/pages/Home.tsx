@@ -10,6 +10,7 @@ import ListingCardCompact from "@/components/ListingCardCompact";
 import AppInstallBanner from "@/components/AppInstallBanner";
 import { Button } from "@/components/ui/button";
 import { getStorefrontHref } from "@/lib/storefront";
+import { guideIcon } from "@/lib/cloudinary";
 import {
   Ambulance,
   ArrowRight,
@@ -80,42 +81,42 @@ const GUIDE_SHORTCUTS = [
     title: "Saúde",
     description: "Hospitais, clínicas e farmácias",
     href: "/busca?q=saude",
-    icon: Stethoscope,
+    image: guideIcon("guide-health"),
     tone: "bg-emerald-50 text-emerald-700",
   },
   {
     title: "Segurança",
     description: "Polícia, apoio e serviços úteis",
     href: "/busca?q=seguranca",
-    icon: Shield,
+    image: guideIcon("guide-security"),
     tone: "bg-blue-50 text-blue-700",
   },
   {
     title: "Emergências",
     description: "Atalhos rápidos para urgências",
     href: "/busca?q=emergencia",
-    icon: Ambulance,
+    image: guideIcon("guide-emergencies"),
     tone: "bg-rose-50 text-rose-700",
   },
   {
     title: "Oficinas",
     description: "Mecânicos, eletricistas e reparos",
     href: "/busca?q=oficina",
-    icon: Wrench,
+    image: guideIcon("guide-workshops"),
     tone: "bg-amber-50 text-amber-700",
   },
   {
     title: "Serviços",
     description: "Prestadores e negócios locais",
     href: "/busca?q=servicos",
-    icon: HeartHandshake,
+    image: guideIcon("guide-services"),
     tone: "bg-violet-50 text-violet-700",
   },
   {
     title: "Empresas",
     description: "Lojas, comércios e contatos úteis",
     href: "/lojas",
-    icon: Building2,
+    image: guideIcon("guide-businesses"),
     tone: "bg-slate-100 text-slate-700",
   },
 ];

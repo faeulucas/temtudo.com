@@ -115,7 +115,6 @@ const PWA_TOP_TABS = [
     href: "/promocoes",
     image: TAB_ICONS.promo,
     fallbackImage: TAB_ICONS.promo,
-    emoji: "✨",
     tone: "text-slate-900",
   },
   {
@@ -123,7 +122,6 @@ const PWA_TOP_TABS = [
     href: "/delivery",
     image: TAB_ICONS.delivery,
     fallbackImage: TAB_ICONS.delivery,
-    emoji: "🍽️",
     tone: "text-slate-700",
   },
   {
@@ -131,7 +129,6 @@ const PWA_TOP_TABS = [
     href: "/mercado",
     image: TAB_ICONS.market,
     fallbackImage: TAB_ICONS.market,
-    emoji: "🛒",
     tone: "text-slate-700",
   },
   {
@@ -139,7 +136,6 @@ const PWA_TOP_TABS = [
     href: "/lojas",
     image: TAB_ICONS.store,
     fallbackImage: TAB_ICONS.store,
-    emoji: "🏬",
     tone: "text-slate-700",
   },
 ];
@@ -157,7 +153,7 @@ function TabIcon({ image, emoji, alt }: { image?: string; emoji: string; alt: st
       />
     );
   }
-  return <span className="text-lg leading-none">{emoji}</span>;
+  return emoji ? <span className="text-lg leading-none">{emoji}</span> : null;
 }
 
 const PWA_ACTION_PILLS = [

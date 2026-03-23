@@ -10,7 +10,7 @@ import ListingCardCompact from "@/components/ListingCardCompact";
 import AppInstallBanner from "@/components/AppInstallBanner";
 import { Button } from "@/components/ui/button";
 import { getStorefrontHref } from "@/lib/storefront";
-import { guideIcon } from "@/lib/cloudinary";
+import { guideIcon, thingsIcon } from "@/lib/cloudinary";
 import {
   Ambulance,
   ArrowRight,
@@ -127,21 +127,39 @@ const GUIDE_SHORTCUTS = [
   },
 ];
 
-function CategoryIcon({ emoji, image, alt }: { emoji: string; image?: string; alt: string }) {
-  if (image) {
-    return (
-      <img
-        src={image}
-        alt={alt}
-        className="h-11 w-11 object-contain"
-        loading="lazy"
-        onError={(e) => {
-          (e.target as HTMLImageElement).style.display = "none";
-        }}
-      />
-    );
+function CategoryIcon({
+  emoji,
+  image,
+  fallbackImage,
+  alt,
+}: {
+  emoji: string;
+  image?: string;
+  fallbackImage?: string;
+  alt: string;
+}) {
+  const [src, setSrc] = useState<string | undefined>(image || fallbackImage);
+  const [failed, setFailed] = useState(false);
+
+  if (!src || failed) {
+    return <span className="text-xl">{emoji}</span>;
   }
-  return <span className="text-xl">{emoji}</span>;
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className="h-11 w-11 object-contain"
+      loading="lazy"
+      onError={() => {
+        if (fallbackImage && src !== fallbackImage) {
+          setSrc(fallbackImage);
+        } else {
+          setFailed(true);
+        }
+      }}
+    />
+  );
 }
 
 const PILLARS = [
@@ -198,56 +216,64 @@ const CATEGORY_SHORTCUTS = [
     label: "Promoções",
     href: "/busca?q=promo",
     emoji: "🧧",
-    image: "/icons/things/promo.webp",
+    image: thingsIcon("promo"),
+    fallbackImage: "/icons/things/promo.webp",
     tone: "bg-orange-50 text-orange-700",
   },
   {
     label: "Delivery",
     href: "/busca?type=food",
     emoji: "🍽️",
-    image: "/icons/things/delivery.webp",
+    image: thingsIcon("delivery"),
+    fallbackImage: "/icons/things/delivery.webp",
     tone: "bg-rose-50 text-rose-700",
   },
   {
     label: "Mercado",
     href: "/busca?q=mercado",
     emoji: "🛒",
-    image: "/icons/things/market.webp",
+    image: thingsIcon("market"),
+    fallbackImage: "/icons/things/market.webp",
     tone: "bg-amber-50 text-amber-700",
   },
   {
     label: "Lojas",
     href: "/lojas",
     emoji: "🏬",
-    image: "/icons/things/store.webp",
+    image: thingsIcon("store"),
+    fallbackImage: "/icons/things/store.webp",
     tone: "bg-indigo-50 text-indigo-700",
   },
   {
     label: "Serviços",
     href: "/busca?q=servicos",
     emoji: "🛠️",
-    image: "/icons/things/services.webp",
+    image: thingsIcon("services"),
+    fallbackImage: "/icons/things/services.webp",
     tone: "bg-emerald-50 text-emerald-700",
   },
   {
     label: "Imóveis",
     href: "/busca?type=property",
     emoji: "🏡",
-    image: "/icons/things/realestate.webp",
+    image: thingsIcon("realestate"),
+    fallbackImage: "/icons/things/realestate.webp",
     tone: "bg-blue-50 text-blue-700",
   },
   {
     label: "Eventos",
     href: "/busca?q=eventos",
     emoji: "📅",
-    image: "/icons/things/events.webp",
+    image: thingsIcon("events"),
+    fallbackImage: "/icons/things/events.webp",
     tone: "bg-purple-50 text-purple-700",
   },
   {
     label: "Empregos",
     href: "/busca?type=job",
     emoji: "💼",
-    image: "/icons/things/jobs.webp",
+    image: thingsIcon("jobs"),
+    fallbackImage: "/icons/things/jobs.webp",
     tone: "bg-cyan-50 text-cyan-700",
   },
 ];
@@ -1365,6 +1391,7 @@ export default function Home() {
                   <div className={`inline-flex rounded-2xl p-3 ${item.tone}`}>
                     <CategoryIcon
                       image={item.image}
+                      fallbackImage={item.fallbackImage}
                       emoji={item.emoji ?? "✨"}
                       alt={item.title}
                     />

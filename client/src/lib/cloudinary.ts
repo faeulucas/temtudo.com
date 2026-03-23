@@ -22,3 +22,9 @@ export function guideIcon(id: string, size = 160) {
   const url = cloudinaryUrl(`${baseFolder}/${id}.webp`, { w: size });
   return url;
 }
+
+// Generic helper for the category/things icons
+export function thingsIcon(id: string, size = 200) {
+  const url = cloudinaryUrl(`${baseFolder}/${id}.webp`, { w: size, h: size });
+  return url;
+}

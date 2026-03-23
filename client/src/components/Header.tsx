@@ -109,6 +109,22 @@ const PWA_TOP_TABS = [
   { label: "Lojas", href: "/lojas", image: thingsIcon("store"), emoji: "🏬", tone: "text-slate-700" },
 ];
 
+function TabIcon({ image, emoji, alt }: { image?: string; emoji: string; alt: string }) {
+  const [failed, setFailed] = useState(false);
+  if (image && !failed) {
+    return (
+      <img
+        src={image}
+        alt={alt}
+        className="h-5 w-5 object-contain"
+        loading="lazy"
+        onError={() => setFailed(true)}
+      />
+    );
+  }
+  return <span className="text-lg leading-none">{emoji}</span>;
+}
+
 const PWA_ACTION_PILLS = [
   { label: "Favoritos", href: "/favoritos", icon: Heart, tone: "bg-rose-50 text-rose-600" },
   { label: "Cupons", href: "/planos", icon: Percent, tone: "bg-violet-50 text-violet-600" },
@@ -411,23 +427,18 @@ export default function Header({
               <div className="overflow-x-auto scrollbar-hide">
                 <div className="flex w-max min-w-full items-end gap-6 border-b border-slate-100 pb-2">
                   {PWA_TOP_TABS.map((item, index) => (
-                    <Link
-                      key={item.label}
-                      href={item.href}
-                      className={`flex min-w-[64px] flex-col items-center gap-1 text-xs font-medium ${item.tone}`}
-                    >
-                      <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-slate-100">
-                        <CategoryIcon
-                          image={item.image}
-                          fallbackImage={item.image}
-                          emoji={item.emoji}
-                          alt={item.label}
-                        />
-                      </span>
-                      <span>{item.label}</span>
-                      <span
-                        className={`mt-1 h-0.5 w-10 rounded-full ${
-                          index === 0 ? "bg-slate-900" : "bg-transparent"
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className={`flex min-w-[64px] flex-col items-center gap-1 text-xs font-medium ${item.tone}`}
+                  >
+                    <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-slate-100">
+                        <TabIcon image={item.image} emoji={item.emoji} alt={item.label} />
+                    </span>
+                    <span>{item.label}</span>
+                    <span
+                      className={`mt-1 h-0.5 w-10 rounded-full ${
+                        index === 0 ? "bg-slate-900" : "bg-transparent"
                         }`}
                       />
                     </Link>

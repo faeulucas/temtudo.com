@@ -38,8 +38,13 @@ import {
   Zap,
 } from "lucide-react";
 import { CategorySvgIcon } from "@/components/CategorySvgIcon";
-import { thingsIcon, cloudinaryFile, cloudinaryDirect } from "@/lib/cloudinary";
 
+const TAB_ICONS = {
+  promo: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229865/promo%C3%A7oes_mcwevy.png",
+  delivery: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229863/delivery_dh1ldp.png",
+  market: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/mercado_mklm3p.png",
+  store: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/lojas_kkgcle.png",
+};
 interface HeaderProps {
   selectedCity?: number | null;
   onCityChange?: (cityId: number | null) => void;
@@ -107,32 +112,32 @@ const PWA_TOP_TABS = [
   {
     label: "Tudo",
     href: "/busca",
-    image: cloudinaryFile("promo", "webp") || cloudinaryDirect("promo", "png"),
-    fallbackImage: cloudinaryDirect("promo", "png") || thingsIcon("promo"),
+    image: TAB_ICONS.promo,
+    fallbackImage: TAB_ICONS.promo,
     emoji: "✨",
     tone: "text-slate-900",
   },
   {
     label: "Restaurantes",
     href: "/busca?type=food",
-    image: cloudinaryFile("delivery", "webp") || cloudinaryDirect("delivery", "png"),
-    fallbackImage: cloudinaryDirect("delivery", "png") || thingsIcon("delivery"),
+    image: TAB_ICONS.delivery,
+    fallbackImage: TAB_ICONS.delivery,
     emoji: "🍽️",
     tone: "text-slate-700",
   },
   {
     label: "Mercado",
     href: "/busca?q=mercado",
-    image: cloudinaryFile("market", "webp") || cloudinaryDirect("market", "png"),
-    fallbackImage: cloudinaryDirect("market", "png") || thingsIcon("market"),
+    image: TAB_ICONS.market,
+    fallbackImage: TAB_ICONS.market,
     emoji: "🛒",
     tone: "text-slate-700",
   },
   {
     label: "Lojas",
     href: "/lojas",
-    image: cloudinaryFile("store", "webp") || cloudinaryDirect("store", "png"),
-    fallbackImage: cloudinaryDirect("store", "png") || thingsIcon("store"),
+    image: TAB_ICONS.store,
+    fallbackImage: TAB_ICONS.store,
     emoji: "🏬",
     tone: "text-slate-700",
   },

@@ -11,6 +11,17 @@ import AppInstallBanner from "@/components/AppInstallBanner";
 import { Button } from "@/components/ui/button";
 import { getStorefrontHref } from "@/lib/storefront";
 import { guideIcon, thingsIcon, cloudinaryFile, cloudinaryDirect } from "@/lib/cloudinary";
+
+const CLOUD_ICONS = {
+  promo: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229865/promo%C3%A7oes_mcwevy.png",
+  delivery: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229863/delivery_dh1ldp.png",
+  market: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/mercado_mklm3p.png",
+  store: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/lojas_kkgcle.png",
+  services: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229865/servi%C3%A7os_yvvovd.png",
+  realestate: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/im%C3%B3veis_bqgzqe.png",
+  events: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229866/eventos_fmc6ux.png",
+  jobs: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229863/empregos_bikklg.png",
+};
 import {
   Ambulance,
   ArrowRight,
@@ -216,68 +227,64 @@ const CATEGORY_SHORTCUTS = [
     label: "Promoções",
     href: "/busca?q=promo",
     emoji: "🧧",
-    image: cloudinaryFile("promo", "webp") || cloudinaryDirect("promo", "png"),
-    fallbackImage: cloudinaryDirect("promo", "png") || thingsIcon("promo") || "/icons/things/promo.webp",
+    image: CLOUD_ICONS.promo,
+    fallbackImage: CLOUD_ICONS.promo,
     tone: "bg-orange-50 text-orange-700",
   },
   {
     label: "Delivery",
     href: "/busca?type=food",
     emoji: "🍽️",
-    image: cloudinaryFile("delivery", "webp") || cloudinaryDirect("delivery", "png"),
-    fallbackImage: cloudinaryDirect("delivery", "png") || thingsIcon("delivery") || "/icons/things/delivery.webp",
+    image: CLOUD_ICONS.delivery,
+    fallbackImage: CLOUD_ICONS.delivery,
     tone: "bg-rose-50 text-rose-700",
   },
   {
     label: "Mercado",
     href: "/busca?q=mercado",
     emoji: "🛒",
-    image: cloudinaryFile("market", "webp") || cloudinaryDirect("market", "png"),
-    fallbackImage: cloudinaryDirect("market", "png") || thingsIcon("market") || "/icons/things/market.webp",
+    image: CLOUD_ICONS.market,
+    fallbackImage: CLOUD_ICONS.market,
     tone: "bg-amber-50 text-amber-700",
   },
   {
     label: "Lojas",
     href: "/lojas",
     emoji: "🏬",
-    image: cloudinaryFile("store", "webp") || cloudinaryDirect("store", "png"),
-    fallbackImage: cloudinaryDirect("store", "png") || thingsIcon("store") || "/icons/things/store.webp",
+    image: CLOUD_ICONS.store,
+    fallbackImage: CLOUD_ICONS.store,
     tone: "bg-indigo-50 text-indigo-700",
   },
   {
     label: "Serviços",
     href: "/busca?q=servicos",
     emoji: "🛠️",
-    image: cloudinaryFile("services", "webp") || cloudinaryDirect("services", "png"),
-    fallbackImage: cloudinaryDirect("services", "png") || thingsIcon("services") || "/icons/things/services.webp",
+    image: CLOUD_ICONS.services,
+    fallbackImage: CLOUD_ICONS.services,
     tone: "bg-emerald-50 text-emerald-700",
   },
   {
     label: "Imóveis",
     href: "/busca?type=property",
     emoji: "🏡",
-    image: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774225930/imoveis_y8nbie.png",
-    fallbackImage:
-      cloudinaryDirect("realestate", "png") ||
-      cloudinaryFile("realestate", "webp") ||
-      thingsIcon("realestate") ||
-      "/icons/things/realestate.webp",
+    image: CLOUD_ICONS.realestate,
+    fallbackImage: CLOUD_ICONS.realestate,
     tone: "bg-blue-50 text-blue-700",
   },
   {
     label: "Eventos",
     href: "/busca?q=eventos",
     emoji: "📅",
-    image: cloudinaryFile("events", "webp") || cloudinaryDirect("events", "png"),
-    fallbackImage: cloudinaryDirect("events", "png") || thingsIcon("events") || "/icons/things/events.webp",
+    image: CLOUD_ICONS.events,
+    fallbackImage: CLOUD_ICONS.events,
     tone: "bg-purple-50 text-purple-700",
   },
   {
     label: "Empregos",
     href: "/busca?type=job",
     emoji: "💼",
-    image: cloudinaryFile("jobs", "webp") || cloudinaryDirect("jobs", "png"),
-    fallbackImage: cloudinaryDirect("jobs", "png") || thingsIcon("jobs") || "/icons/things/jobs.webp",
+    image: CLOUD_ICONS.jobs,
+    fallbackImage: CLOUD_ICONS.jobs,
     tone: "bg-cyan-50 text-cyan-700",
   },
 ];

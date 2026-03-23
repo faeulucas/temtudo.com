@@ -40,10 +40,10 @@ import {
 import { CategorySvgIcon } from "@/components/CategorySvgIcon";
 
 const TAB_ICONS = {
-  promo: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229865/promo%C3%A7oes_mcwevy.png",
-  delivery: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229863/delivery_dh1ldp.png",
-  market: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/mercado_mklm3p.png",
-  store: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/lojas_kkgcle.png",
+  promo: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229865/promo%C3%A7oes_mcwevy.png?v=2",
+  delivery: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229863/delivery_dh1ldp.png?v=2",
+  market: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/mercado_mklm3p.png?v=2",
+  store: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/lojas_kkgcle.png?v=2",
 };
 interface HeaderProps {
   selectedCity?: number | null;

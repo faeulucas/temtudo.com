@@ -13,17 +13,17 @@ import { getStorefrontHref } from "@/lib/storefront";
 import { guideIcon, thingsIcon, cloudinaryFile, cloudinaryDirect } from "@/lib/cloudinary";
 
 const CLOUD_ICONS = {
-  promocoes: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229865/promo%C3%A7oes_mcwevy.png",
-  delivery: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229863/delivery_dh1ldp.png",
-  mercado: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/mercado_mklm3p.png",
-  lojas: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/lojas_kkgcle.png",
-  servicos: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229865/servi%C3%A7os_yvvovd.png",
-  imoveis: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/im%C3%B3veis_bqgzqe.png",
-  eventos: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229866/eventos_fmc6ux.png",
-  empregos: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229863/empregos_bikklg.png",
-  lanches: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/lanches_wfp564.png",
-  pizza: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229865/pizza_xslxqr.png",
-  burguer: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/hamburguer_uq4feq.png",
+  promocoes: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229865/promo%C3%A7oes_mcwevy.png?v=2",
+  delivery: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229863/delivery_dh1ldp.png?v=2",
+  mercado: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/mercado_mklm3p.png?v=2",
+  lojas: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/lojas_kkgcle.png?v=2",
+  servicos: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229865/servi%C3%A7os_yvvovd.png?v=2",
+  imoveis: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/im%C3%B3veis_bqgzqe.png?v=2",
+  eventos: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229866/eventos_fmc6ux.png?v=2",
+  empregos: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229863/empregos_bikklg.png?v=2",
+  lanches: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/lanches_wfp564.png?v=2",
+  pizza: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229865/pizza_xslxqr.png?v=2",
+  burguer: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/hamburguer_uq4feq.png?v=2",
 };
 import {
   Ambulance,

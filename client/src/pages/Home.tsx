@@ -1356,7 +1356,6 @@ export default function Home() {
 
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {GUIDE_SHORTCUTS.map((item) => {
-              const Icon = item.icon;
               return (
                 <Link
                   key={item.title}
@@ -1364,7 +1363,11 @@ export default function Home() {
                   className="group rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-orange-200 hover:bg-orange-50/40 sm:rounded-[28px]"
                 >
                   <div className={`inline-flex rounded-2xl p-3 ${item.tone}`}>
-                    <Icon className="h-5 w-5" />
+                    <CategoryIcon
+                      image={item.image}
+                      emoji={item.emoji ?? "✨"}
+                      alt={item.title}
+                    />
                   </div>
 
                   <h3 className="mt-4 font-display text-2xl font-bold text-slate-900">

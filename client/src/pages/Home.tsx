@@ -256,8 +256,8 @@ const CATEGORY_SHORTCUTS = [
     label: "Imóveis",
     href: "/busca?type=property",
     emoji: "🏡",
-    image: thingsIcon("realestate"),
-    fallbackImage: "/icons/things/realestate.webp",
+    image: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774225930/imoveis_y8nbie.png",
+    fallbackImage: thingsIcon("realestate") ?? "/icons/things/realestate.webp",
     tone: "bg-blue-50 text-blue-700",
   },
   {

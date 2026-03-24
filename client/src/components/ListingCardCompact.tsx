@@ -1,5 +1,6 @@
 import { Link } from "wouter";
-import { BadgeCheck, Heart, MapPin, Zap } from "lucide-react";
+import { BadgeCheck, Heart, MapPin } from "lucide-react";
+import { StatusBadge } from "./StatusBadge";
 
 interface ListingCardCompactProps {
   id: number;
@@ -13,6 +14,8 @@ interface ListingCardCompactProps {
   seller?: {
     name?: string | null;
     isVerified?: boolean | null | undefined;
+    plan?: string | null;
+    planActive?: boolean | null;
   } | null;
   type?: string | null;
   onFavorite?: (id: number) => void;
@@ -44,6 +47,9 @@ export default function ListingCardCompact({
 }: ListingCardCompactProps) {
   const primaryImage = images?.find((image) => image.isPrimary) || images?.[0];
   const sellerLabel = seller?.name || "Anunciante";
+  const isPremium = seller?.planActive && seller?.plan === "premium";
+  const isProfessional =
+    seller?.planActive && seller?.plan === "profissional" && !isPremium;
 
   const formatPrice = () => {
     if (!price || priceType === "free") return "Grátis";
@@ -97,10 +103,7 @@ export default function ListingCardCompact({
 
           <div className="absolute left-2 top-2 flex flex-wrap gap-1">
             {isBoosted && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-400 px-2 py-1 text-[10px] font-black text-white shadow-sm">
-                <Zap className="h-3 w-3" />
-                BOOSTER
-              </span>
+              <StatusBadge kind="impulsionado" />
             )}
 
             {type && (
@@ -132,6 +135,8 @@ export default function ListingCardCompact({
             {seller?.isVerified && (
               <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-blue-500" />
             )}
+            {isPremium && <StatusBadge kind="premium" />}
+            {isProfessional && <StatusBadge kind="profissional" />}
           </div>
         </div>
       </Link>

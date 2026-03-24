@@ -1,7 +1,8 @@
 import { Link } from "wouter";
-import { BadgeCheck, Clock, Eye, Heart, MapPin, Zap } from "lucide-react";
+import { BadgeCheck, Clock, Eye, Heart, MapPin } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { StatusBadge } from "./StatusBadge";
 
 interface ListingCardProps {
   id: number;
@@ -19,6 +20,8 @@ interface ListingCardProps {
   seller?: {
     name?: string | null;
     isVerified?: boolean | null | undefined;
+    plan?: string | null;
+    planActive?: boolean | null;
   } | null;
   categoryName?: string;
   type?: string | null;
@@ -56,6 +59,9 @@ export default function ListingCard({
 }: ListingCardProps) {
   const primaryImage = images?.find((image) => image.isPrimary) || images?.[0];
   const sellerLabel = seller?.name || "Anunciante";
+  const isPremium = seller?.planActive && seller?.plan === "premium";
+  const isProfessional =
+    seller?.planActive && seller?.plan === "profissional" && !isPremium;
 
   const formatPrice = () => {
     if (!price || priceType === "free") return "Grátis";
@@ -85,10 +91,7 @@ export default function ListingCard({
     >
       <div className="absolute left-3 top-3 z-10 flex flex-col gap-1">
         {isBoosted && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-amber-400 px-2.5 py-1 text-xs font-bold text-white shadow-md">
-            <Zap className="h-3 w-3" />
-            BOOSTER
-          </span>
+          <StatusBadge kind="impulsionado" />
         )}
 
         {type && (
@@ -172,6 +175,9 @@ export default function ListingCard({
               {seller.isVerified && (
                 <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-blue-500" />
               )}
+
+              {isPremium && <StatusBadge kind="premium" />}
+              {isProfessional && <StatusBadge kind="profissional" />}
 
               {viewCount !== undefined && (
                 <div className="ml-auto flex items-center gap-1 text-slate-400">

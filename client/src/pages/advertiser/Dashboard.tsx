@@ -101,6 +101,10 @@ export default function AdvertiserDashboard() {
     trpc.advertiser.myPlanOrders.useQuery(undefined, {
       enabled: isAuthenticated,
     });
+  const { data: planStatus, isLoading: planStatusLoading } =
+    trpc.advertiser.planStatus.useQuery(undefined, {
+      enabled: isAuthenticated,
+    });
 
   const updateMutation = trpc.advertiser.updateListing.useMutation({
     onSuccess: async () => {
@@ -197,6 +201,11 @@ export default function AdvertiserDashboard() {
     plan: "relampago" | "basico" | "plus" | "premium",
     listingId?: number
   ) => getCheckoutUrl({ type: "booster", plan, listingId, isAuthenticated });
+
+  const limitReached =
+    planStatus?.maxActiveListings !== null &&
+    planStatus?.maxActiveListings !== undefined &&
+    (planStatus?.activeListings ?? 0) >= (planStatus?.maxActiveListings ?? 0);
 
   const formatCurrency = (value: number | string) => {
     const numeric = typeof value === "string" ? Number(value) : value ?? 0;
@@ -538,7 +547,7 @@ export default function AdvertiserDashboard() {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <Link href="/anunciar" className="block w-full sm:w-auto">
+              <Link href="/anunciante/novo" className="block w-full sm:w-auto">
                 <Button className="w-full rounded-2xl bg-white px-6 py-6 font-bold text-slate-900 hover:bg-slate-100 sm:w-auto">
                   <Plus className="mr-2 h-5 w-5" />
                   {isFoodSegment ? "Novo item do cardápio" : "Novo anúncio"}
@@ -562,6 +571,141 @@ export default function AdvertiserDashboard() {
                   Ver planos
                 </Button>
               </Link>
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-5 grid gap-4">
+          <div
+            className={`rounded-[24px] border bg-white p-5 shadow-sm sm:p-6 ${
+              planStatus?.isExpiringSoon || limitReached
+                ? "border-amber-300 bg-amber-50"
+                : "border-slate-200"
+            }`}
+          >
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="space-y-1">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                  Seu plano atual
+                </p>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-xl font-bold text-slate-900">
+                    {planStatusLoading
+                      ? "Carregando..."
+                      : planStatus?.planLabel ?? "Grátis"}
+                  </h3>
+                  <span
+                    className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${
+                      planStatus?.planActive
+                        ? "bg-emerald-100 text-emerald-700"
+                        : "bg-slate-100 text-slate-600"
+                    }`}
+                  >
+                    {planStatus?.planActive ? "Ativo" : "Inativo"}
+                  </span>
+                  {planStatus?.isExpiringSoon ? (
+                    <span className="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
+                      Expira em breve
+                    </span>
+                  ) : null}
+                </div>
+                <p className="text-sm text-slate-600">
+                  {planStatus?.expiresAt
+                    ? `Expira em ${new Intl.DateTimeFormat("pt-BR", {
+                        dateStyle: "medium",
+                      }).format(new Date(planStatus.expiresAt))}${
+                        planStatus.daysToExpire !== null
+                          ? ` · ${planStatus.daysToExpire} dia(s)`
+                          : ""
+                      }`
+                    : "Sem expiração registrada"}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 text-sm text-slate-600">
+                <Zap className="h-4 w-4 text-orange-500" />
+                Boosters:{" "}
+                {planStatusLoading
+                  ? "—"
+                  : `${planStatus?.boostersUsed ?? 0}/${
+                      planStatus?.boostersTotal ?? 0
+                    }`}
+              </div>
+            </div>
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
+                <div className="flex items-center justify-between text-sm font-semibold text-slate-700">
+                  <span>Anúncios ativos</span>
+                  <span>
+                    {planStatusLoading
+                      ? "—"
+                      : `${planStatus?.activeListings ?? 0}/${
+                          planStatus?.maxActiveListings === null
+                            ? "∞"
+                            : planStatus?.maxActiveListings ?? 0
+                        }`}
+                  </span>
+                </div>
+                <div className="mt-2 h-2 rounded-full bg-slate-200">
+                  <div
+                    className={`h-2 rounded-full ${
+                      limitReached ? "bg-amber-500" : "bg-blue-500"
+                    }`}
+                    style={{
+                      width: `${Math.min(
+                        100,
+                        Math.round(
+                          ((planStatus?.activeListings ?? 0) /
+                            (planStatus?.maxActiveListings ??
+                              Math.max(planStatus?.activeListings ?? 1, 1))) *
+                            100
+                        )
+                      )}%`,
+                    }}
+                  />
+                </div>
+                {limitReached && (
+                  <p className="mt-2 text-xs font-semibold text-amber-700">
+                    Limite atingido. Pause um anúncio ou faça upgrade.
+                  </p>
+                )}
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
+                <div className="flex items-center justify-between text-sm font-semibold text-slate-700">
+                  <span>Boosters incluídos</span>
+                  <span>
+                    {planStatusLoading
+                      ? "—"
+                      : `${planStatus?.boostersUsed ?? 0}/${
+                          planStatus?.boostersTotal ?? 0
+                        }`}
+                  </span>
+                </div>
+                <div className="mt-2 h-2 rounded-full bg-slate-200">
+                  <div
+                    className="h-2 rounded-full bg-orange-500"
+                    style={{
+                      width: `${Math.min(
+                        100,
+                        planStatus && planStatus.boostersTotal > 0
+                          ? Math.round(
+                              ((planStatus.boostersUsed ?? 0) /
+                                planStatus.boostersTotal) *
+                                100
+                            )
+                          : 0
+                      )}%`,
+                    }}
+                  />
+                </div>
+                {planStatus?.boostersTotal === 0 ? (
+                  <p className="mt-2 text-xs text-slate-600">
+                    Faça upgrade para ganhar boosters incluídos no ano.
+                  </p>
+                ) : null}
+              </div>
             </div>
           </div>
         </section>
@@ -759,7 +903,7 @@ export default function AdvertiserDashboard() {
                     ? "Comece cadastrando os lanches, porções, bebidas e combos da sua loja."
                     : "Crie seu primeiro produto e acompanhe tudo por aqui."}
                 </p>
-                <Link href="/anunciar">
+                <Link href="/anunciante/novo">
                   <Button className="mt-6 rounded-2xl bg-brand-gradient px-6 text-white">
                     <Plus className="mr-2 h-4 w-4" />
                     {isFoodSegment ? "Cadastrar item" : "Criar anúncio"}

@@ -45,6 +45,16 @@ import {
   getMockSellerProfile,
 } from "./mockData";
 import { isOpenNow } from "./_core/openingHours";
+import {
+  PLAN_RULES,
+  PlanSlug,
+  addDays,
+  addYears,
+  computeBoosterAllowance,
+  getPlanRulesForUser,
+  isUserPremium,
+  resolveUserPlan,
+} from "./_core/plans";
 
 function parseCityIds(json?: string | null): number[] {
   if (!json) return [];
@@ -76,6 +86,107 @@ function cityScopeCondition(table: typeof listings, cityId?: number | null) {
     sql`JSON_CONTAINS(COALESCE(${table.servedCityIdsJson}, '[]'), CAST(${cityId} AS JSON))`,
     sql`JSON_CONTAINS(COALESCE(${table.deliveryCityIdsJson}, '[]'), CAST(${cityId} AS JSON))`
   );
+}
+
+async function getUserWithPlan(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, userId: number) {
+  const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  if (!user) throw new TRPCError({ code: "FORBIDDEN" });
+  return user;
+}
+
+async function activatePlanForUser(
+  db: NonNullable<Awaited<ReturnType<typeof getDb>>>,
+  userId: number,
+  plan: PlanSlug,
+  opts: { paidAt?: Date } = {}
+) {
+  const activatedAt = opts.paidAt ?? new Date();
+  const expiresAt = addYears(activatedAt, 1);
+  const updates: Record<string, unknown> = {
+    plan,
+    planActive: true,
+    planExpiresAt: expiresAt,
+    planBoosterQuotaUsed: 0,
+    planBoosterQuotaResetsAt: addYears(activatedAt, 1),
+    updatedAt: new Date(),
+  };
+  if (plan === "premium") {
+    updates.isVerified = true;
+  }
+
+  await db.update(users).set(updates).where(eq(users.id, userId));
+}
+
+async function syncPlanFromPaidOrders(
+  db: NonNullable<Awaited<ReturnType<typeof getDb>>>,
+  user: Awaited<ReturnType<typeof getUserWithPlan>>
+) {
+  const now = new Date();
+  if (user.planActive && user.planExpiresAt && user.planExpiresAt > now) {
+    return user;
+  }
+
+  const [latestPaid] = await db
+    .select()
+    .from(planOrders)
+    .where(and(eq(planOrders.userId, user.id), eq(planOrders.status, "paid")))
+    .orderBy(desc(planOrders.createdAt))
+    .limit(1);
+
+  if (!latestPaid) return user;
+
+  const expiresAt = addYears(latestPaid.createdAt ?? now, 1);
+  if (expiresAt <= now) return user;
+
+  await activatePlanForUser(db, user.id, latestPaid.plan as PlanSlug, {
+    paidAt: latestPaid.createdAt ?? now,
+  });
+
+  return {
+    ...user,
+    plan: latestPaid.plan as PlanSlug,
+    planActive: true,
+    planExpiresAt: expiresAt,
+    planBoosterQuotaUsed: 0,
+    planBoosterQuotaResetsAt: addYears(latestPaid.createdAt ?? now, 1),
+  };
+}
+
+async function getPlanState(
+  db: NonNullable<Awaited<ReturnType<typeof getDb>>>,
+  userId: number
+) {
+  let user = await getUserWithPlan(db, userId);
+  const now = new Date();
+  if (
+    user.planActive &&
+    (!user.planExpiresAt || user.planExpiresAt <= now)
+  ) {
+    await db
+      .update(users)
+      .set({ planActive: false })
+      .where(eq(users.id, user.id));
+    user = { ...user, planActive: false };
+  }
+  user = await syncPlanFromPaidOrders(db, user);
+
+  const { plan, rules } = getPlanRulesForUser(user);
+  let quotaUsed = user.planBoosterQuotaUsed ?? 0;
+  let quotaResetsAt = user.planBoosterQuotaResetsAt ?? addYears(now, 1);
+  if (!quotaResetsAt || quotaResetsAt <= now) {
+    quotaUsed = 0;
+    quotaResetsAt = addYears(now, 1);
+    await db
+      .update(users)
+      .set({
+        planBoosterQuotaUsed: quotaUsed,
+        planBoosterQuotaResetsAt: quotaResetsAt,
+      })
+      .where(eq(users.id, userId));
+    user = { ...user, planBoosterQuotaUsed: quotaUsed, planBoosterQuotaResetsAt: quotaResetsAt };
+  }
+
+  return { user, plan, rules, quotaUsed, quotaResetsAt };
 }
 
 async function attachImagesToListings<T extends { id: number }>(
@@ -134,6 +245,9 @@ async function attachSellerPreviewToListings<T extends { userId: number }>(
       servedCityIdsJson: users.servedCityIdsJson,
       deliveryCityIdsJson: users.deliveryCityIdsJson,
       neighborhood: users.neighborhood,
+      plan: users.plan,
+      planActive: users.planActive,
+      planExpiresAt: users.planExpiresAt,
       openingHoursJson: users.openingHoursJson,
       isVerified: users.isVerified,
     })
@@ -148,6 +262,10 @@ async function attachSellerPreviewToListings<T extends { userId: number }>(
       ? {
           ...sellersById.get(item.userId)!,
           isOpenNow: isOpenNow(sellersById.get(item.userId)!.openingHoursJson),
+          isVerified:
+            sellersById.get(item.userId)!.isVerified ||
+            (sellersById.get(item.userId)!.planActive &&
+              resolveUserPlan(sellersById.get(item.userId)!) === "premium"),
         }
       : null,
   }));
@@ -1086,15 +1204,21 @@ export const appRouter = router({
         if (input.maxPrice)
           conditions.push(lte(listings.price, String(input.maxPrice)));
         const offset = (input.page - 1) * input.limit;
-        const items = await db
-          .select()
+        const planPriority = sql<number>`CASE WHEN ${users.planActive} = 1 AND ${users.plan} = 'premium' THEN 3 WHEN ${users.planActive} = 1 AND ${users.plan} = 'profissional' THEN 2 ELSE 1 END`;
+        const rows = await db
+          .select({
+            listing: listings,
+            priority: planPriority,
+          })
           .from(listings)
+          .leftJoin(users, eq(listings.userId, users.id))
           .where(and(...conditions))
-          .orderBy(desc(listings.isBoosted), desc(listings.createdAt))
+          .orderBy(desc(listings.isBoosted), desc(planPriority), desc(listings.createdAt))
           .limit(input.limit)
           .offset(offset);
-        const itemsWithImages = await attachImagesToListings(db, items);
-        return { items: itemsWithImages, total: items.length };
+        const listingItems = rows.map(row => row.listing);
+        const itemsWithImages = await attachImagesToListings(db, listingItems);
+        return { items: itemsWithImages, total: listingItems.length };
       }),
     listingById: publicProcedure
       .input(z.object({ id: z.number() }))
@@ -1431,7 +1555,6 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
-
         const [listing] = await db
           .select()
           .from(listings)
@@ -1460,24 +1583,60 @@ export const appRouter = router({
 
         const config = planConfig[input.plan];
 
+        const { user, plan, quotaUsed, quotaResetsAt } = await getPlanState(db, ctx.user.id);
+        const allowance = computeBoosterAllowance(user);
+        const hasIncludedBooster = plan !== "free" && allowance.remaining > 0;
+        const updatedQuotaUsed = hasIncludedBooster ? allowance.used + 1 : quotaUsed;
+        const updatedQuotaReset = hasIncludedBooster ? allowance.nextReset : quotaResetsAt;
+
+        const orderStatus: "pending" | "paid" = hasIncludedBooster ? "paid" : "pending";
+        const priceValue = hasIncludedBooster ? 0 : config.price;
+
         const result = await db.insert(boosterOrders).values({
           userId: ctx.user.id,
           listingId: input.listingId,
           plan: input.plan,
           durationDays: config.durationDays,
-          price: String(config.price),
-          status: "pending",
+          price: String(priceValue),
+          status: orderStatus,
         });
 
         // drizzle mysql returns OkPacket with insertId
         const orderId = (result as unknown as { insertId?: number }).insertId ?? 0;
 
+        if (hasIncludedBooster) {
+          await db
+            .update(users)
+            .set({
+              planBoosterQuotaUsed: updatedQuotaUsed,
+              planBoosterQuotaResetsAt: updatedQuotaReset,
+            })
+            .where(eq(users.id, ctx.user.id));
+
+          const startsAt = new Date();
+          const expiresAt = addDays(startsAt, config.durationDays);
+          await db.insert(boosters).values({
+            userId: ctx.user.id,
+            listingId: input.listingId,
+            type: "featured",
+            durationDays: config.durationDays,
+            price: String(priceValue),
+            status: "active",
+            startsAt,
+            expiresAt,
+          });
+          await db
+            .update(listings)
+            .set({ isBoosted: true, boostExpiresAt: expiresAt })
+            .where(eq(listings.id, input.listingId));
+        }
+
         return {
           id: Number(orderId),
           plan: input.plan,
           durationDays: config.durationDays,
-          price: config.price,
-          status: "pending",
+          price: priceValue,
+          status: orderStatus,
         };
       }),
     createPlanOrder: protectedProcedure
@@ -1528,6 +1687,48 @@ export const appRouter = router({
         .where(eq(planOrders.userId, ctx.user.id))
         .orderBy(desc(planOrders.createdAt));
     }),
+    planStatus: protectedProcedure.query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+      const { user, plan, rules, quotaUsed, quotaResetsAt } = await getPlanState(db, ctx.user.id);
+
+      const [{ activeListings }] = await db
+        .select({ activeListings: sql<number>`COUNT(*)` })
+        .from(listings)
+        .where(and(eq(listings.userId, ctx.user.id), eq(listings.status, "active")));
+
+      const expiresAt = user.planExpiresAt ?? null;
+      const daysToExpire =
+        expiresAt !== null
+          ? Math.max(
+              0,
+              Math.ceil(
+                (new Date(expiresAt).getTime() - new Date().getTime()) / 86400000
+              )
+            )
+          : null;
+      const isExpiringSoon = expiresAt ? expiresAt < addDays(new Date(), 15) : false;
+
+      const boostersTotal = rules.includedBoostersPerYear;
+      const boostersUsed = quotaUsed;
+      const boostersRemaining = Math.max(boostersTotal - boostersUsed, 0);
+
+      return {
+        plan,
+        planLabel: rules.label,
+        planActive: user.planActive,
+        expiresAt,
+        daysToExpire,
+        isExpiringSoon,
+        boostersUsed,
+        boostersTotal,
+        boostersRemaining,
+        quotaResetsAt,
+        maxActiveListings: rules.maxActiveListings,
+        activeListings,
+      };
+    }),
     createListing: protectedProcedure
       .input(
         z.object({
@@ -1555,6 +1756,22 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+        const { rules } = await getPlanState(db, ctx.user.id);
+
+        if (rules.maxActiveListings !== null) {
+          const [{ count }] = await db
+            .select({ count: sql<number>`COUNT(*) as count` })
+            .from(listings)
+            .where(and(eq(listings.userId, ctx.user.id), eq(listings.status, "active")));
+
+          if (count >= rules.maxActiveListings) {
+            throw new TRPCError({
+              code: "FORBIDDEN",
+              message: `Seu plano permite ${rules.maxActiveListings} anúncios ativos. Faça upgrade ou pause um anúncio antes de criar outro.`,
+            });
+          }
+        }
+
         const expiresAt = new Date();
         expiresAt.setDate(expiresAt.getDate() + 30);
         const result = await db.insert(listings).values({
@@ -1640,6 +1857,7 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+        const { rules } = await getPlanState(db, ctx.user.id);
         const [listing] = await db
           .select()
           .from(listings)
@@ -1651,6 +1869,19 @@ export const appRouter = router({
           )
           .limit(1);
         if (!listing) throw new TRPCError({ code: "FORBIDDEN" });
+
+        const [{ count }] = await db
+          .select({ count: sql<number>`COUNT(*) as count` })
+          .from(listingImages)
+          .where(eq(listingImages.listingId, input.listingId));
+
+        if (count >= rules.maxImagesPerListing) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: `Limite de ${rules.maxImagesPerListing} fotos por anúncio para o seu plano.`,
+          });
+        }
+
         await db.insert(listingImages).values(input);
         return { success: true };
       }),
@@ -1868,6 +2099,32 @@ export const appRouter = router({
         ).length,
       };
     }),
+    markPlanOrderPaid: protectedProcedure
+      .input(z.object({ orderId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+        const [order] = await db
+          .select()
+          .from(planOrders)
+          .where(eq(planOrders.id, input.orderId))
+          .limit(1);
+
+        if (!order) throw new TRPCError({ code: "NOT_FOUND", message: "Pedido não encontrado" });
+
+        await db
+          .update(planOrders)
+          .set({ status: "paid" })
+          .where(eq(planOrders.id, input.orderId));
+
+        await activatePlanForUser(db, order.userId, order.plan as PlanSlug, {
+          paidAt: order.createdAt ?? new Date(),
+        });
+
+        return { success: true };
+      }),
     allUsers: protectedProcedure
       .input(
         z.object({ page: z.number().default(1), limit: z.number().default(20) })
@@ -1895,7 +2152,11 @@ export const appRouter = router({
             cityId: users.cityId,
             neighborhood: users.neighborhood,
             planId: users.planId,
+            plan: users.plan,
+            planActive: users.planActive,
             planExpiresAt: users.planExpiresAt,
+            planBoosterQuotaUsed: users.planBoosterQuotaUsed,
+            planBoosterQuotaResetsAt: users.planBoosterQuotaResetsAt,
             trialStartedAt: users.trialStartedAt,
             trialUsed: users.trialUsed,
             isVerified: users.isVerified,

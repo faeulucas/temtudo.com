@@ -101,7 +101,7 @@ function DashboardHeader({
 
   return (
     <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur">
-      <div className="flex items-center justify-between gap-3 px-4 py-3">
+      <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between gap-3 px-4 py-3 lg:px-6">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-orange-600">
             {title}
@@ -143,8 +143,8 @@ export default function AdvertiserLayout({
   headerTitle,
   headerSubtitle,
   headerNewButtonHref,
-  headerNewButtonLabel,
-  headerShowNewButton = true,
+      headerNewButtonLabel,
+      headerShowNewButton = true,
 }: AdvertiserLayoutProps) {
   return (
     <div className="min-h-screen bg-slate-50">
@@ -158,7 +158,9 @@ export default function AdvertiserLayout({
             newButtonLabel={headerNewButtonLabel}
             showNewButton={headerShowNewButton}
           />
-          <main className="flex-1 px-4 py-6 lg:px-6">{children}</main>
+          <main className="flex-1 px-4 py-6 lg:px-6">
+            <div className="mx-auto w-full max-w-[1200px]">{children}</div>
+          </main>
         </div>
       </div>
     </div>

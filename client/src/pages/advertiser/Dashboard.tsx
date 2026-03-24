@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { LOGIN_ROUTE } from "@/const";
 import { trpc } from "@/lib/trpc";
@@ -56,9 +56,16 @@ const SEGMENT_ICON = {
 
 export default function AdvertiserDashboard() {
   const { user, isAuthenticated, loading } = useAuth();
+  const [location, setLocation] = useLocation();
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const utils = trpc.useUtils();
+
+  const activeTab =
+    new URLSearchParams(location.split("?")[1] ?? "").get("tab") ??
+    "visao-geral";
+
+  const goToTab = (tab: string) => setLocation(`/anunciante?tab=${tab}`);
 
   const { data: stats } = trpc.advertiser.stats.useQuery(undefined, {
     enabled: isAuthenticated,
@@ -160,6 +167,77 @@ export default function AdvertiserDashboard() {
       )
     : 30;
 
+  if (activeTab === "meus-dados") {
+    return (
+      <div className="min-h-screen bg-[linear-gradient(180deg,#fff7ed_0%,#ffffff_18%,#f8fafc_100%)]">
+        <Header />
+        <main className="container py-6 sm:py-8">
+          <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="flex items-center gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-orange-50 text-xl font-bold text-orange-600">
+                {(user?.name ?? "U").charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-orange-600">
+                  Minha conta
+                </p>
+                <h1 className="text-xl font-bold text-slate-900">
+                  {user?.name ?? "Usuário"}
+                </h1>
+                <p className="text-sm text-slate-500">{user?.email}</p>
+              </div>
+            </div>
+          </section>
+
+          <section className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              { key: "dados", label: "Meus dados", tab: "meus-dados" },
+              { key: "anuncios", label: "Meus anúncios", tab: "meus-anuncios" },
+              { key: "config", label: "Configurações", tab: "configuracoes" },
+              { key: "booster", label: "Booster", tab: "booster" },
+              { key: "contatos", label: "Contatos", tab: "contatos" },
+              { key: "financeiro", label: "Faturamento", tab: "faturamento" },
+            ].map((item) => (
+              <button
+                key={item.key}
+                onClick={() => goToTab(item.tab)}
+                className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left text-sm font-semibold text-slate-800 transition hover:border-slate-300 hover:bg-slate-50"
+              >
+                {item.label}
+              </button>
+            ))}
+          </section>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (activeTab !== "visao-geral") {
+    return (
+      <div className="min-h-screen bg-[linear-gradient(180deg,#fff7ed_0%,#ffffff_18%,#f8fafc_100%)]">
+        <Header />
+        <main className="container py-10 sm:py-12">
+          <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-600">
+              Em breve
+            </p>
+            <h1 className="mt-2 text-2xl font-bold text-slate-900">Seção em construção</h1>
+            <p className="mt-2 text-slate-600">
+              Estamos preparando esta área do painel. Volte em breve ou navegue para a visão geral.
+            </p>
+            <div className="mt-4 flex justify-center">
+              <Button onClick={() => goToTab("visao-geral")} className="rounded-xl bg-slate-900 text-white hover:bg-slate-800">
+                Voltar para o painel
+              </Button>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,#fff7ed_0%,#ffffff_18%,#f8fafc_100%)]">
       <Header />
@@ -212,18 +290,14 @@ export default function AdvertiserDashboard() {
                 </Button>
               </Link>
 
-              <Link
-                href="/anunciante/meus-dados"
-                className="block w-full sm:w-auto"
+              <Button
+                onClick={() => goToTab("meus-dados")}
+                variant="outline"
+                className="w-full rounded-2xl border-white/30 bg-white/10 px-6 py-6 font-semibold text-white hover:bg-white/15 sm:w-auto"
               >
-                <Button
-                  variant="outline"
-                  className="w-full rounded-2xl border-white/30 bg-white/10 px-6 py-6 font-semibold text-white hover:bg-white/15 sm:w-auto"
-                >
-                  <Settings className="mr-2 h-4 w-4" />
-                  Meus dados
-                </Button>
-              </Link>
+                <Settings className="mr-2 h-4 w-4" />
+                Meus dados
+              </Button>
 
               <Link href="/planos" className="block w-full sm:w-auto">
                 <Button

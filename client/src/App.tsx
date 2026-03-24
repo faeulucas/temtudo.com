@@ -40,6 +40,8 @@ import HealthPage from "./pages/topics/Health";
 import EducationPage from "./pages/topics/Education";
 import EventsPage from "./pages/topics/Events";
 import JobsPage from "./pages/topics/Jobs";
+import BoosterCheckoutPage from "./pages/BoosterCheckout";
+import PlanCheckoutPage from "./pages/PlanCheckout";
 
 function Redirect({ to }: { to: string }) {
   const [, setLocation] = useLocation();
@@ -72,6 +74,8 @@ function Router() {
       <Route path="/lojas" component={StoresPage} />
       <Route path="/loja/:sellerId" component={StorefrontPage} />
       <Route path="/booster" component={BoosterPage} />
+      <Route path="/checkout/booster" component={BoosterCheckoutPage} />
+      <Route path="/checkout/plan" component={PlanCheckoutPage} />
       <Route path="/anunciante" component={AdvertiserDashboard} />
       <Route path="/minha-conta" component={() => <Redirect to="/anunciante?tab=meus-dados" />} />
       <Route path="/anuncio/:id" component={ListingDetailPage} />

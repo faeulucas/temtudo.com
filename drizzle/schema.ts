@@ -2,6 +2,7 @@ import {
   boolean,
   decimal,
   int,
+  index,
   mysqlEnum,
   mysqlTable,
   text,
@@ -33,6 +34,9 @@ export const users = mysqlTable("users", {
   companyName: text("companyName"),
   // Location
   cityId: int("cityId"),
+  serviceMode: mysqlEnum("serviceMode", ["single", "multi"]).default("single"),
+  servedCityIdsJson: text("servedCityIdsJson"),
+  deliveryCityIdsJson: text("deliveryCityIdsJson"),
   neighborhood: varchar("neighborhood", { length: 100 }),
   // Plan
   planId: int("planId"),
@@ -96,6 +100,9 @@ export const listings = mysqlTable("listings", {
   subcategory: varchar("subcategory", { length: 80 }),
   itemCondition: varchar("itemCondition", { length: 30 }),
   cityId: int("cityId"),
+  serviceMode: mysqlEnum("serviceMode", ["single", "multi"]).default("single"),
+  servedCityIdsJson: text("servedCityIdsJson"),
+  deliveryCityIdsJson: text("deliveryCityIdsJson"),
   title: varchar("title", { length: 200 }).notNull(),
   description: text("description"),
   extraDataJson: text("extraDataJson"),
@@ -169,6 +176,29 @@ export const boosters = mysqlTable("boosters", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
+// ─── Booster Orders ───────────────────────────────────────────────────────────
+export const boosterOrders = mysqlTable(
+  "booster_orders",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("userId").notNull(),
+    listingId: int("listingId").notNull(),
+    plan: mysqlEnum("plan", ["relampago", "basico", "plus", "premium"]).notNull(),
+    durationDays: int("durationDays").notNull(),
+    price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+    status: mysqlEnum("status", ["pending", "paid", "failed", "canceled"])
+      .default("pending")
+      .notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  table => ({
+    userIdIdx: index("idx_booster_orders_userId").on(table.userId),
+    listingIdIdx: index("idx_booster_orders_listingId").on(table.listingId),
+    statusIdx: index("idx_booster_orders_status").on(table.status),
+    createdAtIdx: index("idx_booster_orders_createdAt").on(table.createdAt),
+  })
+);
+
 // ─── Favorites ────────────────────────────────────────────────────────────────
 export const favorites = mysqlTable("favorites", {
   id: int("id").autoincrement().primaryKey(),
@@ -235,8 +265,32 @@ export type Plan = typeof plans.$inferSelect;
 export type Listing = typeof listings.$inferSelect;
 export type ListingImage = typeof listingImages.$inferSelect;
 export type Booster = typeof boosters.$inferSelect;
+export type BoosterOrder = typeof boosterOrders.$inferSelect;
 export type Favorite = typeof favorites.$inferSelect;
 export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
 export type Review = typeof reviews.$inferSelect;
 export type Report = typeof reports.$inferSelect;
 export type Banner = typeof banners.$inferSelect;
+
+// ─── Plan Orders ──────────────────────────────────────────────────────────────
+export const planOrders = mysqlTable(
+  "plan_orders",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("userId").notNull(),
+    plan: mysqlEnum("plan", ["profissional", "premium"]).notNull(),
+    price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+    billingCycle: mysqlEnum("billingCycle", ["annual"]).notNull(),
+    status: mysqlEnum("status", ["pending", "paid", "failed", "canceled"])
+      .default("pending")
+      .notNull(),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+  },
+  table => ({
+    userIdIdx: index("idx_plan_orders_userId").on(table.userId),
+    statusIdx: index("idx_plan_orders_status").on(table.status),
+    createdAtIdx: index("idx_plan_orders_createdAt").on(table.createdAt),
+  })
+);
+
+export type PlanOrder = typeof planOrders.$inferSelect;

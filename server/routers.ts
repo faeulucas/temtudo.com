@@ -26,6 +26,8 @@ import {
   plans,
   listingImages,
   boosters,
+  boosterOrders,
+  planOrders,
   favorites,
   users,
   passwordResetTokens,
@@ -43,6 +45,38 @@ import {
   getMockSellerProfile,
 } from "./mockData";
 import { isOpenNow } from "./_core/openingHours";
+
+function parseCityIds(json?: string | null): number[] {
+  if (!json) return [];
+  try {
+    const parsed = JSON.parse(json);
+    return Array.isArray(parsed) ? parsed.map(Number).filter(Boolean) : [];
+  } catch {
+    return [];
+  }
+}
+
+function matchesCityScope(
+  item:
+    | { cityId?: number | null; servedCityIdsJson?: string | null; deliveryCityIdsJson?: string | null }
+    | null,
+  cityId?: number | null
+) {
+  if (!cityId || !item) return true;
+  if (item.cityId === cityId) return true;
+  const served = parseCityIds(item.servedCityIdsJson);
+  const delivery = parseCityIds(item.deliveryCityIdsJson);
+  return served.includes(cityId) || delivery.includes(cityId);
+}
+
+function cityScopeCondition(table: typeof listings, cityId?: number | null) {
+  if (!cityId) return null;
+  return or(
+    eq(table.cityId, cityId),
+    sql`JSON_CONTAINS(COALESCE(${table.servedCityIdsJson}, '[]'), CAST(${cityId} AS JSON))`,
+    sql`JSON_CONTAINS(COALESCE(${table.deliveryCityIdsJson}, '[]'), CAST(${cityId} AS JSON))`
+  );
+}
 
 async function attachImagesToListings<T extends { id: number }>(
   db: Awaited<ReturnType<typeof getDb>>,
@@ -96,6 +130,9 @@ async function attachSellerPreviewToListings<T extends { userId: number }>(
       bannerUrl: users.bannerUrl,
       whatsapp: users.whatsapp,
       cityId: users.cityId,
+      serviceMode: users.serviceMode,
+      servedCityIdsJson: users.servedCityIdsJson,
+      deliveryCityIdsJson: users.deliveryCityIdsJson,
       neighborhood: users.neighborhood,
       openingHoursJson: users.openingHoursJson,
       isVerified: users.isVerified,
@@ -714,15 +751,30 @@ export const appRouter = router({
           cpfCnpj: z.string().optional(),
           companyName: z.string().optional(),
           cityId: z.number().optional(),
+          serviceMode: z.enum(["single", "multi"]).optional(),
+          servedCityIds: z.array(z.number()).optional(),
+          deliveryCityIds: z.array(z.number()).optional(),
           neighborhood: z.string().optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+        const { servedCityIds, deliveryCityIds, ...rest } = input;
+        const servedCityIdsJson =
+          servedCityIds && servedCityIds.length > 0 ? JSON.stringify(servedCityIds) : undefined;
+        const deliveryCityIdsJson =
+          deliveryCityIds && deliveryCityIds.length > 0
+            ? JSON.stringify(deliveryCityIds)
+            : undefined;
         await db
           .update(users)
-          .set({ ...input, updatedAt: new Date() })
+          .set({
+            ...rest,
+            servedCityIdsJson,
+            deliveryCityIdsJson,
+            updatedAt: new Date(),
+          })
           .where(eq(users.id, ctx.user.id));
         return { success: true };
       }),
@@ -903,18 +955,19 @@ export const appRouter = router({
           return attachMockSellerPreviewToListings(
             mockListings
               .filter(item => item.status === "active" && item.isBoosted)
-              .filter(item => !input.cityId || item.cityId === input.cityId)
+              .filter(item => matchesCityScope(item, input.cityId))
               .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
               .slice(0, input.limit)
           );
         }
         await ensureIbaitiInstitutionDirectory(db);
 
-        const conditions = [
+        const conditions: any[] = [
           eq(listings.status, "active"),
           eq(listings.isBoosted, true),
         ];
-        if (input.cityId) conditions.push(eq(listings.cityId, input.cityId));
+        const cityCond = cityScopeCondition(listings, input.cityId);
+        if (cityCond) conditions.push(cityCond);
         const items = await db
           .select()
           .from(listings)
@@ -938,7 +991,7 @@ export const appRouter = router({
           return attachMockSellerPreviewToListings(
             mockListings
               .filter(item => item.status === "active")
-              .filter(item => !input.cityId || item.cityId === input.cityId)
+              .filter(item => matchesCityScope(item, input.cityId))
               .filter(
                 item =>
                   !input.categoryId || item.categoryId === input.categoryId
@@ -949,10 +1002,11 @@ export const appRouter = router({
         }
         await ensureIbaitiInstitutionDirectory(db);
 
-        const conditions: ReturnType<typeof eq>[] = [
+        const conditions: any[] = [
           eq(listings.status, "active"),
         ];
-        if (input.cityId) conditions.push(eq(listings.cityId, input.cityId));
+        const cityCond = cityScopeCondition(listings, input.cityId);
+        if (cityCond) conditions.push(cityCond);
         if (input.categoryId)
           conditions.push(eq(listings.categoryId, input.categoryId));
         const items = await db
@@ -1000,7 +1054,7 @@ export const appRouter = router({
                   ? item.subcategory === input.subcategory
                   : true)
             )
-            .filter(item => !input.cityId || item.cityId === input.cityId)
+            .filter(item => matchesCityScope(item, input.cityId))
             .filter(item => !input.type || item.type === input.type)
             .filter(
               item =>
@@ -1024,7 +1078,8 @@ export const appRouter = router({
           conditions.push(eq(listings.categoryId, input.categoryId));
         if (input.subcategory)
           conditions.push(eq(listings.subcategory, input.subcategory));
-        if (input.cityId) conditions.push(eq(listings.cityId, input.cityId));
+        const cityCond = cityScopeCondition(listings, input.cityId);
+        if (cityCond) conditions.push(cityCond);
         if (input.type) conditions.push(eq(listings.type, input.type));
         if (input.minPrice)
           conditions.push(gte(listings.price, String(input.minPrice)));
@@ -1203,7 +1258,7 @@ export const appRouter = router({
                   ? item.subcategory === input.subcategory
                   : false)
             )
-            .filter(item => !input.cityId || item.cityId === input.cityId);
+            .filter(item => matchesCityScope(item, input.cityId));
 
           if (related.length > 0) {
             return related.slice(0, input.limit);
@@ -1229,8 +1284,8 @@ export const appRouter = router({
 
         if (input.subcategory)
           strictConditions.push(eq(listings.subcategory, input.subcategory));
-        if (input.cityId)
-          strictConditions.push(eq(listings.cityId, input.cityId));
+        const cityCond = cityScopeCondition(listings, input.cityId);
+        if (cityCond) strictConditions.push(cityCond);
 
         let items = await db
           .select()
@@ -1276,7 +1331,7 @@ export const appRouter = router({
               item =>
                 item.status === "active" &&
                 item.categoryId === category.id &&
-                (!input.cityId || item.cityId === input.cityId)
+                matchesCityScope(item, input.cityId)
             )
             .sort(
               (a, b) =>
@@ -1294,7 +1349,8 @@ export const appRouter = router({
           .limit(1);
         if (!cat) return [];
         const conditions: any[] = [eq(listings.status, "active"), eq(listings.categoryId, cat.id)];
-        if (input.cityId) conditions.push(eq(listings.cityId, input.cityId));
+        const cityCond = cityScopeCondition(listings, input.cityId);
+        if (cityCond) conditions.push(cityCond);
         const items = await db
           .select()
           .from(listings)
@@ -1345,6 +1401,116 @@ export const appRouter = router({
 
         return { ...listing, images };
       }),
+    myBoosterOrders: protectedProcedure.query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) return [];
+
+      return db
+        .select({
+          id: boosterOrders.id,
+          listingId: boosterOrders.listingId,
+          listingTitle: listings.title,
+          plan: boosterOrders.plan,
+          durationDays: boosterOrders.durationDays,
+          price: boosterOrders.price,
+          status: boosterOrders.status,
+          createdAt: boosterOrders.createdAt,
+        })
+        .from(boosterOrders)
+        .leftJoin(listings, eq(boosterOrders.listingId, listings.id))
+        .where(eq(boosterOrders.userId, ctx.user.id))
+        .orderBy(desc(boosterOrders.createdAt));
+    }),
+    createBoosterOrder: protectedProcedure
+      .input(
+        z.object({
+          listingId: z.number(),
+          plan: z.enum(["relampago", "basico", "plus", "premium"]),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+        const [listing] = await db
+          .select()
+          .from(listings)
+          .where(
+            and(
+              eq(listings.id, input.listingId),
+              eq(listings.userId, ctx.user.id),
+              eq(listings.status, "active")
+            )
+          )
+          .limit(1);
+
+        if (!listing) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Listing not found or not active" });
+        }
+
+        const planConfig: Record<
+          "relampago" | "basico" | "plus" | "premium",
+          { durationDays: number; price: number }
+        > = {
+          relampago: { durationDays: 1, price: 9.9 },
+          basico: { durationDays: 7, price: 12.9 },
+          plus: { durationDays: 15, price: 24.9 },
+          premium: { durationDays: 30, price: 49.9 },
+        };
+
+        const config = planConfig[input.plan];
+
+        const result = await db.insert(boosterOrders).values({
+          userId: ctx.user.id,
+          listingId: input.listingId,
+          plan: input.plan,
+          durationDays: config.durationDays,
+          price: String(config.price),
+          status: "pending",
+        });
+
+        // drizzle mysql returns OkPacket with insertId
+        const orderId = (result as unknown as { insertId?: number }).insertId ?? 0;
+
+        return {
+          id: Number(orderId),
+          plan: input.plan,
+          durationDays: config.durationDays,
+          price: config.price,
+          status: "pending",
+        };
+      }),
+    createPlanOrder: protectedProcedure
+      .input(z.object({ plan: z.enum(["profissional", "premium"]) }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+        const planConfig: Record<"profissional" | "premium", { billingCycle: "annual"; price: number }> = {
+          profissional: { billingCycle: "annual", price: 99.9 },
+          premium: { billingCycle: "annual", price: 129.9 },
+        };
+
+        const config = planConfig[input.plan];
+
+        const result = await db.insert(planOrders).values({
+          userId: ctx.user.id,
+          plan: input.plan,
+          price: String(config.price),
+          billingCycle: config.billingCycle,
+          status: "pending",
+        });
+
+        const orderId = (result as unknown as { insertId?: number }).insertId ?? 0;
+
+        return {
+          id: Number(orderId),
+          plan: input.plan,
+          billingCycle: config.billingCycle,
+          price: config.price,
+          status: "pending",
+        };
+      }),
     createListing: protectedProcedure
       .input(
         z.object({
@@ -1362,6 +1528,9 @@ export const appRouter = router({
           subcategory: z.string().max(80).optional(),
           itemCondition: z.string().max(30).optional(),
           cityId: z.number().optional(),
+          serviceMode: z.enum(["single", "multi"]).default("single"),
+          servedCityIds: z.array(z.number()).default([]),
+          deliveryCityIds: z.array(z.number()).default([]),
           neighborhood: z.string().optional(),
           whatsapp: z.string().optional(),
         })
@@ -1374,6 +1543,10 @@ export const appRouter = router({
         const result = await db.insert(listings).values({
           ...input,
           userId: ctx.user.id,
+          servedCityIdsJson:
+            input.servedCityIds?.length ? JSON.stringify(input.servedCityIds) : "[]",
+          deliveryCityIdsJson:
+            input.deliveryCityIds?.length ? JSON.stringify(input.deliveryCityIds) : "[]",
           price: input.price ? String(input.price) : undefined,
           status: "active",
           expiresAt,
@@ -1398,6 +1571,9 @@ export const appRouter = router({
           subcategory: z.string().max(80).optional(),
           itemCondition: z.string().max(30).optional(),
           cityId: z.number().optional(),
+          serviceMode: z.enum(["single", "multi"]).optional(),
+          servedCityIds: z.array(z.number()).optional(),
+          deliveryCityIds: z.array(z.number()).optional(),
           neighborhood: z.string().optional(),
           status: z.enum(["active", "paused", "sold"]).optional(),
           whatsapp: z.string().optional(),
@@ -1406,11 +1582,17 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
-        const { id, price, ...rest } = input;
+        const { id, price, servedCityIds, deliveryCityIds, ...rest } = input;
         await db
           .update(listings)
           .set({
             ...rest,
+            servedCityIdsJson:
+              servedCityIds && servedCityIds.length ? JSON.stringify(servedCityIds) : undefined,
+            deliveryCityIdsJson:
+              deliveryCityIds && deliveryCityIds.length
+                ? JSON.stringify(deliveryCityIds)
+                : undefined,
             price: price ? String(price) : undefined,
             updatedAt: new Date(),
           })

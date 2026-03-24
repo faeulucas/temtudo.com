@@ -24,8 +24,8 @@ export function cloudinaryRaw(publicId: string) {
 
 // Shortcut for our guide icons
 export function guideIcon(id: string, size = 160) {
-  // expects files like guide-health.webp inside baseFolder
-  const url = cloudinaryUrl(`${baseFolder}/${id}.webp`, { w: size });
+  // expects files like things/guide-health.webp inside baseFolder
+  const url = cloudinaryUrl(`${baseFolder}/things/${id}.webp`, { w: size });
   return url;
 }
 

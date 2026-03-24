@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 import { getStorefrontHref } from "@/lib/storefront";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { StatusBadge } from "@/components/StatusBadge";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ListingCard from "@/components/ListingCard";
@@ -104,6 +105,12 @@ export default function ListingDetailPage() {
       : listing?.seller?.name || "Anunciante";
 
   const sellerInitial = sellerDisplayName.charAt(0)?.toUpperCase() || "?";
+  const sellerPlan = listing?.seller && "plan" in listing.seller ? listing.seller.plan : null;
+  const sellerPlanActive =
+    listing?.seller && "planActive" in listing.seller ? listing.seller.planActive : null;
+  const isSellerPremium = sellerPlanActive && sellerPlan === "premium";
+  const isSellerProfessional = sellerPlanActive && sellerPlan === "profissional" && !isSellerPremium;
+  const isListingBoosted = listing?.isBoosted;
 
   const sellerStorageKey = listing?.seller?.id
     ? `norte-vivo:follow-seller:${listing.seller.id}`
@@ -331,6 +338,12 @@ export default function ListingDetailPage() {
               <div className="inline-flex items-center gap-2 rounded-full bg-white/12 px-4 py-2 text-sm font-semibold text-white">
                 <Sparkles className="h-4 w-4" />
                 Página de anúncio do Norte Vivo
+              </div>
+
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                {isListingBoosted && <StatusBadge kind="impulsionado" />}
+                {isSellerPremium && <StatusBadge kind="premium" />}
+                {isSellerProfessional && <StatusBadge kind="profissional" />}
               </div>
 
               <h1 className="mt-4 break-words font-display text-3xl font-black leading-tight text-white sm:text-5xl">
@@ -810,6 +823,9 @@ export default function ListingDetailPage() {
                         Verificado
                       </span>
                     )}
+
+                    {isSellerPremium && <StatusBadge kind="premium" />}
+                    {isSellerProfessional && <StatusBadge kind="profissional" />}
                   </div>
 
                   <p className="mt-2 text-sm leading-6 text-slate-500">

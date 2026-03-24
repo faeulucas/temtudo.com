@@ -19,6 +19,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Link, useParams } from "wouter";
+import { StatusBadge } from "@/components/StatusBadge";
 
 export default function StorefrontPage() {
   const { sellerId } = useParams<{ sellerId: string }>();
@@ -39,6 +40,9 @@ export default function StorefrontPage() {
 
   const seller = data?.seller;
   const listings = data?.listings ?? [];
+  const isSellerPremium = seller?.planActive && seller?.plan === "premium";
+  const isSellerProfessional =
+    seller?.planActive && seller?.plan === "profissional" && !isSellerPremium;
 
   const cityName =
     cities?.find((city) => city.id === seller?.cityId)?.name ??
@@ -181,6 +185,9 @@ export default function StorefrontPage() {
                         Verificada
                       </span>
                     )}
+
+                    {isSellerPremium && <StatusBadge kind="premium" />}
+                    {isSellerProfessional && <StatusBadge kind="profissional" />}
 
                     <span
                       className={`inline-flex rounded-full px-3 py-1 text-sm font-semibold ${

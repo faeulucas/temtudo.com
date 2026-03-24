@@ -1248,6 +1248,9 @@ export const appRouter = router({
             whatsapp: users.whatsapp,
             openingHoursJson: users.openingHoursJson,
             isVerified: users.isVerified,
+            plan: users.plan,
+            planActive: users.planActive,
+            planExpiresAt: users.planExpiresAt,
             createdAt: users.createdAt,
           })
           .from(users)
@@ -1288,6 +1291,9 @@ export const appRouter = router({
             bio: users.bio,
             openingHoursJson: users.openingHoursJson,
             isVerified: users.isVerified,
+            plan: users.plan,
+            planActive: users.planActive,
+            planExpiresAt: users.planExpiresAt,
             createdAt: users.createdAt,
             cityId: users.cityId,
             neighborhood: users.neighborhood,

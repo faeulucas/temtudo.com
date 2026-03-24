@@ -41,7 +41,7 @@ function Sidebar({ navItems }: { navItems: NavItem[] }) {
   const [location] = useLocation();
 
   return (
-    <aside className="hidden w-64 shrink-0 border-r border-slate-200 bg-white/90 px-3 py-6 lg:flex lg:flex-col">
+    <aside className="fixed inset-y-0 left-0 hidden w-[252px] shrink-0 border-r border-slate-200 bg-[#f5f5f5] px-4 py-6 lg:flex lg:flex-col">
       <div className="px-3">
         <div className="flex items-center gap-2 rounded-2xl bg-orange-50 px-3 py-2 text-sm font-semibold text-orange-700">
           <ShoppingBag className="h-4 w-4" />
@@ -58,16 +58,16 @@ function Sidebar({ navItems }: { navItems: NavItem[] }) {
             <Link key={item.href} href={item.href}>
               <a
                 className={cn(
-                  "group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition",
+                  "group flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition",
                   active
-                    ? "bg-slate-900 text-white shadow-sm"
-                    : "text-slate-700 hover:bg-slate-100"
+                    ? "border border-gray-200 bg-white text-gray-900 shadow-sm"
+                    : "text-gray-700 hover:bg-gray-200"
                 )}
               >
                 <item.icon
                   className={cn(
                     "h-4 w-4",
-                    active ? "text-white" : "text-slate-500 group-hover:text-slate-700"
+                    active ? "text-gray-900" : "text-gray-500 group-hover:text-gray-700"
                   )}
                 />
                 {item.label}
@@ -150,7 +150,7 @@ export default function AdvertiserLayout({
     <div className="min-h-screen bg-slate-50">
       <div className="flex">
         <Sidebar navItems={navItems} />
-        <div className="flex min-h-screen flex-1 flex-col">
+        <div className="flex min-h-screen flex-1 flex-col lg:pl-[252px]">
           <DashboardHeader
             title={headerTitle}
             subtitle={headerSubtitle}
@@ -159,7 +159,7 @@ export default function AdvertiserLayout({
             showNewButton={headerShowNewButton}
           />
           <main className="flex-1 px-4 py-6 lg:px-6">
-            <div className="mx-auto w-full max-w-[1200px]">{children}</div>
+            <div className="mx-auto w-full max-w-[1160px]">{children}</div>
           </main>
         </div>
       </div>

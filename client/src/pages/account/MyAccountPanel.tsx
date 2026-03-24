@@ -1,3 +1,4 @@
+import type React from "react";
 import { useState } from "react";
 import { Link } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -10,6 +11,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import AdvertiserLayout, { NavItem } from "@/layouts/AdvertiserLayout";
 import { LOGIN_ROUTE } from "@/const";
 import { trpc } from "@/lib/trpc";
 import {
@@ -103,7 +105,11 @@ function buildSections(
               { key: "vitrine", label: "Minha Vitrine", href: storefrontHref },
               { key: "produtos-loja", label: "Produtos da Loja", href: "/anunciante" },
               { key: "pedidos-loja", label: "Pedidos da Loja" },
-              { key: "config-loja", label: "Configuracoes da Loja", href: "/anunciante/meus-dados" },
+              {
+                key: "config-loja",
+                label: "Configuracoes da Loja",
+                href: "/anunciante/meus-dados",
+              },
             ],
           },
         ]
@@ -235,15 +241,15 @@ export default function MyAccountPanel() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f3f3f3]">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+      <div className="flex min-h-screen items-center justify-center bg-slate-50">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-orange-500 border-t-transparent" />
       </div>
     );
   }
 
   if (!isAuthenticated || !user) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f3f3f3] px-6">
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 px-6">
         <div className="w-full max-w-md rounded-[24px] border border-slate-200 bg-white p-8 text-center shadow-sm">
           <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
             <LogIn className="h-8 w-8 text-slate-700" />
@@ -287,25 +293,6 @@ export default function MyAccountPanel() {
   const avatarSrc = typeof user.avatar === "string" ? user.avatar : undefined;
   const avatarInitial = displayName?.charAt(0)?.toUpperCase() || "N";
 
-  const renderNav = () => (
-    <div className="flex flex-wrap items-center justify-center gap-3">
-      {sections.map(section => (
-        <button
-          key={section.key}
-          type="button"
-          onClick={() => setActiveSection(section.key)}
-          className={`rounded-xl border px-4 py-3 text-sm font-medium transition-colors ${
-            section.key === activeSection
-              ? "border-blue-500 bg-blue-50 text-blue-700"
-              : "border-slate-300 bg-white text-slate-700 hover:border-slate-400"
-          }`}
-        >
-          {section.label}
-        </button>
-      ))}
-    </div>
-  );
-
   const visibleCards = cards.filter(card => {
     if (activeSection === "conta") {
       return [
@@ -336,16 +323,187 @@ export default function MyAccountPanel() {
     return true;
   });
 
+  const renderSectionChips = () => (
+    <div className="flex flex-wrap gap-2">
+      {sections.map(section => (
+        <button
+          key={section.key}
+          type="button"
+          onClick={() => setActiveSection(section.key)}
+          className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+            section.key === activeSection
+              ? "border-slate-900 bg-slate-900 text-white"
+              : "border-slate-200 bg-white text-slate-700 hover:border-slate-400"
+          }`}
+        >
+          {section.label}
+        </button>
+      ))}
+    </div>
+  );
+
+  const quickStats = [
+    { key: "listings", label: "Anuncios", value: advertiserStats?.totalListings ?? 0 },
+    { key: "contacts", label: "Contatos", value: advertiserStats?.totalContacts ?? 0 },
+    { key: "boosters", label: "Boosters", value: advertiserStats?.totalBoosters ?? 0 },
+  ];
+
+  const navItems: NavItem[] = [
+    { label: "Minha conta", href: "/minha-conta", icon: User },
+    { label: "Pedidos", href: "/minha-conta", icon: ShoppingBag },
+    { label: "Favoritos", href: "/favoritos", icon: Star },
+    { label: "Pagamentos", href: "/minha-conta", icon: CreditCard },
+    { label: "Enderecos", href: "/minha-conta", icon: MapPin },
+    { label: "Seguranca", href: "/minha-conta", icon: Shield },
+    { label: "Configuracoes", href: "/minha-conta", icon: Settings },
+    ...(isAdvertiser
+      ? [{ label: "Painel do anunciante", href: "/anunciante", icon: LayoutGrid }]
+      : []),
+  ];
+
   return (
-    <div className="min-h-screen bg-[#f3f3f3]">
-      <div className="mx-auto max-w-[1680px] px-4 py-3 sm:px-6">
-        <header className="rounded-[24px] border border-slate-200 bg-[#fffddf] px-4 py-6 sm:px-8">
-          <div className="flex items-center justify-between gap-4 sm:hidden">
-            <h1 className="text-lg font-semibold text-slate-900">Painel Minha Conta</h1>
+    <AdvertiserLayout
+      navItems={navItems}
+      headerTitle="Minha conta"
+      headerSubtitle="Area do usuario"
+      headerShowNewButton={false}
+    >
+      <div className="space-y-6">
+        <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <Avatar className="h-14 w-14 border border-slate-200">
+                  <AvatarImage src={avatarSrc} alt={displayName || "Perfil"} />
+                  <AvatarFallback className="bg-slate-100 text-lg font-semibold text-slate-700">
+                    {avatarInitial}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-orange-600">
+                    Minha conta
+                  </p>
+                  <h1 className="text-xl font-bold text-slate-900">{displayName}</h1>
+                  <p className="text-sm text-slate-500">
+                    {accountType} • {user.email}
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <Link href="/anunciante/meus-dados">
+                  <Button variant="outline" className="rounded-xl">
+                    <Pencil className="mr-2 h-4 w-4" />
+                    Meus dados
+                  </Button>
+                </Link>
+                {isAdvertiser && (
+                  <Link href="/anunciante">
+                    <Button className="rounded-xl bg-orange-500 text-white hover:bg-orange-600">
+                      <LayoutGrid className="mr-2 h-4 w-4" />
+                      Abrir painel
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-5 flex flex-wrap gap-2 text-sm text-slate-600">
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 font-medium">
+                Plano: {user.trialStartedAt ? "Em teste" : "Gratuito"}
+              </span>
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 font-medium">
+                Tipo: {accountType}
+              </span>
+            </div>
+
+            <div className="mt-6 space-y-2">
+              <p className="text-sm font-semibold text-slate-800">Navegue pelas areas</p>
+              {renderSectionChips()}
+            </div>
+          </section>
+
+          <aside className="space-y-4">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-orange-600">
+                Resumo rapido
+              </p>
+              <div className="mt-4 grid grid-cols-3 gap-3 text-center">
+                {quickStats.map(item => (
+                  <div key={item.key} className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                    <p className="text-xs font-semibold text-slate-500">{item.label}</p>
+                    <p className="text-2xl font-bold text-slate-900">{item.value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold text-slate-900">{currentSection.label}</p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="gap-2 text-sm text-slate-600"
+                  onClick={() => setMobileMenuOpen(true)}
+                >
+                  <Menu className="h-4 w-4" />
+                  Trocar
+                </Button>
+              </div>
+              <div className="mt-3 space-y-2">
+                {currentSection.children.map(item =>
+                  item.href ? (
+                    <Link
+                      key={item.key}
+                      href={item.href}
+                      className="flex items-center justify-between rounded-xl border border-slate-100 px-3 py-2 text-sm text-slate-700 transition hover:border-slate-200 hover:bg-slate-50"
+                    >
+                      {item.label}
+                      <span className="text-slate-400">{">"}</span>
+                    </Link>
+                  ) : (
+                    <div
+                      key={item.key}
+                      className="flex items-center justify-between rounded-xl border border-slate-100 px-3 py-2 text-sm text-slate-700"
+                    >
+                      {item.label}
+                      <span className="text-slate-400">{">"}</span>
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <p className="text-sm font-semibold text-slate-900">Seguranca e privacidade</p>
+              <div className="mt-3 space-y-2 text-sm text-slate-600">
+                <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2">
+                  <span>Autenticacao</span>
+                  <BadgeCheck className="h-5 w-5 text-emerald-500" />
+                </div>
+                <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2">
+                  <span>Preferencias de comunicacao</span>
+                  <MessageSquare className="h-4 w-4 text-slate-500" />
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-orange-600">
+                {currentSection.label}
+              </p>
+              <h2 className="text-lg font-semibold text-slate-900">Acoes rapidas</h2>
+              <p className="text-sm text-slate-500">
+                Atalhos organizados no mesmo visual do painel do anunciante.
+              </p>
+            </div>
             <Button
-              type="button"
               variant="outline"
-              className="rounded-full bg-white"
+              className="lg:hidden"
               onClick={() => setMobileMenuOpen(true)}
             >
               <Menu className="mr-2 h-4 w-4" />
@@ -353,131 +511,44 @@ export default function MyAccountPanel() {
             </Button>
           </div>
 
-          <div className="hidden sm:block">
-            <h1 className="text-center text-[32px] font-semibold text-slate-900">
-              Painel "Minha Conta" - Norte Vivo
-            </h1>
-            <div className="mx-auto mt-8 max-w-6xl rounded-[18px] border border-slate-200 bg-[#f2f2f2] px-6 py-6">
-              <p className="mb-4 text-center text-[15px] text-slate-600">
-                Menu de Navegacao Principal
-              </p>
-              {renderNav()}
-            </div>
-          </div>
-        </header>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {visibleCards.map(card => {
+              const Icon = card.icon;
+              const content = (
+                <article className="flex h-full flex-col justify-between rounded-2xl border border-slate-100 bg-slate-50 p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-800">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    {card.status === "ok" ? (
+                      <BadgeCheck className="h-5 w-5 text-emerald-500" />
+                    ) : null}
+                  </div>
+                  <div className="mt-4">
+                    <h3 className="text-base font-semibold text-slate-900">{card.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">{card.description}</p>
+                  </div>
+                </article>
+              );
 
-        <main className="mt-6 rounded-[24px] border border-slate-200 bg-[#f2f2f2] p-5 sm:p-8">
-          <div className="mb-6 sm:hidden">
-            <h2 className="mb-4 text-center text-base text-slate-600">Menu de Navegacao Principal</h2>
-            {renderNav()}
-          </div>
-
-          <div className="grid gap-8 xl:grid-cols-[minmax(300px,0.85fr)_minmax(0,1.15fr)]">
-            <section className="rounded-[18px] border border-[#c9bc48] bg-[#fffddf] p-5">
-              <p className="mb-5 text-center text-[15px] text-slate-700">Resumo do Perfil</p>
-              <div className="flex flex-wrap items-center gap-4">
-                <Avatar className="h-16 w-16 border border-slate-200">
-                  <AvatarImage src={avatarSrc} alt={displayName || "Perfil"} />
-                  <AvatarFallback className="bg-white text-lg font-semibold text-slate-700">
-                    {avatarInitial}
-                  </AvatarFallback>
-                </Avatar>
-
-                <div className="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-700">
-                  {displayName}
-                </div>
-
-                <div className="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-700">
-                  {accountType}
-                </div>
-
-                <div className="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-700">
-                  {user.email}
-                </div>
-
-                <Link href="/anunciante/meus-dados" className="block">
-                  <Button variant="outline" className="rounded-xl bg-white">
-                    <Pencil className="mr-2 h-4 w-4" />
-                    Editar Perfil
-                  </Button>
+              return card.href ? (
+                <Link key={card.key} href={card.href} className="block h-full">
+                  {content}
                 </Link>
-              </div>
-
-              <div className="mt-6 rounded-xl border border-slate-200 bg-white p-4">
-                <p className="text-sm font-medium text-slate-800">{currentSection.label}</p>
-                <div className="mt-3 space-y-2">
-                  {currentSection.children.map(item =>
-                    item.href ? (
-                      <Link
-                        key={item.key}
-                        href={item.href}
-                        className="flex items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
-                      >
-                        {item.label}
-                        <span className="text-slate-400">{">"}</span>
-                      </Link>
-                    ) : (
-                      <div
-                        key={item.key}
-                        className="flex items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-600"
-                      >
-                        {item.label}
-                        <span className="text-slate-400">{">"}</span>
-                      </div>
-                    )
-                  )}
+              ) : (
+                <div key={card.key} className="h-full">
+                  {content}
                 </div>
-              </div>
-            </section>
-
-            <section className="rounded-[18px] border border-[#c9bc48] bg-[#fffddf] p-5">
-              <div className="flex items-center justify-between gap-4">
-                <p className="text-[15px] text-slate-700">Conteudo Principal</p>
-                <div className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-600">
-                  Cards de Acao
-                </div>
-              </div>
-
-              <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-                {visibleCards.map(card => {
-                  const Icon = card.icon;
-                  const content = (
-                    <article className="rounded-[16px] border border-slate-300 bg-white p-5 shadow-sm">
-                      <div className="flex items-start justify-between gap-3">
-                        <Icon className="h-6 w-6 text-slate-700" />
-                        {card.status === "ok" ? (
-                          <BadgeCheck className="h-5 w-5 text-emerald-500" />
-                        ) : null}
-                      </div>
-                      <h2 className="mt-6 text-[17px] font-medium text-slate-900">
-                        {card.title}
-                      </h2>
-                      <p className="mt-2 text-[15px] leading-7 text-slate-600">
-                        {card.description}
-                      </p>
-                    </article>
-                  );
-
-                  return card.href ? (
-                    <Link key={card.key} href={card.href} className="block">
-                      {content}
-                    </Link>
-                  ) : (
-                    <div key={card.key}>{content}</div>
-                  );
-                })}
-              </div>
-            </section>
+              );
+            })}
           </div>
-        </main>
+        </section>
       </div>
 
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetContent side="left" className="w-[88vw] max-w-sm border-r-0 bg-white p-0">
           <SheetHeader className="border-b border-slate-200 px-5 py-5 text-left">
-            <SheetTitle className="text-xl font-semibold text-slate-900">
-              Minha Conta
-            </SheetTitle>
+            <SheetTitle className="text-xl font-semibold text-slate-900">Minha Conta</SheetTitle>
             <SheetDescription>Navegue pelas areas do painel.</SheetDescription>
           </SheetHeader>
           <div className="space-y-3 p-5">
@@ -491,7 +562,7 @@ export default function MyAccountPanel() {
                 }}
                 className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left text-sm font-medium ${
                   section.key === activeSection
-                    ? "border-blue-500 bg-blue-50 text-blue-700"
+                    ? "border-slate-900 bg-slate-900 text-white"
                     : "border-slate-200 bg-white text-slate-700"
                 }`}
               >
@@ -502,6 +573,6 @@ export default function MyAccountPanel() {
           </div>
         </SheetContent>
       </Sheet>
-    </div>
+    </AdvertiserLayout>
   );
 }

@@ -78,7 +78,11 @@ async function startServer() {
       res.header("Access-Control-Allow-Origin", requestOrigin);
       res.header("Vary", "Origin");
       res.header("Access-Control-Allow-Credentials", "true");
-      res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+      res.header(
+        "Access-Control-Allow-Headers",
+        req.headers["access-control-request-headers"] ||
+          "Content-Type, Authorization, x-request-id, x-requested-with"
+      );
       res.header("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
     }
 

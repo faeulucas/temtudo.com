@@ -38,6 +38,14 @@ import RealEstatePage from "./pages/topics/RealEstate";
 import EventsPage from "./pages/topics/Events";
 import JobsPage from "./pages/topics/Jobs";
 
+function Redirect({ to }: { to: string }) {
+  const [, setLocation] = useLocation();
+  useEffect(() => {
+    setLocation(to);
+  }, [setLocation, to]);
+  return null;
+}
+
 function ScrollToTop() {
   const [location] = useLocation();
 
@@ -76,11 +84,11 @@ function Router() {
       <Route path="/como-funciona" component={HowItWorksPage} />
       <Route path="/termos" component={TermsPage} />
       <Route path="/privacidade" component={PrivacyPage} />
-      <Route path="/anunciante" component={MyAccountPanel} />
+      <Route path="/anunciante" component={AdvertiserDashboard} />
       <Route path="/anunciante/meus-dados" component={AdvertiserProfile} />
-      <Route path="/painel" component={MyAccountPanel} />
+      <Route path="/painel" component={() => <Redirect to="/minha-conta" />} />
       <Route path="/cliente" component={MyAccountPanel} />
-      <Route path="/painel-anunciante" component={AdvertiserDashboard} />
+      <Route path="/painel-anunciante" component={() => <Redirect to="/anunciante" />} />
       <Route path="/anunciante/novo" component={NewListing} />
       <Route path="/anunciante/editar/:id" component={NewListing} />
       <Route path="/anunciar" component={NewListing} />

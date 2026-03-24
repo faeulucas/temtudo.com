@@ -678,7 +678,7 @@ export default function AdvertiserDashboard() {
                           </Link>
                         ) : (
                           <Link
-                            href="/painel-anunciante"
+                            href="/anunciante"
                             className="block w-full sm:w-auto"
                           >
                             <Button

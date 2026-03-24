@@ -86,8 +86,8 @@ function buildSections(
             key: "anuncios",
             label: "Meus Anuncios",
             children: [
-              { key: "ativos", label: "Anuncios Ativos", href: "/painel-anunciante" },
-              { key: "pausados", label: "Anuncios Pausados", href: "/painel-anunciante" },
+              { key: "ativos", label: "Anuncios Ativos", href: "/anunciante" },
+              { key: "pausados", label: "Anuncios Pausados", href: "/anunciante" },
               { key: "novo", label: "Criar Novo Anuncio", href: "/anunciante/novo" },
               { key: "booster", label: "Booster", href: "/booster" },
             ],
@@ -101,7 +101,7 @@ function buildSections(
             label: "Minhas Lojas",
             children: [
               { key: "vitrine", label: "Minha Vitrine", href: storefrontHref },
-              { key: "produtos-loja", label: "Produtos da Loja", href: "/painel-anunciante" },
+              { key: "produtos-loja", label: "Produtos da Loja", href: "/anunciante" },
               { key: "pedidos-loja", label: "Pedidos da Loja" },
               { key: "config-loja", label: "Configuracoes da Loja", href: "/anunciante/meus-dados" },
             ],
@@ -193,7 +193,7 @@ function buildCards(
       title: "Meus Anuncios",
       description: "Gerencie seus anuncios ativos e pausados.",
       icon: LayoutGrid,
-      href: "/painel-anunciante",
+      href: "/anunciante",
       visible: isAdvertiser,
     },
     {

@@ -41,10 +41,10 @@ import { CategorySvgIcon } from "@/components/CategorySvgIcon";
 
 // Ícones 3D hospedados no Cloudinary para as abas superiores
 const TAB_ICONS = {
-  promo: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229865/promo%C3%A7oes_mcwevy.png?v=3",
-  delivery: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229863/delivery_dh1ldp.png?v=3",
-  market: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/mercado_mklm3p.png?v=3",
-  store: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/lojas_kkgcle.png?v=3",
+  promo: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229865/promo%C3%A7oes_mcwevy.png?v=2",
+  delivery: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229863/delivery_dh1ldp.png?v=2",
+  market: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/mercado_mklm3p.png?v=2",
+  store: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/lojas_kkgcle.png?v=2",
 };
 interface HeaderProps {
   selectedCity?: number | null;
@@ -115,6 +115,7 @@ const PWA_TOP_TABS = [
     href: "/promocoes",
     image: TAB_ICONS.promo,
     fallbackImage: TAB_ICONS.promo,
+    emoji: "⭐",
     tone: "text-slate-900",
   },
   {
@@ -122,6 +123,7 @@ const PWA_TOP_TABS = [
     href: "/delivery",
     image: TAB_ICONS.delivery,
     fallbackImage: TAB_ICONS.delivery,
+    emoji: "🍕",
     tone: "text-slate-700",
   },
   {
@@ -129,6 +131,7 @@ const PWA_TOP_TABS = [
     href: "/mercado",
     image: TAB_ICONS.market,
     fallbackImage: TAB_ICONS.market,
+    emoji: "🛒",
     tone: "text-slate-700",
   },
   {
@@ -136,6 +139,7 @@ const PWA_TOP_TABS = [
     href: "/lojas",
     image: TAB_ICONS.store,
     fallbackImage: TAB_ICONS.store,
+    emoji: "🏬",
     tone: "text-slate-700",
   },
 ];
@@ -260,7 +264,7 @@ export default function Header({
       : `Buscar ${animatedQuery || "produtos, serviços ou empresas"}...`;
 
   return (
-    <header className="sticky top-0 z-50 hidden max-w-full overflow-x-clip border-b border-slate-200 bg-white/95 backdrop-blur md:block">
+    <header className="sticky top-0 z-50 max-w-full overflow-x-clip border-b border-slate-200 bg-white/95 backdrop-blur">
       <div className="container">
         <div className="hidden items-center gap-4 py-3 xl:flex">
           <Link href="/" className="flex shrink-0 items-center gap-2">

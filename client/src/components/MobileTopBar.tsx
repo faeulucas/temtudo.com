@@ -1,22 +1,48 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { MapPin } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 
+const TAB_ICONS = {
+  all: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229865/promo%C3%A7oes_mcwevy.png?v=2",
+  delivery: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229863/delivery_dh1ldp.png?v=2",
+  market: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/mercado_mklm3p.png?v=2",
+  store: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229864/lojas_kkgcle.png?v=2",
+  services: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229865/servi%C3%A7os_yvvovd.png?v=2",
+};
+
 const MOBILE_TABS = [
-  { label: "Tudo", href: "/", emoji: "✨" },
-  { label: "Restaurantes", href: "/busca?type=food", emoji: "🍽️" },
-  { label: "Mercados", href: "/busca?q=mercado", emoji: "🛒" },
-  { label: "Lojas", href: "/lojas", emoji: "🏪" },
-  { label: "Serviços", href: "/busca?q=servicos", emoji: "🛠️" },
-  { label: "Guia local", href: "/guia", emoji: "🧭" },
+  { label: "Tudo", href: "/", emoji: "?", image: TAB_ICONS.all },
+  { label: "Restaurantes", href: "/busca?type=food", emoji: "???", image: TAB_ICONS.delivery },
+  { label: "Mercados", href: "/busca?q=mercado", emoji: "??", image: TAB_ICONS.market },
+  { label: "Lojas", href: "/lojas", emoji: "??", image: TAB_ICONS.store },
+  { label: "Servi�os", href: "/busca?q=servicos", emoji: "??", image: TAB_ICONS.services },
+  { label: "Guia local", href: "/guia", emoji: "??" },
 ];
 
-const QUICK_CHIPS = ["Favoritos", "Cupons", "Serviços", "Mercados"];
+const QUICK_CHIPS = ["Favoritos", "Cupons", "Servi�os", "Mercados"];
 
 type MobileTopBarProps = {
   selectedCityName?: string;
 };
+
+function TabIcon({ image, emoji, alt }: { image?: string; emoji: string; alt: string }) {
+  const [failed, setFailed] = useState(false);
+
+  if (image && !failed) {
+    return (
+      <img
+        src={image}
+        alt={alt}
+        className="h-5 w-5 object-contain"
+        loading="lazy"
+        onError={() => setFailed(true)}
+      />
+    );
+  }
+
+  return <span className="text-base leading-none">{emoji}</span>;
+}
 
 export default function MobileTopBar({ selectedCityName }: MobileTopBarProps) {
   const { isAuthenticated } = useAuth();
@@ -38,11 +64,11 @@ export default function MobileTopBar({ selectedCityName }: MobileTopBarProps) {
           <div className="flex items-center gap-2">
             <Link href={isAuthenticated ? "/favoritos" : "/login"}>
               <button className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-900 shadow-sm">
-                <span className="text-base">❤️</span>
+                <span className="text-base">??</span>
               </button>
             </Link>
             <button className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-900 shadow-sm">
-              <span className="text-base">🔔</span>
+              <span className="text-base">??</span>
             </button>
           </div>
         </div>
@@ -54,7 +80,7 @@ export default function MobileTopBar({ selectedCityName }: MobileTopBarProps) {
               href={tab.href}
               className="flex min-w-[96px] items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 shadow-sm transition hover:border-orange-200 hover:bg-orange-50"
             >
-              <span className="text-base">{tab.emoji}</span>
+              <TabIcon image={tab.image} emoji={tab.emoji} alt={tab.label} />
               <span className="truncate">{tab.label}</span>
             </Link>
           ))}
@@ -77,3 +103,4 @@ export default function MobileTopBar({ selectedCityName }: MobileTopBarProps) {
     </div>
   );
 }
+

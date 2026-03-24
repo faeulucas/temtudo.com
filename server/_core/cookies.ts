@@ -39,10 +39,14 @@ export function getSessionCookieOptions(
   //       ? hostname
   //       : undefined;
 
+  const secure = isSecureRequest(req);
+  const isCrossSite = true; // frontend (Vercel) e backend (Railway) em domínios distintos
+  const sameSite: CookieOptions["sameSite"] = isCrossSite ? "none" : "lax";
+
   return {
     httpOnly: true,
     path: "/",
-    sameSite: "lax",
-    secure: isSecureRequest(req),
+    sameSite,
+    secure,
   };
 }

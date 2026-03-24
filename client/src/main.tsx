@@ -19,9 +19,9 @@ const queryClient = new QueryClient({
   },
 });
 
-// Base URL da API: obrigatório em produção, tolera vazio só em dev
+// Base URL da API: obrigatória em produção
 const apiBaseUrlRaw = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.trim();
-console.log("API BASE URL:", apiBaseUrlRaw ?? "<undefined>");
+console.log("[tRPC] VITE_API_BASE_URL:", apiBaseUrlRaw ?? "<undefined>");
 
 if (import.meta.env.PROD && !apiBaseUrlRaw) {
   throw new Error(
@@ -30,6 +30,8 @@ if (import.meta.env.PROD && !apiBaseUrlRaw) {
 }
 
 const apiBaseUrl = apiBaseUrlRaw ? apiBaseUrlRaw.replace(/\/+$/, "") : "";
+const trpcEndpoint = `${apiBaseUrl || ""}/api/trpc`;
+console.log("[tRPC] Endpoint configurado:", trpcEndpoint);
 
 const redirectToLoginIfUnauthorized = (error: unknown) => {
   if (!(error instanceof TRPCClientError)) return;
@@ -61,12 +63,23 @@ const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
       // Em produção não há fallback: sempre usa o Railway
-      url: `${apiBaseUrl || (import.meta.env.DEV ? "" : "")}/api/trpc`,
+      url: trpcEndpoint,
       transformer: superjson,
       async fetch(input, init) {
+        // Debug: loga URL efetiva da requisição
+        if (typeof input === "string") {
+          console.log("[tRPC fetch] input:", input);
+        } else {
+          console.log("[tRPC fetch] input (Request.url):", input.url);
+        }
         const response = await globalThis.fetch(input, {
           ...(init ?? {}),
           credentials: "include",
+          // Garantir que cookies sejam enviados em ambiente cross-site
+          headers: {
+            ...(init?.headers ?? {}),
+            "x-requested-with": "trpc-client",
+          },
         });
 
         const contentType = response.headers.get("content-type") ?? "";
@@ -91,39 +104,41 @@ const trpcClient = trpc.createClient({
   ],
 });
 
-if ("serviceWorker" in navigator && import.meta.env.PROD) {
-  window.addEventListener("load", () => {
-    let refreshing = false;
-
-    navigator.serviceWorker.addEventListener("controllerchange", () => {
-      if (refreshing) return;
-      refreshing = true;
-      window.location.reload();
-    });
-
-    navigator.serviceWorker
-      .register("/sw.js")
-      .then(registration => {
-        registration.update().catch(error => {
-          console.warn("[PWA] Service worker update check failed:", error);
-        });
-
-        registration.addEventListener("updatefound", () => {
-          const newWorker = registration.installing;
-          if (!newWorker) return;
-
-          newWorker.addEventListener("statechange", () => {
-            if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
-              newWorker.postMessage({ type: "SKIP_WAITING" });
-            }
-          });
-        });
-      })
-      .catch(error => {
-        console.warn("[PWA] Service worker registration failed:", error);
-      });
-  });
-}
+// PWA desativado temporariamente para evitar SW interferindo em rotas/API
+// Remova este bloco comentado quando estabilizar a estratégia de cache e liberar PWA.
+// if ("serviceWorker" in navigator && import.meta.env.PROD) {
+//   window.addEventListener("load", () => {
+//     let refreshing = false;
+//
+//     navigator.serviceWorker.addEventListener("controllerchange", () => {
+//      if (refreshing) return;
+//       refreshing = true;
+//       window.location.reload();
+//     });
+//
+//     navigator.serviceWorker
+//       .register("/sw.js")
+//       .then(registration => {
+//         registration.update().catch(error => {
+//           console.warn("[PWA] Service worker update check failed:", error);
+//         });
+//
+//         registration.addEventListener("updatefound", () => {
+//           const newWorker = registration.installing;
+//           if (!newWorker) return;
+//
+//           newWorker.addEventListener("statechange", () => {
+//             if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+//               newWorker.postMessage({ type: "SKIP_WAITING" });
+//             }
+//           });
+//         });
+//       })
+//       .catch(error => {
+//         console.warn("[PWA] Service worker registration failed:", error);
+//       });
+//   });
+// }
 
 createRoot(document.getElementById("root")!).render(
   <trpc.Provider client={trpcClient} queryClient={queryClient}>

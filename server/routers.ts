@@ -1258,7 +1258,11 @@ export const appRouter = router({
       }),
     listingsByCategory: publicProcedure
       .input(
-        z.object({ categorySlug: z.string(), limit: z.number().default(12) })
+        z.object({
+          categorySlug: z.string(),
+          limit: z.number().default(12),
+          cityId: z.number().optional(),
+        })
       )
       .query(async ({ input }) => {
         const db = await getDb();
@@ -1270,7 +1274,9 @@ export const appRouter = router({
           return mockListings
             .filter(
               item =>
-                item.status === "active" && item.categoryId === category.id
+                item.status === "active" &&
+                item.categoryId === category.id &&
+                (!input.cityId || item.cityId === input.cityId)
             )
             .sort(
               (a, b) =>
@@ -1287,12 +1293,12 @@ export const appRouter = router({
           .where(eq(categories.slug, input.categorySlug))
           .limit(1);
         if (!cat) return [];
+        const conditions: any[] = [eq(listings.status, "active"), eq(listings.categoryId, cat.id)];
+        if (input.cityId) conditions.push(eq(listings.cityId, input.cityId));
         const items = await db
           .select()
           .from(listings)
-          .where(
-            and(eq(listings.status, "active"), eq(listings.categoryId, cat.id))
-          )
+          .where(and(...conditions))
           .orderBy(desc(listings.isBoosted), desc(listings.createdAt))
           .limit(input.limit);
         return attachImagesToListings(db, items);

@@ -1,14 +1,14 @@
-import BaseTopicPage from "./BaseTopicPage";
+import CityCategoryTemplate from "./CityCategoryTemplate";
 
 export default function DeliveryPage() {
   return (
-    <BaseTopicPage
-      title="Delivery"
-      description="Peça comida e produtos com entrega rápida na sua região."
-      icon="https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229863/delivery_dh1ldp.png?v=2"
-      emoji="🍽️"
-      ctaHref="/busca?type=food"
-      ctaLabel="Ver delivery"
+    <CityCategoryTemplate
+      eyebrow="Entrega na sua cidade"
+      title="Delivery perto de você"
+      copy="Restaurantes, lanchonetes e comércios que entregam onde você está."
+      categorySlug="delivery"
+      searchTerm="delivery"
+      type="food"
     />
   );
 }

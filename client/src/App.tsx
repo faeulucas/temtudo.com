@@ -8,6 +8,7 @@ import MobileBottomNav from "./components/MobileBottomNav";
 import PwaInstallPrompt from "./components/PwaInstallPrompt";
 import MobileTopBar from "./components/MobileTopBar";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { CurrentCityProvider } from "./contexts/CurrentCityContext";
 import HomePage from "./pages/Home";
 import SearchPage from "./pages/Search";
 import ListingDetailPage from "./pages/ListingDetail";
@@ -35,6 +36,9 @@ import DeliveryPage from "./pages/topics/Delivery";
 import MarketPage from "./pages/topics/Market";
 import ServicesPage from "./pages/topics/Services";
 import RealEstatePage from "./pages/topics/RealEstate";
+import VehiclesPage from "./pages/topics/Vehicles";
+import HealthPage from "./pages/topics/Health";
+import EducationPage from "./pages/topics/Education";
 import EventsPage from "./pages/topics/Events";
 import JobsPage from "./pages/topics/Jobs";
 
@@ -75,10 +79,13 @@ function Router() {
       <Route path="/cidade/:slug" component={CityPage} />
       <Route path="/planos" component={PlansPage} />
       <Route path="/promocoes" component={PromotionsPage} />
+      <Route path="/saude" component={HealthPage} />
+      <Route path="/educacao" component={EducationPage} />
       <Route path="/delivery" component={DeliveryPage} />
       <Route path="/mercado" component={MarketPage} />
       <Route path="/servicos" component={ServicesPage} />
       <Route path="/imoveis" component={RealEstatePage} />
+      <Route path="/veiculos" component={VehiclesPage} />
       <Route path="/eventos" component={EventsPage} />
       <Route path="/empregos" component={JobsPage} />
       <Route path="/como-funciona" component={HowItWorksPage} />
@@ -116,16 +123,18 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="light">
-        <TooltipProvider>
-          <ScrollToTop />
-          <Toaster />
-          <PwaInstallPrompt />
-          {!hideMobileChrome && <MobileTopBar />}
-          <Router />
-          {!hideMobileChrome && <MobileBottomNav />}
-        </TooltipProvider>
-      </ThemeProvider>
+      <CurrentCityProvider>
+        <ThemeProvider defaultTheme="light">
+          <TooltipProvider>
+            <ScrollToTop />
+            <Toaster />
+            <PwaInstallPrompt />
+            {!hideMobileChrome && <MobileTopBar />}
+            <Router />
+            {!hideMobileChrome && <MobileBottomNav />}
+          </TooltipProvider>
+        </ThemeProvider>
+      </CurrentCityProvider>
     </ErrorBoundary>
   );
 }

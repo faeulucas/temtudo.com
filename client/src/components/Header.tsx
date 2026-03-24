@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { LOGIN_ROUTE } from "@/const";
@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useCurrentCity } from "@/contexts/CurrentCityContext";
 import {
   Bell,
   Car,
@@ -61,37 +62,37 @@ const HEADER_SHORTCUTS = [
 const HEADER_PILLS = [
   {
     label: "Saúde",
-    href: "/busca?q=saude",
+    href: "/saude",
     iconName: "Cross",
     tone: "bg-emerald-50 text-emerald-700",
   },
   {
     label: "Educação",
-    href: "/busca?q=educacao",
+    href: "/educacao",
     iconName: "Building2",
     tone: "bg-orange-50 text-orange-700",
   },
   {
     label: "Delivery",
-    href: "/categoria/delivery",
+    href: "/delivery",
     iconName: "ShoppingBag",
     tone: "bg-amber-50 text-amber-700",
   },
   {
     label: "Imóveis",
-    href: "/busca?q=imoveis",
+    href: "/imoveis",
     iconName: "Home",
     tone: "bg-cyan-50 text-cyan-700",
   },
   {
     label: "Veículos",
-    href: "/busca?q=veiculos",
+    href: "/veiculos",
     iconName: "Car",
     tone: "bg-blue-50 text-blue-700",
   },
   {
     label: "Serviços",
-    href: "/busca?q=servicos",
+    href: "/servicos",
     iconName: "Wrench",
     tone: "bg-violet-50 text-violet-700",
   },
@@ -163,7 +164,7 @@ function TabIcon({ image, emoji, alt }: { image?: string; emoji: string; alt: st
 const PWA_ACTION_PILLS = [
   { label: "Favoritos", href: "/favoritos", icon: Heart, tone: "bg-rose-50 text-rose-600" },
   { label: "Cupons", href: "/planos", icon: Percent, tone: "bg-violet-50 text-violet-600" },
-  { label: "Serviços", href: "/busca?q=servicos", icon: Wrench, tone: "bg-amber-50 text-amber-600" },
+  { label: "Serviços", href: "/servicos", icon: Wrench, tone: "bg-amber-50 text-amber-600" },
   { label: "Categorias", href: "/busca", icon: LayoutDashboard, tone: "bg-indigo-50 text-indigo-600" },
 ];
 
@@ -183,6 +184,7 @@ export default function Header({
 }: HeaderProps) {
   const { user, isAuthenticated, logout } = useAuth();
   const [, navigate] = useLocation();
+  const { cityId: contextCityId, setCityId: setContextCityId } = useCurrentCity();
 
   const [searchQ, setSearchQ] = useState("");
   const [animatedQuery, setAnimatedQuery] = useState("");
@@ -199,6 +201,16 @@ export default function Header({
 
   const { data: cities } = trpc.public.cities.useQuery();
   const { data: categories } = trpc.public.categories.useQuery();
+  const effectiveCityId = selectedCity ?? contextCityId ?? null;
+
+  const handleCityChange = useCallback(
+    (value: string) => {
+      const nextId = value === "all" ? null : Number(value);
+      setContextCityId(nextId);
+      onCityChange?.(nextId);
+    },
+    [onCityChange, setContextCityId]
+  );
 
   const searchSuggestions = useMemo(() => {
     const categorySuggestions = (categories ?? []).map((category) => category.name);
@@ -298,10 +310,8 @@ export default function Header({
               <div className="h-8 w-px bg-slate-200" />
 
               <Select
-                value={selectedCity ? String(selectedCity) : "all"}
-                onValueChange={(value) =>
-                  onCityChange?.(value === "all" ? null : Number(value))
-                }
+                value={effectiveCityId ? String(effectiveCityId) : "all"}
+                onValueChange={handleCityChange}
               >
                 <SelectTrigger className="h-12 w-[170px] border-0 bg-transparent px-3 text-sm font-medium text-slate-700 shadow-none focus:ring-0">
                   <MapPin className="mr-1 h-4 w-4 text-blue-600" />
@@ -428,10 +438,8 @@ export default function Header({
             <div className="space-y-3 py-3">
               <div className="flex items-center justify-between gap-3">
                 <Select
-                  value={selectedCity ? String(selectedCity) : "all"}
-                  onValueChange={(value) =>
-                    onCityChange?.(value === "all" ? null : Number(value))
-                  }
+                  value={effectiveCityId ? String(effectiveCityId) : "all"}
+                  onValueChange={handleCityChange}
                 >
                   <SelectTrigger className="h-auto max-w-[240px] border-0 bg-transparent px-0 text-sm font-medium text-slate-800 shadow-none focus:ring-0">
                     <MapPin className="mr-1 h-4 w-4 text-slate-500" />
@@ -570,10 +578,8 @@ export default function Header({
 
               <div className="border-b border-slate-100 pb-2">
                 <Select
-                  value={selectedCity ? String(selectedCity) : "all"}
-                  onValueChange={(value) =>
-                    onCityChange?.(value === "all" ? null : Number(value))
-                  }
+                  value={effectiveCityId ? String(effectiveCityId) : "all"}
+                  onValueChange={handleCityChange}
                 >
                   <SelectTrigger className="h-auto max-w-[180px] border-0 bg-transparent px-0 text-sm font-medium text-slate-700 shadow-none focus:ring-0">
                     <MapPin className="mr-1 h-4 w-4 text-slate-500" />
@@ -632,3 +638,4 @@ export default function Header({
     </header>
   );
 }
+

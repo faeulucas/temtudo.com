@@ -11,6 +11,7 @@ import AppInstallBanner from "@/components/AppInstallBanner";
 import { Button } from "@/components/ui/button";
 import { getStorefrontHref } from "@/lib/storefront";
 import { guideIcon, thingsIcon, cloudinaryFile, cloudinaryDirect } from "@/lib/cloudinary";
+import { useCurrentCity } from "@/contexts/CurrentCityContext";
 
 const CLOUD_ICONS = {
   promocoes: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229865/promo%C3%A7oes_mcwevy.png?v=2",
@@ -495,7 +496,7 @@ function SectionHeader({
 export default function Home() {
   const { isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
-  const [selectedCity, setSelectedCity] = useState<number | null>(null);
+  const { cityId: currentCityId, city: currentCity, setCityId, status: cityStatus } = useCurrentCity();
   const [activeCategoryId, setActiveCategoryId] = useState<number | "all">(
     "all"
   );
@@ -504,21 +505,21 @@ export default function Home() {
   const { data: cities } = trpc.public.cities.useQuery();
   const { data: featured } = trpc.public.featuredListings.useQuery({
     limit: 8,
-    cityId: selectedCity ?? undefined,
-  });
+    cityId: currentCityId ?? undefined,
+  }, { enabled: cityStatus === "ready" });
   const { data: recent } = trpc.public.recentListings.useQuery({
     limit: 16,
-    cityId: selectedCity ?? undefined,
-  });
+    cityId: currentCityId ?? undefined,
+  }, { enabled: cityStatus === "ready" });
   const { data: deliveryListings } = trpc.public.listingsByCategory.useQuery({
     categorySlug: "delivery",
     limit: 6,
-  });
+    cityId: currentCityId ?? undefined,
+  }, { enabled: cityStatus === "ready" });
 
   const featuredListings = (featured ?? []) as HomeHighlightListing[];
   const recentListings = (recent ?? []) as HomeHighlightListing[];
-  const selectedCityName =
-    cities?.find((city) => city.id === selectedCity)?.name ?? "sua cidade";
+  const selectedCityName = currentCity?.name ?? "sua cidade";
   const primaryListings =
     featuredListings.length > 0 ? featuredListings : recentListings;
   const visibleListings =
@@ -631,7 +632,7 @@ export default function Home() {
   }, [categories, recentListings]);
 
   const handleSearch = (query: string) => {
-    navigate(`/busca?q=${encodeURIComponent(query)}&city=${selectedCity || ""}`);
+    navigate(`/busca?q=${encodeURIComponent(query)}&city=${currentCityId || ""}`);
   };
 
   const cityNameById = (cityId?: number | null) =>
@@ -647,11 +648,7 @@ export default function Home() {
       />
 
       <div className="hidden md:block">
-        <Header
-          selectedCity={selectedCity}
-          onCityChange={setSelectedCity}
-          onSearch={handleSearch}
-        />
+        <Header selectedCity={currentCityId} onCityChange={setCityId} onSearch={handleSearch} />
       </div>
 
       <main className="pb-24 md:pb-0">

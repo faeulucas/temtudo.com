@@ -7,12 +7,18 @@ import ListingCard from "@/components/ListingCard";
 import { getCashbackRuleBySlug } from "@/lib/cashback";
 import { ChevronRight } from "lucide-react";
 import { CategorySvgIcon } from "@/components/CategorySvgIcon";
+import { useCurrentCity } from "@/contexts/CurrentCityContext";
 
 export default function CategoryPage() {
   const { slug } = useParams<{ slug: string }>();
   const { data: categories } = trpc.public.categories.useQuery();
   const { data: cities } = trpc.public.cities.useQuery();
-  const { data: listings, isLoading } = trpc.public.listingsByCategory.useQuery({ categorySlug: slug, limit: 40 });
+  const { cityId: currentCityId, status: cityStatus } = useCurrentCity();
+  const { data: listings, isLoading } = trpc.public.listingsByCategory.useQuery({
+    categorySlug: slug,
+    limit: 40,
+    cityId: currentCityId ?? undefined,
+  }, { enabled: Boolean(slug) && cityStatus === "ready" });
   const utils = trpc.useUtils();
   const trackCategoryView = trpc.public.trackCategoryView.useMutation({
     onSuccess: async () => {

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useCurrentCity } from "@/contexts/CurrentCityContext";
 import { Link, useLocation } from "wouter";
 import { MapPin } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -13,10 +14,10 @@ const TAB_ICONS = {
 
 const MOBILE_TABS = [
   { label: "Tudo", href: "/", emoji: "?", image: TAB_ICONS.all },
-  { label: "Restaurantes", href: "/busca?type=food", emoji: "???", image: TAB_ICONS.delivery },
+  { label: "Restaurantes", href: "/delivery", emoji: "???", image: TAB_ICONS.delivery },
   { label: "Mercados", href: "/busca?q=mercado", emoji: "??", image: TAB_ICONS.market },
   { label: "Lojas", href: "/lojas", emoji: "??", image: TAB_ICONS.store },
-  { label: "Serviços", href: "/busca?q=servicos", emoji: "??", image: TAB_ICONS.services },
+  { label: "Serviços", href: "/servicos", emoji: "??", image: TAB_ICONS.services },
   { label: "Guia local", href: "/guia", emoji: "??" },
 ];
 
@@ -47,10 +48,11 @@ function TabIcon({ image, emoji, alt }: { image?: string; emoji: string; alt: st
 export default function MobileTopBar({ selectedCityName }: MobileTopBarProps) {
   const { isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
+  const { city } = useCurrentCity();
 
   const cityLabel = useMemo(
-    () => selectedCityName || "Todas as cidades",
-    [selectedCityName]
+    () => selectedCityName || city?.name || "Todas as cidades",
+    [selectedCityName, city?.name]
   );
 
   return (
@@ -103,4 +105,13 @@ export default function MobileTopBar({ selectedCityName }: MobileTopBarProps) {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
 

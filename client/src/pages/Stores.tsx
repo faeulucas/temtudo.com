@@ -417,13 +417,7 @@ export default function StoresPage() {
                 </Button>
               </Link>
 
-              <Link
-                href={getCheckoutUrl({
-                  type: "plan",
-                  plan: "profissional",
-                  isAuthenticated,
-                })}
-              >
+              <Link href="/planos">
                 <Button
                   variant="outline"
                   className="h-12 w-full rounded-2xl border-white/30 bg-white/10 text-white hover:bg-white/15"

@@ -554,7 +554,7 @@ export default function AdvertiserDashboard() {
                 Meus dados
               </Button>
 
-              <Link href={planCheckout("profissional")} className="block w-full sm:w-auto">
+              <Link href="/planos" className="block w-full sm:w-auto">
                 <Button
                   variant="outline"
                   className="w-full rounded-2xl border-white/30 bg-white/10 px-6 py-6 font-semibold text-white hover:bg-white/15 sm:w-auto"
@@ -1087,7 +1087,7 @@ export default function AdvertiserDashboard() {
                 </div>
               </div>
 
-              <Link href={planCheckout("profissional")} className="block w-full sm:w-auto">
+              <Link href="/planos" className="block w-full sm:w-auto">
                 <Button className="mt-5 w-full rounded-2xl bg-white text-blue-900 hover:bg-blue-50 sm:w-auto">
                   Ver planos <ChevronRight className="ml-1 h-4 w-4" />
                 </Button>

@@ -53,13 +53,7 @@ export default function BoosterPage() {
                 </Button>
               </Link>
 
-              <Link
-                href={getCheckoutUrl({
-                  type: "plan",
-                  plan: "profissional",
-                  isAuthenticated,
-                })}
-              >
+              <Link href="/planos">
                 <Button className="rounded-2xl bg-white/10 text-white hover:bg-white/15">
                   Ver planos
                 </Button>

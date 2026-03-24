@@ -75,13 +75,7 @@ export default function HowItWorksPage() {
                 </Button>
               </Link>
 
-              <Link
-                href={getCheckoutUrl({
-                  type: "plan",
-                  plan: "profissional",
-                  isAuthenticated,
-                })}
-              >
+              <Link href="/planos">
                 <Button className="h-12 rounded-2xl bg-white/10 px-6 text-white hover:bg-white/15">
                   Ver planos
                 </Button>
@@ -241,13 +235,7 @@ export default function HowItWorksPage() {
                 </Button>
               </Link>
 
-              <Link
-                href={getCheckoutUrl({
-                  type: "plan",
-                  plan: "profissional",
-                  isAuthenticated,
-                })}
-              >
+              <Link href="/planos">
                 <Button className="h-12 w-full rounded-2xl bg-orange-500 px-6 font-bold text-white hover:bg-orange-600">
                   <ArrowRight className="mr-2 h-4 w-4" />
                   Ver planos

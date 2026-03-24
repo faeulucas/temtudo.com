@@ -2164,13 +2164,7 @@ export default function Home() {
                   </Button>
                 </Link>
 
-                <Link
-                  href={getCheckoutUrl({
-                    type: "plan",
-                    plan: "profissional",
-                    isAuthenticated,
-                  })}
-                >
+                <Link href="/planos">
                   <Button className="h-12 w-full rounded-2xl bg-orange-500 text-white hover:bg-orange-600">
                     <Zap className="mr-2 h-4 w-4" />
                     Ver planos

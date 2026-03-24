@@ -1,4 +1,4 @@
-import { trpc } from "@/lib/trpc";
+﻿import { trpc } from "@/lib/trpc";
 import { UNAUTHED_ERR_MSG } from "@shared/const";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink, TRPCClientError } from "@trpc/client";
@@ -18,19 +18,24 @@ const queryClient = new QueryClient({
     },
   },
 });
-const apiBaseUrl = import.meta.env.PROD
-  ? ""
-  : ((import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(
-      /\/+$/,
-      ""
-    ) ?? "");
+
+// Base URL da API: obrigatório em produção, tolera vazio só em dev
+const apiBaseUrlRaw = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.trim();
+console.log("API BASE URL:", apiBaseUrlRaw ?? "<undefined>");
+
+if (import.meta.env.PROD && !apiBaseUrlRaw) {
+  throw new Error(
+    "[API] VITE_API_BASE_URL não definida em produção. Configure a URL pública do backend (Railway) no Vercel."
+  );
+}
+
+const apiBaseUrl = apiBaseUrlRaw ? apiBaseUrlRaw.replace(/\/+$/, "") : "";
 
 const redirectToLoginIfUnauthorized = (error: unknown) => {
   if (!(error instanceof TRPCClientError)) return;
   if (typeof window === "undefined") return;
 
   const isUnauthorized = error.message === UNAUTHED_ERR_MSG;
-
   if (!isUnauthorized) return;
 
   window.location.href = LOGIN_ROUTE;
@@ -55,13 +60,32 @@ queryClient.getMutationCache().subscribe(event => {
 const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
-      url: apiBaseUrl ? `${apiBaseUrl}/api/trpc` : "/api/trpc",
+      // Em produção não há fallback: sempre usa o Railway
+      url: `${apiBaseUrl || (import.meta.env.DEV ? "" : "")}/api/trpc`,
       transformer: superjson,
-      fetch(input, init) {
-        return globalThis.fetch(input, {
+      async fetch(input, init) {
+        const response = await globalThis.fetch(input, {
           ...(init ?? {}),
           credentials: "include",
         });
+
+        const contentType = response.headers.get("content-type") ?? "";
+        const isJson = contentType.includes("application/json");
+
+        if (!isJson) {
+          const preview = await response.text();
+          console.error(
+            `[API] Resposta não-JSON. status=${response.status} content-type=${contentType} body=${preview.slice(
+              0,
+              300
+            )}`
+          );
+          throw new TRPCClientError(
+            `Resposta não-JSON do servidor (status ${response.status}). Verifique a URL da API.`
+          );
+        }
+
+        return response;
       },
     }),
   ],
@@ -89,10 +113,7 @@ if ("serviceWorker" in navigator && import.meta.env.PROD) {
           if (!newWorker) return;
 
           newWorker.addEventListener("statechange", () => {
-            if (
-              newWorker.state === "installed" &&
-              navigator.serviceWorker.controller
-            ) {
+            if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
               newWorker.postMessage({ type: "SKIP_WAITING" });
             }
           });

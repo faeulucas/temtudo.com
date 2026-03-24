@@ -96,6 +96,11 @@ async function startServer() {
   app.get("/api/health", (_req, res) => {
     res.status(200).json({ ok: true });
   });
+  // Log básico das chamadas tRPC para debug em prod
+  app.use("/api/trpc", (req, _res, next) => {
+    console.log(`[tRPC] ${req.method} ${req.url} origin=${req.headers.origin ?? ""}`);
+    next();
+  });
   // tRPC API
   app.use(
     "/api/trpc",

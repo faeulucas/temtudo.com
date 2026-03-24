@@ -6,7 +6,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://site-onde-comer-e-pedir-production.up.railway.app/api/$1"
+      "destination": "https://site-faellucas-production.up.railway.app/api/$1"
     },
     {
       "source": "/(.*)",

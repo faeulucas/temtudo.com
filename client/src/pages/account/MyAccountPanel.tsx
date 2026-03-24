@@ -1,5 +1,6 @@
 import type React from "react";
-import { Link } from "wouter";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,6 @@ import AdvertiserLayout, { NavItem } from "@/layouts/AdvertiserLayout";
 import { LOGIN_ROUTE } from "@/const";
 import { trpc } from "@/lib/trpc";
 import {
-  BadgeCheck,
   CheckCircle,
   ClipboardList,
   CreditCard,
@@ -22,7 +22,7 @@ import {
   Settings,
   Shield,
   ShoppingBag,
-  TrendingUp,
+  Store,
   User,
   Wallet,
 } from "lucide-react";
@@ -32,18 +32,29 @@ type DashboardCard = {
   title: string;
   description: string;
   icon: React.ComponentType<{ className?: string }>;
-  href?: string;
+  targetTab?: string;
   visible?: boolean;
   status?: "ok" | "default";
 };
 
-const CARD_ORDER: DashboardCard[] = [
+const SECTIONS: NavItem[] = [
+  { label: "Visao geral", href: "/painel?tab=visao-geral", icon: LayoutGrid },
+  { label: "Meus dados", href: "/painel?tab=meus-dados", icon: User },
+  { label: "Meus anuncios", href: "/painel?tab=meus-anuncios", icon: ClipboardList },
+  { label: "Minha loja", href: "/painel?tab=minha-loja", icon: Store },
+  { label: "Contatos", href: "/painel?tab=contatos", icon: MessageCircle },
+  { label: "Booster", href: "/painel?tab=booster", icon: Megaphone },
+  { label: "Faturamento", href: "/painel?tab=faturamento", icon: Wallet },
+  { label: "Configuracoes", href: "/painel?tab=configuracoes", icon: Settings },
+];
+
+const CARDS: DashboardCard[] = [
   {
     key: "perfil",
     title: "Informacoes do seu perfil",
     description: "Dados pessoais e da conta.",
     icon: ClipboardList,
-    href: "/anunciante/meus-dados",
+    targetTab: "meus-dados",
   },
   {
     key: "seguranca",
@@ -51,54 +62,80 @@ const CARD_ORDER: DashboardCard[] = [
     description: "Voce configurou a seguranca da sua conta.",
     icon: Lock,
     status: "ok",
+    targetTab: "configuracoes",
   },
   {
     key: "plus",
     title: "NorteVivo+",
     description: "Assinatura com beneficios exclusivos.",
     icon: Gem,
-    href: "/planos",
   },
   {
     key: "cartoes",
     title: "Cartoes",
     description: "Cartoes salvos na sua conta.",
     icon: CreditCard,
+    targetTab: "faturamento",
   },
   {
     key: "enderecos",
     title: "Enderecos",
     description: "Enderecos salvos na sua conta.",
     icon: MapPin,
+    targetTab: "meus-dados",
   },
   {
     key: "privacidade",
     title: "Privacidade",
     description: "Preferencias e controle do uso dos seus dados.",
     icon: Shield,
+    targetTab: "configuracoes",
   },
   {
     key: "comunicacoes",
     title: "Comunicacoes",
     description: "Escolha que tipo de informacao quer receber.",
     icon: MessageCircle,
+    targetTab: "configuracoes",
+  },
+  {
+    key: "anuncios",
+    title: "Meus Anuncios",
+    description: "Gerencie seus anuncios ativos e pausados.",
+    icon: LayoutGrid,
+    targetTab: "meus-anuncios",
+    visible: true,
+  },
+  {
+    key: "loja",
+    title: "Minha Loja",
+    description: "Gerencie sua vitrine e produtos.",
+    icon: Store,
+    targetTab: "minha-loja",
+    visible: true,
+  },
+  {
+    key: "booster",
+    title: "Booster",
+    description: "Impulsione seus anuncios e alcance mais clientes.",
+    icon: Megaphone,
+    targetTab: "booster",
+    visible: true,
+  },
+  {
+    key: "faturamento",
+    title: "Faturamento",
+    description: "Visualize seu extrato e pagamentos.",
+    icon: Wallet,
+    targetTab: "faturamento",
   },
 ];
 
-function buildNavItems(isAdvertiser: boolean): NavItem[] {
-  return [
-    { label: "Compras", href: "/minha-conta", icon: ShoppingBag },
-    { label: "Vendas", href: "/minha-conta", icon: TrendingUp },
-    { label: "Marketing", href: "/minha-conta", icon: Megaphone },
-    { label: "Emprestimos", href: "/minha-conta", icon: Wallet },
-    { label: "Assinaturas", href: "/minha-conta", icon: Gem },
-    { label: "Faturamento", href: "/minha-conta", icon: FileText },
-    { label: "Meu perfil", href: "/anunciante/meus-dados", icon: User },
-    ...(isAdvertiser
-      ? [{ label: "Painel do anunciante", href: "/anunciante", icon: LayoutGrid }]
-      : []),
-    { label: "Configuracoes", href: "/minha-conta", icon: Settings },
-  ];
+function getTabFromLocation(location: string) {
+  const query = location.split("?")[1];
+  if (!query) return "visao-geral";
+  const params = new URLSearchParams(query);
+  return params.get("tab") || "visao-geral";
 }
 
 export default function MyAccountPanel() {
@@ -106,6 +143,44 @@ export default function MyAccountPanel() {
   const { data: advertiserStats } = trpc.advertiser.stats.useQuery(undefined, {
     enabled: isAuthenticated,
   });
+  const [location, setLocation] = useLocation();
+  const [activeTab, setActiveTab] = useState<string>("visao-geral");
+
+  useEffect(() => {
+    setActiveTab(getTabFromLocation(location));
+  }, [location]);
+
+  const isStoreOwner = user?.personType === "pj";
+  const isAdvertiser = isStoreOwner || (advertiserStats?.totalListings ?? 0) > 0;
+
+  const navItems = useMemo(() => {
+    return SECTIONS.filter(item => {
+      if (item.label === "Meus anuncios" || item.label === "Booster") {
+        return isAdvertiser;
+      }
+      if (item.label === "Minha loja") {
+        return isStoreOwner;
+      }
+      return true;
+    });
+  }, [isAdvertiser, isStoreOwner]);
+
+  const cards = useMemo(
+    () =>
+      CARDS.filter(card => {
+        if (card.key === "plus") {
+          return Boolean(user?.trialStartedAt);
+        }
+        if (!isAdvertiser && ["anuncios", "booster"].includes(card.key)) return false;
+        if (!isStoreOwner && card.key === "loja") return false;
+        return card.visible !== false;
+      }),
+    [isAdvertiser, isStoreOwner, user?.trialStartedAt]
+  );
+
+  const displayName = user?.personType === "pj" ? user?.companyName || user?.name : user?.name;
+  const avatarSrc = typeof user?.avatar === "string" ? user?.avatar : undefined;
+  const avatarInitial = displayName?.charAt(0)?.toUpperCase() || "N";
 
   if (loading) {
     return (
@@ -136,24 +211,102 @@ export default function MyAccountPanel() {
     );
   }
 
-  const isStoreOwner = user.personType === "pj";
-  const isAdvertiser = isStoreOwner || (advertiserStats?.totalListings ?? 0) > 0;
-  const displayName = user.personType === "pj" ? user.companyName || user.name : user.name;
-  const avatarSrc = typeof user.avatar === "string" ? user.avatar : undefined;
-  const avatarInitial = displayName?.charAt(0)?.toUpperCase() || "N";
-  const navItems = buildNavItems(isAdvertiser);
+  const handleNavigate = (tab: string) => {
+    setLocation(`/painel?tab=${tab}`);
+  };
 
-  const cards = CARD_ORDER.filter(card => {
-    if (card.key === "plus") {
-      return Boolean(user.trialStartedAt);
+  const renderSection = () => {
+    switch (activeTab) {
+      case "meus-dados":
+        return (
+          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <h3 className="text-lg font-semibold text-gray-900">Meus dados</h3>
+            <p className="mt-2 text-sm text-gray-600">Edite suas informacoes pessoais e de conta.</p>
+          </div>
+        );
+      case "meus-anuncios":
+        return (
+          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <h3 className="text-lg font-semibold text-gray-900">Meus anúncios</h3>
+            <p className="mt-2 text-sm text-gray-600">
+              Gere seus anúncios sem sair do painel. (Conteúdo detalhado pode ser plugado aqui)
+            </p>
+          </div>
+        );
+      case "minha-loja":
+        return (
+          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <h3 className="text-lg font-semibold text-gray-900">Minha loja</h3>
+            <p className="mt-2 text-sm text-gray-600">Gerencie vitrine e produtos dentro do painel.</p>
+          </div>
+        );
+      case "contatos":
+        return (
+          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <h3 className="text-lg font-semibold text-gray-900">Contatos</h3>
+            <p className="mt-2 text-sm text-gray-600">Centralize mensagens e leads aqui.</p>
+          </div>
+        );
+      case "booster":
+        return (
+          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <h3 className="text-lg font-semibold text-gray-900">Booster</h3>
+            <p className="mt-2 text-sm text-gray-600">Configure impulsionamento dentro do painel.</p>
+          </div>
+        );
+      case "faturamento":
+        return (
+          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <h3 className="text-lg font-semibold text-gray-900">Faturamento</h3>
+            <p className="mt-2 text-sm text-gray-600">Veja extratos e pagamentos sem sair do painel.</p>
+          </div>
+        );
+      case "configuracoes":
+        return (
+          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <h3 className="text-lg font-semibold text-gray-900">Configurações</h3>
+            <p className="mt-2 text-sm text-gray-600">Ajuste preferências, segurança e notificações.</p>
+          </div>
+        );
+      default:
+        return (
+          <section className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {cards.map(card => {
+              const Icon = card.icon;
+              const cardContent = (
+                <article className="flex h-full min-h-[180px] flex-col justify-between rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition hover:border-gray-300 hover:shadow-md">
+                  <div className="flex items-start justify-between">
+                    <Icon className="h-7 w-7 text-gray-700" />
+                    {card.status === "ok" ? (
+                      <CheckCircle className="h-5 w-5 text-emerald-500" />
+                    ) : null}
+                  </div>
+                  <div className="mt-6">
+                    <h3 className="text-lg font-semibold text-gray-900">{card.title}</h3>
+                    <p className="mt-2 text-sm text-gray-600 leading-6">{card.description}</p>
+                  </div>
+                </article>
+              );
+              return (
+                <button
+                  key={card.key}
+                  type="button"
+                  onClick={() => handleNavigate(card.targetTab || "visao-geral")}
+                  className="text-left"
+                >
+                  {cardContent}
+                </button>
+              );
+            })}
+          </section>
+        );
     }
-    return true;
-  });
+  };
 
   return (
     <AdvertiserLayout
       navItems={navItems}
-      headerTitle="Minha conta"
+      headerTitle="Painel"
       headerSubtitle={user.email ?? "Area do usuario"}
       headerShowNewButton={false}
     >
@@ -171,41 +324,14 @@ export default function MyAccountPanel() {
           <p className="text-sm text-gray-600">{user.email}</p>
         </div>
 
-        <section className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {cards.map(card => {
-            const Icon = card.icon;
-            const cardContent = (
-              <article className="flex h-full min-h-[180px] flex-col justify-between rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition hover:border-gray-300 hover:shadow-md">
-                <div className="flex items-start justify-between">
-                  <Icon className="h-7 w-7 text-gray-700" />
-                  {card.status === "ok" ? (
-                    <CheckCircle className="h-5 w-5 text-emerald-500" />
-                  ) : null}
-                </div>
-                <div className="mt-6">
-                  <h3 className="text-lg font-semibold text-gray-900">{card.title}</h3>
-                  <p className="mt-2 text-sm text-gray-600 leading-6">{card.description}</p>
-                </div>
-              </article>
-            );
-            return card.href ? (
-              <Link key={card.key} href={card.href} className="block h-full">
-                {cardContent}
-              </Link>
-            ) : (
-              <div key={card.key} className="h-full">
-                {cardContent}
-              </div>
-            );
-          })}
-        </section>
+        {renderSection()}
 
-          <p className="text-center text-sm text-gray-600">
-            Voce pode{" "}
-            <a className="text-blue-500 hover:underline" href="/minha-conta/cancelar">
-              cancelar sua conta
-            </a>{" "}
-            quando quiser.
+        <p className="text-center text-sm text-gray-600">
+          Voce pode{" "}
+          <a className="text-blue-500 hover:underline" href="/painel?tab=configuracoes">
+            cancelar sua conta
+          </a>{" "}
+          quando quiser.
         </p>
       </div>
     </AdvertiserLayout>

@@ -175,10 +175,14 @@ export default function PlansPage() {
   const { isAuthenticated } = useAuth();
   const [billingCycle, setBillingCycle] = useState<BillingCycle>("yearly");
 
-  const planCheckout = (planId: string) =>
+  const planCheckout = (planId: "profissional" | "premium") =>
     getCheckoutUrl({ type: "plan", plan: planId, isAuthenticated });
   const boosterCheckout = (slug: string) =>
     getCheckoutUrl({ type: "booster", plan: slug, isAuthenticated });
+
+  const freePlanHref = isAuthenticated
+    ? "/anunciante?tab=meus-dados"
+    : "/login?redirect=/anunciante?tab=meus-dados";
 
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,#fff7ed_0%,#ffffff_18%,#f8fafc_100%)]">
@@ -389,13 +393,23 @@ export default function PlansPage() {
                   ))}
                 </ul>
 
-                <Link href={planCheckout(plan.id)}>
-                  <Button
-                    className={`w-full rounded-xl py-5 text-base font-bold ${plan.btnClass}`}
-                  >
-                    {variant.price === 0 ? "Começar grátis" : "Assinar agora"}
-                  </Button>
-                </Link>
+                {plan.id === "gratis" ? (
+                  <Link href={freePlanHref}>
+                    <Button
+                      className={`w-full rounded-xl py-5 text-base font-bold ${plan.btnClass}`}
+                    >
+                      Começar grátis
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link href={planCheckout(plan.id as "profissional" | "premium")}>
+                    <Button
+                      className={`w-full rounded-xl py-5 text-base font-bold ${plan.btnClass}`}
+                    >
+                      Assinar agora
+                    </Button>
+                  </Link>
+                )}
               </div>
             );
           })}

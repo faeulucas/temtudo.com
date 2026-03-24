@@ -1511,6 +1511,23 @@ export const appRouter = router({
           status: "pending",
         };
       }),
+    myPlanOrders: protectedProcedure.query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) return [];
+
+      return db
+        .select({
+          id: planOrders.id,
+          plan: planOrders.plan,
+          price: planOrders.price,
+          billingCycle: planOrders.billingCycle,
+          status: planOrders.status,
+          createdAt: planOrders.createdAt,
+        })
+        .from(planOrders)
+        .where(eq(planOrders.userId, ctx.user.id))
+        .orderBy(desc(planOrders.createdAt));
+    }),
     createListing: protectedProcedure
       .input(
         z.object({

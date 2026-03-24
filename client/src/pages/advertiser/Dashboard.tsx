@@ -35,6 +35,7 @@ import {
   CarFront,
   Zap,
   Sparkles,
+  ShieldCheck,
   TrendingUp,
 } from "lucide-react";
 
@@ -72,6 +73,8 @@ const BOOSTER_STATUS_STYLES: Record<
   canceled: { label: "Cancelado", badge: "border-slate-200 bg-slate-100 text-slate-600" },
 };
 
+const PLAN_STATUS_STYLES = BOOSTER_STATUS_STYLES;
+
 export default function AdvertiserDashboard() {
   const { user, isAuthenticated, loading } = useAuth();
   const [location, setLocation] = useLocation();
@@ -92,6 +95,10 @@ export default function AdvertiserDashboard() {
   const { data: categories } = trpc.public.categories.useQuery();
   const { data: boosterOrders, isLoading: boosterOrdersLoading } =
     trpc.advertiser.myBoosterOrders.useQuery(undefined, {
+      enabled: isAuthenticated,
+    });
+  const { data: planOrders, isLoading: planOrdersLoading } =
+    trpc.advertiser.myPlanOrders.useQuery(undefined, {
       enabled: isAuthenticated,
     });
 
@@ -191,6 +198,21 @@ export default function AdvertiserDashboard() {
     listingId?: number
   ) => getCheckoutUrl({ type: "booster", plan, listingId, isAuthenticated });
 
+  const formatCurrency = (value: number | string) => {
+    const numeric = typeof value === "string" ? Number(value) : value ?? 0;
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      minimumFractionDigits: 2,
+    }).format(numeric);
+  };
+
+  const formatDateTime = (value: string | Date) =>
+    new Intl.DateTimeFormat("pt-BR", {
+      dateStyle: "short",
+      timeStyle: "short",
+    }).format(new Date(value));
+
   if (activeTab === "meus-dados") {
     return (
       <div className="min-h-screen bg-[linear-gradient(180deg,#fff7ed_0%,#ffffff_18%,#f8fafc_100%)]">
@@ -219,6 +241,7 @@ export default function AdvertiserDashboard() {
               { key: "anuncios", label: "Meus anúncios", tab: "meus-anuncios" },
               { key: "config", label: "Configurações", tab: "configuracoes" },
               { key: "booster", label: "Booster", tab: "booster" },
+              { key: "planos", label: "Planos", tab: "planos" },
               { key: "contatos", label: "Contatos", tab: "contatos" },
               { key: "financeiro", label: "Faturamento", tab: "faturamento" },
             ].map((item) => (
@@ -237,22 +260,103 @@ export default function AdvertiserDashboard() {
     );
   }
 
-  if (activeTab === "booster") {
-    const formatCurrency = (value: number | string) => {
-      const numeric = typeof value === "string" ? Number(value) : value ?? 0;
-      return new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-        minimumFractionDigits: 2,
-      }).format(numeric);
+  if (activeTab === "planos") {
+    const planLabels: Record<"profissional" | "premium", string> = {
+      profissional: "Plano Profissional",
+      premium: "Plano Premium",
     };
 
-    const formatDate = (value: string | Date) =>
-      new Intl.DateTimeFormat("pt-BR", {
-        dateStyle: "short",
-        timeStyle: "short",
-      }).format(new Date(value));
+    return (
+      <div className="min-h-screen bg-[linear-gradient(180deg,#fff7ed_0%,#ffffff_18%,#f8fafc_100%)]">
+        <Header />
+        <main className="container py-8 sm:py-10">
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-600">
+                Histórico de assinaturas
+              </p>
+              <h1 className="text-2xl font-bold text-slate-900">Planos do anunciante</h1>
+              <p className="text-sm text-slate-600">Acompanhe os pedidos de plano criados.</p>
+            </div>
+            <Link href="/planos">
+              <Button className="rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-200/60 hover:bg-blue-700">
+                Escolher plano
+              </Button>
+            </Link>
+          </div>
 
+          <section className="rounded-3xl border border-slate-200 bg-white/90 p-4 shadow-sm backdrop-blur sm:p-6">
+            {planOrdersLoading ? (
+              <div className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-4 text-slate-600">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+                Carregando histórico...
+              </div>
+            ) : (planOrders?.length ?? 0) === 0 ? (
+              <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 px-6 py-10 text-center text-slate-600">
+                <Star className="h-8 w-8 text-blue-500" />
+                <p className="text-base font-semibold text-slate-800">
+                  Você ainda não possui assinaturas registradas
+                </p>
+                <p className="text-sm text-slate-500">
+                  Quando criar uma assinatura, ela aparecerá aqui com o status.
+                </p>
+                <Link href="/planos">
+                  <Button variant="outline" className="rounded-xl border-blue-200 text-blue-600 hover:bg-blue-50">
+                    Ver planos
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {planOrders?.map(order => {
+                  const statusConfig =
+                    PLAN_STATUS_STYLES[order.status as keyof typeof PLAN_STATUS_STYLES] ??
+                    PLAN_STATUS_STYLES.pending;
+
+                  return (
+                    <div
+                      key={order.id}
+                      className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-[1px] hover:shadow-md sm:p-5"
+                    >
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-slate-500">
+                            <ShieldCheck className="h-3.5 w-3.5 text-blue-500" />
+                            Pedido #{order.id} · {formatDateTime(order.createdAt)}
+                          </div>
+                          <h3 className="text-lg font-semibold text-slate-900">
+                            {planLabels[order.plan as keyof typeof planLabels] ?? order.plan}
+                          </h3>
+                          <p className="text-sm text-slate-600">
+                            Ciclo: {order.billingCycle === "annual" ? "Anual" : order.billingCycle}
+                          </p>
+                        </div>
+
+                        <div className="flex flex-col items-start gap-2 sm:items-end">
+                          <span
+                            className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${statusConfig.badge}`}
+                          >
+                            {statusConfig.label}
+                          </span>
+                          <div className="text-right">
+                            <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Valor</p>
+                            <p className="text-lg font-bold text-slate-900">{formatCurrency(order.price)}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (activeTab === "booster") {
     const planLabel: Record<"relampago" | "basico" | "plus" | "premium", string> = {
       relampago: "Relâmpago",
       basico: "Básico",
@@ -319,7 +423,7 @@ export default function AdvertiserDashboard() {
                         <div className="space-y-1">
                           <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-slate-500">
                             <Zap className="h-3 w-3 text-orange-500" />
-                            Booster #{order.id} · {formatDate(order.createdAt)}
+                            Booster #{order.id} · {formatDateTime(order.createdAt)}
                           </div>
                           <div className="flex items-center gap-2">
                             <h3 className="text-lg font-semibold text-slate-900">{title}</h3>

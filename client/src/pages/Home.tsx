@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { getStorefrontHref } from "@/lib/storefront";
 import { guideIcon, thingsIcon, cloudinaryFile, cloudinaryDirect } from "@/lib/cloudinary";
 import { useCurrentCity } from "@/contexts/CurrentCityContext";
+import { getCheckoutUrl } from "@/lib/checkout";
 
 const CLOUD_ICONS = {
   promocoes: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229865/promo%C3%A7oes_mcwevy.png?v=2",
@@ -2163,7 +2164,13 @@ export default function Home() {
                   </Button>
                 </Link>
 
-                <Link href="/planos">
+                <Link
+                  href={getCheckoutUrl({
+                    type: "plan",
+                    plan: "profissional",
+                    isAuthenticated,
+                  })}
+                >
                   <Button className="h-12 w-full rounded-2xl bg-orange-500 text-white hover:bg-orange-600">
                     <Zap className="mr-2 h-4 w-4" />
                     Ver planos

@@ -3,16 +3,16 @@ import Header from "@/components/Header";
 import ListingCard from "@/components/ListingCard";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { getCheckoutUrl } from "@/lib/checkout";
 import { BadgeCheck, Flame, Sparkles, TrendingUp, Zap } from "lucide-react";
 import { Link } from "wouter";
-import { useAuth } from "@/_core/hooks/useAuth";
-import { LOGIN_ROUTE } from "@/const";
 
 export default function BoosterPage() {
-  const { isAuthenticated } = useAuth();
   const { data: featured } = trpc.public.featuredListings.useQuery({ limit: 16 });
   const { data: categories } = trpc.public.categories.useQuery();
   const { data: cities } = trpc.public.cities.useQuery();
+  const { isAuthenticated } = useAuth();
 
   const boostedListings = featured ?? [];
 
@@ -40,14 +40,26 @@ export default function BoosterPage() {
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link href={isAuthenticated ? "/anunciante" : LOGIN_ROUTE}>
+              <Link
+                href={getCheckoutUrl({
+                  type: "booster",
+                  plan: "relampago",
+                  isAuthenticated,
+                })}
+              >
                 <Button className="rounded-2xl bg-white text-orange-700 hover:bg-orange-50">
                   <Zap className="mr-2 h-4 w-4" />
                   Ativar Booster agora
                 </Button>
               </Link>
 
-              <Link href="/planos">
+              <Link
+                href={getCheckoutUrl({
+                  type: "plan",
+                  plan: "profissional",
+                  isAuthenticated,
+                })}
+              >
                 <Button className="rounded-2xl bg-white/10 text-white hover:bg-white/15">
                   Ver planos
                 </Button>
@@ -138,7 +150,13 @@ export default function BoosterPage() {
           </p>
 
           <div className="mt-6">
-            <Link href={isAuthenticated ? "/anunciante" : LOGIN_ROUTE}>
+            <Link
+              href={getCheckoutUrl({
+                type: "booster",
+                plan: "relampago",
+                isAuthenticated,
+              })}
+            >
               <Button className="rounded-2xl bg-white px-8 py-6 font-bold text-orange-600 hover:bg-orange-50">
                 <Zap className="mr-2 h-4 w-4" />
                 Ativar Booster

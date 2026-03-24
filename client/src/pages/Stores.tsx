@@ -1,8 +1,16 @@
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { getStorefrontHref } from "@/lib/storefront";
 import { trpc } from "@/lib/trpc";
+import { getCheckoutUrl } from "@/lib/checkout";
 import {
   Building2,
   MapPin,
@@ -16,6 +24,8 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link } from "wouter";
+import { useCurrentCity } from "@/contexts/CurrentCityContext";
+import { useAuth } from "@/_core/hooks/useAuth";
 
 type StorePreview = {
   id: number;
@@ -36,10 +46,18 @@ type StorePreview = {
 };
 
 export default function StoresPage() {
+  const { isAuthenticated } = useAuth();
   const [search, setSearch] = useState("");
+  const { cityId, city, setCityId, status: cityStatus } = useCurrentCity();
 
-  const { data: featured } = trpc.public.featuredListings.useQuery({ limit: 12 });
-  const { data: recent } = trpc.public.recentListings.useQuery({ limit: 20 });
+  const { data: featured } = trpc.public.featuredListings.useQuery({
+    limit: 12,
+    cityId: cityId ?? undefined,
+  }, { enabled: cityStatus === "ready" });
+  const { data: recent } = trpc.public.recentListings.useQuery({
+    limit: 20,
+    cityId: cityId ?? undefined,
+  }, { enabled: cityStatus === "ready" });
   const { data: categories } = trpc.public.categories.useQuery();
   const { data: cities } = trpc.public.cities.useQuery();
 
@@ -110,6 +128,30 @@ export default function StoresPage() {
                 Explore empresas, parceiros e negócios ativos da região para
                 encontrar produtos, serviços e contatos com mais rapidez.
               </p>
+
+              <div className="mt-4 flex flex-wrap items-center gap-3 text-sm font-semibold text-white">
+                <div className="inline-flex items-center gap-2 rounded-full bg-white/12 px-3 py-2">
+                  <MapPin className="h-4 w-4" />
+                  {city?.name ?? "sua cidade"}
+                </div>
+
+                <Select
+                  value={cityId ? String(cityId) : "all"}
+                  onValueChange={(value) => setCityId(value === "all" ? null : Number(value))}
+                >
+                  <SelectTrigger className="w-[190px] rounded-2xl bg-white/10 text-white ring-0 focus:ring-2 focus:ring-orange-300">
+                    <SelectValue placeholder="Trocar cidade" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas as cidades</SelectItem>
+                    {(cities ?? []).map((item) => (
+                      <SelectItem key={item.id} value={String(item.id)}>
+                        {item.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
@@ -375,7 +417,13 @@ export default function StoresPage() {
                 </Button>
               </Link>
 
-              <Link href="/planos">
+              <Link
+                href={getCheckoutUrl({
+                  type: "plan",
+                  plan: "profissional",
+                  isAuthenticated,
+                })}
+              >
                 <Button
                   variant="outline"
                   className="h-12 w-full rounded-2xl border-white/30 bg-white/10 text-white hover:bg-white/15"

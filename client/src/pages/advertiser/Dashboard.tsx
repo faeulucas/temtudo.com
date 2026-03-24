@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { getAdvertiserInsights } from "@/lib/advertiserInsights";
 import { CASHBACK_RULES } from "@/lib/cashback";
 import { getSegmentFromCategorySlug, SEGMENT_CONTENT } from "@/lib/segments";
+import { getCheckoutUrl } from "@/lib/checkout";
 import { toast } from "sonner";
 import {
   AlertCircle,
@@ -54,6 +55,23 @@ const SEGMENT_ICON = {
   electronics: Cpu,
 } as const;
 
+const planFromDuration = (days?: number): "relampago" | "basico" | "plus" | "premium" => {
+  if (!days || days <= 1) return "relampago";
+  if (days <= 7) return "basico";
+  if (days <= 15) return "plus";
+  return "premium";
+};
+
+const BOOSTER_STATUS_STYLES: Record<
+  "pending" | "paid" | "failed" | "canceled",
+  { label: string; badge: string }
+> = {
+  pending: { label: "Pendente", badge: "border-amber-100 bg-amber-50 text-amber-700" },
+  paid: { label: "Pago", badge: "border-emerald-100 bg-emerald-50 text-emerald-700" },
+  failed: { label: "Falhou", badge: "border-red-100 bg-red-50 text-red-700" },
+  canceled: { label: "Cancelado", badge: "border-slate-200 bg-slate-100 text-slate-600" },
+};
+
 export default function AdvertiserDashboard() {
   const { user, isAuthenticated, loading } = useAuth();
   const [location, setLocation] = useLocation();
@@ -72,6 +90,10 @@ export default function AdvertiserDashboard() {
   });
 
   const { data: categories } = trpc.public.categories.useQuery();
+  const { data: boosterOrders, isLoading: boosterOrdersLoading } =
+    trpc.advertiser.myBoosterOrders.useQuery(undefined, {
+      enabled: isAuthenticated,
+    });
 
   const updateMutation = trpc.advertiser.updateListing.useMutation({
     onSuccess: async () => {
@@ -88,12 +110,7 @@ export default function AdvertiserDashboard() {
     },
   });
 
-  const boostMutation = trpc.advertiser.activateBooster.useMutation({
-    onSuccess: async () => {
-      await utils.advertiser.stats.invalidate();
-      toast.success("Booster ativado.");
-    },
-  });
+  // fluxo de booster agora redireciona para o checkout, sem ativação direta
 
   useEffect(() => {
     if (deletingId === null) return;
@@ -167,6 +184,13 @@ export default function AdvertiserDashboard() {
       )
     : 30;
 
+  const planCheckout = (plan: "profissional" | "premium") =>
+    getCheckoutUrl({ type: "plan", plan, isAuthenticated });
+  const boosterCheckout = (
+    plan: "relampago" | "basico" | "plus" | "premium",
+    listingId?: number
+  ) => getCheckoutUrl({ type: "booster", plan, listingId, isAuthenticated });
+
   if (activeTab === "meus-dados") {
     return (
       <div className="min-h-screen bg-[linear-gradient(180deg,#fff7ed_0%,#ffffff_18%,#f8fafc_100%)]">
@@ -206,6 +230,133 @@ export default function AdvertiserDashboard() {
                 {item.label}
               </button>
             ))}
+          </section>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (activeTab === "booster") {
+    const formatCurrency = (value: number | string) => {
+      const numeric = typeof value === "string" ? Number(value) : value ?? 0;
+      return new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+        minimumFractionDigits: 2,
+      }).format(numeric);
+    };
+
+    const formatDate = (value: string | Date) =>
+      new Intl.DateTimeFormat("pt-BR", {
+        dateStyle: "short",
+        timeStyle: "short",
+      }).format(new Date(value));
+
+    const planLabel: Record<"relampago" | "basico" | "plus" | "premium", string> = {
+      relampago: "Relâmpago",
+      basico: "Básico",
+      plus: "Plus",
+      premium: "Premium",
+    };
+
+    return (
+      <div className="min-h-screen bg-[linear-gradient(180deg,#fff7ed_0%,#ffffff_18%,#f8fafc_100%)]">
+        <Header />
+        <main className="container py-8 sm:py-10">
+          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-orange-600">
+                Histórico de boosters
+              </p>
+              <h1 className="mt-1 text-2xl font-bold text-slate-900">Pedidos realizados</h1>
+              <p className="text-sm text-slate-600">
+                Acompanhe todos os boosters criados para seus anúncios.
+              </p>
+            </div>
+            <Link href="/booster">
+              <Button className="rounded-xl bg-brand-gradient px-5 text-white shadow-lg shadow-orange-200/60">
+                Ativar novo booster
+              </Button>
+            </Link>
+          </div>
+
+          <section className="rounded-3xl border border-slate-200 bg-white/90 p-4 shadow-sm backdrop-blur sm:p-6">
+            {boosterOrdersLoading ? (
+              <div className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-4 text-slate-600">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
+                Carregando seu histórico...
+              </div>
+            ) : (boosterOrders?.length ?? 0) === 0 ? (
+              <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 px-6 py-10 text-center text-slate-600">
+                <Sparkles className="h-8 w-8 text-orange-500" />
+                <p className="text-base font-semibold text-slate-800">
+                  Você ainda não ativou nenhum booster
+                </p>
+                <p className="text-sm text-slate-500">
+                  Assim que criar um booster, ele aparecerá aqui com o status e detalhes.
+                </p>
+                <Link href="/booster">
+                  <Button variant="outline" className="rounded-xl border-orange-200 text-orange-600 hover:bg-orange-50">
+                    Começar agora
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {boosterOrders?.map((order) => {
+                  const statusConfig =
+                    BOOSTER_STATUS_STYLES[order.status as keyof typeof BOOSTER_STATUS_STYLES] ??
+                    BOOSTER_STATUS_STYLES.pending;
+                  const title = order.listingTitle ?? "Anúncio removido";
+
+                  return (
+                    <div
+                      key={order.id}
+                      className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-[1px] hover:shadow-md sm:p-5"
+                    >
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-slate-500">
+                            <Zap className="h-3 w-3 text-orange-500" />
+                            Booster #{order.id} · {formatDate(order.createdAt)}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
+                            {order.listingId ? (
+                              <Link
+                                href={`/anuncio/${order.listingId}`}
+                                className="text-xs font-semibold text-blue-600 hover:text-blue-500"
+                              >
+                                ver anúncio
+                              </Link>
+                            ) : null}
+                          </div>
+                          <p className="text-sm text-slate-600">
+                            Plano {planLabel[order.plan as keyof typeof planLabel]} ·{" "}
+                            {order.durationDays} dias
+                          </p>
+                        </div>
+
+                        <div className="flex flex-col items-start gap-2 sm:items-end">
+                          <span
+                            className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${statusConfig.badge}`}
+                          >
+                            {statusConfig.label}
+                          </span>
+                          <div className="text-right">
+                            <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Valor</p>
+                            <p className="text-lg font-bold text-slate-900">
+                              {formatCurrency(order.price)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </section>
         </main>
         <Footer />
@@ -299,7 +450,7 @@ export default function AdvertiserDashboard() {
                 Meus dados
               </Button>
 
-              <Link href="/planos" className="block w-full sm:w-auto">
+              <Link href={planCheckout("profissional")} className="block w-full sm:w-auto">
                 <Button
                   variant="outline"
                   className="w-full rounded-2xl border-white/30 bg-white/10 px-6 py-6 font-semibold text-white hover:bg-white/15 sm:w-auto"
@@ -352,21 +503,18 @@ export default function AdvertiserDashboard() {
               </div>
             </div>
 
-            <Button
-              size="sm"
-              className="w-full rounded-xl bg-blue-600 text-white hover:bg-blue-700 md:w-auto"
-              onClick={() =>
-                boostMutation.mutate({
-                  listingId: boostSuggestionListing.id,
-                  type: "featured",
-                  durationDays: 1,
-                })
-              }
-              disabled={boostMutation.isPending}
+            <Link
+              href={boosterCheckout(planFromDuration(7), boostSuggestionListing.id)}
+              className="block w-full md:w-auto"
             >
-              <Zap className="mr-2 h-4 w-4" />
-              Impulsionar agora
-            </Button>
+              <Button
+                size="sm"
+                className="w-full rounded-xl bg-blue-600 text-white hover:bg-blue-700 md:w-auto"
+              >
+                <Zap className="mr-2 h-4 w-4" />
+                Impulsionar agora
+              </Button>
+            </Link>
           </section>
         )}
 
@@ -606,21 +754,18 @@ export default function AdvertiserDashboard() {
                         </Link>
 
                         {!listing.isBoosted && (
-                          <Button
-                            size="sm"
-                            className="w-full rounded-xl bg-amber-400 text-slate-900 hover:bg-amber-300 sm:w-auto"
-                            onClick={() =>
-                              boostMutation.mutate({
-                                listingId: listing.id,
-                                type: "featured",
-                                durationDays: 7,
-                              })
-                            }
-                            disabled={boostMutation.isPending}
+                          <Link
+                            href={boosterCheckout(planFromDuration(7), listing.id)}
+                            className="block w-full sm:w-auto"
                           >
-                            <Zap className="mr-1 h-3.5 w-3.5" />
-                            Booster
-                          </Button>
+                            <Button
+                              size="sm"
+                              className="w-full rounded-xl bg-amber-400 text-slate-900 hover:bg-amber-300 sm:w-auto"
+                            >
+                              <Zap className="mr-1 h-3.5 w-3.5" />
+                              Booster
+                            </Button>
+                          </Link>
                         )}
 
                         <Button
@@ -722,21 +867,21 @@ export default function AdvertiserDashboard() {
 
                       <div className="mt-3">
                         {insight.durationDays && insight.listingId ? (
-                          <Button
-                            size="sm"
-                            className={`rounded-xl ${buttonClasses}`}
-                            onClick={() =>
-                              boostMutation.mutate({
-                                listingId: insight.listingId!,
-                                type: "featured",
-                                durationDays: insight.durationDays,
-                              })
-                            }
-                            disabled={boostMutation.isPending}
+                          <Link
+                            href={boosterCheckout(
+                              planFromDuration(insight.durationDays),
+                              insight.listingId
+                            )}
+                            className="block w-full sm:w-auto"
                           >
-                            <Zap className="mr-2 h-4 w-4" />
-                            {insight.actionLabel}
-                          </Button>
+                            <Button
+                              size="sm"
+                              className={`w-full rounded-xl sm:w-auto ${buttonClasses}`}
+                            >
+                              <Zap className="mr-2 h-4 w-4" />
+                              {insight.actionLabel}
+                            </Button>
+                          </Link>
                         ) : insight.listingId ? (
                           <Link
                             href={`/anunciante/editar/${insight.listingId}`}
@@ -838,7 +983,7 @@ export default function AdvertiserDashboard() {
                 </div>
               </div>
 
-              <Link href="/planos" className="block w-full sm:w-auto">
+              <Link href={planCheckout("profissional")} className="block w-full sm:w-auto">
                 <Button className="mt-5 w-full rounded-2xl bg-white text-blue-900 hover:bg-blue-50 sm:w-auto">
                   Ver planos <ChevronRight className="ml-1 h-4 w-4" />
                 </Button>

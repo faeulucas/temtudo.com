@@ -2,6 +2,13 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Ambulance,
   ArrowRight,
   Briefcase,
@@ -17,19 +24,20 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
+import { useCurrentCity } from "@/contexts/CurrentCityContext";
 
 const GUIDE_SECTIONS = [
   {
     title: "Saúde",
     description: "Hospitais, clínicas, farmácias e atendimentos úteis.",
-    href: "/busca?q=saude",
+    href: "/saude",
     icon: Stethoscope,
     tone: "bg-emerald-50 text-emerald-700",
   },
   {
     title: "Educação",
     description: "Escolas, cursos, reforço e oportunidades de aprendizagem.",
-    href: "/busca?q=educacao",
+    href: "/educacao",
     icon: Briefcase,
     tone: "bg-orange-50 text-orange-700",
   },
@@ -57,7 +65,7 @@ const GUIDE_SECTIONS = [
   {
     title: "Serviços Gerais",
     description: "Prestadores e negócios locais para o dia a dia.",
-    href: "/busca?q=servicos",
+    href: "/servicos",
     icon: HeartHandshake,
     tone: "bg-violet-50 text-violet-700",
   },
@@ -65,6 +73,8 @@ const GUIDE_SECTIONS = [
 
 export default function GuidePage() {
   const { data: cities } = trpc.public.cities.useQuery();
+  const { city, cityId, setCityId } = useCurrentCity();
+  const currentCityName = city?.name ?? "sua cidade";
 
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,#fff7ed_0%,#ffffff_18%,#f8fafc_100%)]">
@@ -90,7 +100,7 @@ export default function GuidePage() {
               </p>
 
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <Link href="/busca?q=servicos">
+                <Link href="/servicos">
                   <Button className="h-12 rounded-2xl bg-white px-6 text-slate-900 hover:bg-slate-100">
                     <Phone className="mr-2 h-4 w-4" />
                     Explorar serviços
@@ -102,6 +112,30 @@ export default function GuidePage() {
                     Voltar para Home
                   </Button>
                 </Link>
+              </div>
+
+              <div className="mt-4 flex flex-wrap items-center gap-3 text-sm font-semibold text-white">
+                <div className="inline-flex items-center gap-2 rounded-full bg-white/12 px-3 py-2">
+                  <MapPin className="h-4 w-4" />
+                  {currentCityName}
+                </div>
+
+                <Select
+                  value={cityId ? String(cityId) : "all"}
+                  onValueChange={(value) => setCityId(value === "all" ? null : Number(value))}
+                >
+                  <SelectTrigger className="w-[190px] rounded-2xl border-0 bg-white/10 text-white ring-0 focus:ring-2 focus:ring-sky-200">
+                    <SelectValue placeholder="Trocar cidade" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas as cidades</SelectItem>
+                    {(cities ?? []).map((item) => (
+                      <SelectItem key={item.id} value={String(item.id)}>
+                        {item.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
@@ -264,7 +298,7 @@ export default function GuidePage() {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2 lg:min-w-[340px]">
-              <Link href="/busca?q=servicos">
+              <Link href="/servicos">
                 <Button className="h-12 w-full rounded-2xl bg-white text-slate-900 hover:bg-slate-100">
                   <Phone className="mr-2 h-4 w-4" />
                   Buscar serviços
@@ -281,6 +315,30 @@ export default function GuidePage() {
                 </Button>
               </Link>
             </div>
+
+            <div className="mt-4 flex flex-wrap items-center gap-3 text-sm font-semibold text-white">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/12 px-3 py-2">
+                <MapPin className="h-4 w-4" />
+                {currentCityName}
+              </div>
+
+                <Select
+                  value={cityId ? String(cityId) : "all"}
+                  onValueChange={(value) => setCityId(value === "all" ? null : Number(value))}
+                >
+                  <SelectTrigger className="w-[190px] rounded-2xl border-0 bg-white/10 text-white ring-0 focus:ring-2 focus:ring-sky-200">
+                    <SelectValue placeholder="Trocar cidade" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas as cidades</SelectItem>
+                    {(cities ?? []).map((item) => (
+                      <SelectItem key={item.id} value={String(item.id)}>
+                        {item.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
           </div>
         </section>
       </main>
@@ -289,3 +347,6 @@ export default function GuidePage() {
     </div>
   );
 }
+
+
+

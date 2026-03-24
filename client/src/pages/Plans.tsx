@@ -2,10 +2,10 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { CheckCircle, Zap, Star, Crown, ShieldCheck, Sparkles } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { LOGIN_ROUTE } from "@/const";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import { getCheckoutUrl } from "@/lib/checkout";
 
 type BillingCycle = "monthly" | "yearly";
 
@@ -138,24 +138,28 @@ const PLANS: PlanDefinition[] = [
 
 const BOOSTERS = [
   {
+    slug: "relampago",
     name: "Booster Relâmpago",
     price: 9.9,
     days: 1,
     desc: "Impulsiona seu anúncio por 24 horas",
   },
   {
+    slug: "basico",
     name: "Destaque Básico",
     price: 12.9,
     days: 7,
     desc: "Aparece no topo da categoria por 7 dias",
   },
   {
+    slug: "plus",
     name: "Destaque Plus",
     price: 24.9,
     days: 15,
     desc: "Destaque na home + topo da categoria por 15 dias",
   },
   {
+    slug: "premium",
     name: "Destaque Premium",
     price: 49.9,
     days: 30,
@@ -170,6 +174,11 @@ function formatPrice(value: number) {
 export default function PlansPage() {
   const { isAuthenticated } = useAuth();
   const [billingCycle, setBillingCycle] = useState<BillingCycle>("yearly");
+
+  const planCheckout = (planId: string) =>
+    getCheckoutUrl({ type: "plan", plan: planId, isAuthenticated });
+  const boosterCheckout = (slug: string) =>
+    getCheckoutUrl({ type: "booster", plan: slug, isAuthenticated });
 
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,#fff7ed_0%,#ffffff_18%,#f8fafc_100%)]">
@@ -380,7 +389,7 @@ export default function PlansPage() {
                   ))}
                 </ul>
 
-                <Link href={isAuthenticated ? "/anunciante" : LOGIN_ROUTE}>
+                <Link href={planCheckout(plan.id)}>
                   <Button
                     className={`w-full rounded-xl py-5 text-base font-bold ${plan.btnClass}`}
                   >
@@ -435,7 +444,7 @@ export default function PlansPage() {
                   </span>
                 </div>
 
-                <Link href={isAuthenticated ? "/anunciante" : LOGIN_ROUTE}>
+                <Link href={boosterCheckout(booster.slug)}>
                   <Button className="w-full rounded-xl bg-orange-gradient font-bold text-white hover:opacity-90">
                     Ativar booster
                   </Button>
@@ -466,13 +475,13 @@ export default function PlansPage() {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <Link href={isAuthenticated ? "/anunciante" : LOGIN_ROUTE}>
+              <Link href={planCheckout("profissional")}>
                 <Button className="h-12 w-full rounded-2xl bg-white text-slate-900 hover:bg-slate-100">
                   Começar agora
                 </Button>
               </Link>
 
-              <Link href="/booster">
+              <Link href={boosterCheckout("relampago")}>
                 <Button className="h-12 w-full rounded-2xl bg-orange-500 text-white hover:bg-orange-600">
                   Ver boosters
                 </Button>

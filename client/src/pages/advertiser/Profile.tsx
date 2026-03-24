@@ -76,6 +76,9 @@ export default function AdvertiserProfile() {
   const [cpfCnpj, setCpfCnpj] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [cityId, setCityId] = useState<string>("none");
+  const [serviceMode, setServiceMode] = useState<"single" | "multi">("single");
+  const [servedCities, setServedCities] = useState<number[]>([]);
+  const [deliveryCities, setDeliveryCities] = useState<number[]>([]);
   const [neighborhood, setNeighborhood] = useState("");
   const [bio, setBio] = useState("");
   const [openingHours, setOpeningHours] = useState<OpeningHoursMap>(DEFAULT_OPENING_HOURS);
@@ -85,6 +88,14 @@ export default function AdvertiserProfile() {
   const utils = trpc.useUtils();
   const { data: cities } = trpc.public.cities.useQuery();
 
+  const toggleCity = (
+    list: number[],
+    setter: React.Dispatch<React.SetStateAction<number[]>>,
+    id: number
+  ) => {
+    setter(prev => (prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]));
+  };
+
   useEffect(() => {
     if (!user) return;
     setProfileName(user.name ?? "");
@@ -93,6 +104,27 @@ export default function AdvertiserProfile() {
     setCpfCnpj(user.cpfCnpj ?? "");
     setWhatsapp(user.whatsapp ?? "");
     setCityId(user.cityId ? String(user.cityId) : "none");
+    setServiceMode((user as any).serviceMode ?? "single");
+    setServedCities(
+      (() => {
+        try {
+          const parsed = JSON.parse((user as any).servedCityIdsJson ?? "[]");
+          return Array.isArray(parsed) ? parsed.map(Number).filter(Boolean) : [];
+        } catch {
+          return [];
+        }
+      })()
+    );
+    setDeliveryCities(
+      (() => {
+        try {
+          const parsed = JSON.parse((user as any).deliveryCityIdsJson ?? "[]");
+          return Array.isArray(parsed) ? parsed.map(Number).filter(Boolean) : [];
+        } catch {
+          return [];
+        }
+      })()
+    );
     setNeighborhood(user.neighborhood ?? "");
     setBio(user.bio ?? "");
     setOpeningHours(parseOpeningHours((user as { openingHoursJson?: string | null }).openingHoursJson));
@@ -293,6 +325,9 @@ export default function AdvertiserProfile() {
                 bio: bio || undefined,
                 openingHoursJson: JSON.stringify(openingHours),
                 cityId: cityId !== "none" ? Number(cityId) : undefined,
+                serviceMode,
+                servedCityIds: serviceMode === "multi" ? servedCities : [],
+                deliveryCityIds: serviceMode === "multi" ? deliveryCities : [],
                 neighborhood: neighborhood || undefined,
               });
             }}
@@ -383,6 +418,72 @@ export default function AdvertiserProfile() {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="md:col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <p className="mb-3 text-sm font-semibold text-slate-800">Alcance por cidade</p>
+                <div className="flex flex-col gap-3">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <label className="text-sm font-medium text-slate-700">Modo de atendimento</label>
+                    <Select value={serviceMode} onValueChange={value => setServiceMode(value as "single" | "multi")}>
+                      <SelectTrigger className="w-[200px] rounded-xl">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="single">Apenas cidade principal</SelectItem>
+                        <SelectItem value="multi">Atende várias cidades</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {serviceMode === "multi" && (
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                          Cidades atendidas
+                        </p>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {(cities ?? []).map(city => (
+                            <label
+                              key={`served-${city.id}`}
+                              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700"
+                            >
+                              <input
+                                type="checkbox"
+                                className="h-4 w-4 rounded border-slate-300 text-orange-500"
+                                checked={servedCities.includes(city.id)}
+                                onChange={() => toggleCity(servedCities, setServedCities, city.id)}
+                              />
+                              {city.name}
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                          Cidades com entrega
+                        </p>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {(cities ?? []).map(city => (
+                            <label
+                              key={`delivery-${city.id}`}
+                              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700"
+                            >
+                              <input
+                                type="checkbox"
+                                className="h-4 w-4 rounded border-slate-300 text-orange-500"
+                                checked={deliveryCities.includes(city.id)}
+                                onChange={() => toggleCity(deliveryCities, setDeliveryCities, city.id)}
+                              />
+                              {city.name}
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 

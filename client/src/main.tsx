@@ -69,8 +69,10 @@ const trpcClient = trpc.createClient({
         // Debug: loga URL efetiva da requisição
         if (typeof input === "string") {
           console.log("[tRPC fetch] input:", input);
-        } else {
+        } else if (input instanceof Request) {
           console.log("[tRPC fetch] input (Request.url):", input.url);
+        } else {
+          console.log("[tRPC fetch] input (URL):", input.toString());
         }
         const response = await globalThis.fetch(input, {
           ...(init ?? {}),

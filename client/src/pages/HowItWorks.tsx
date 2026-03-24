@@ -13,6 +13,8 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Link } from "wouter";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { getCheckoutUrl } from "@/lib/checkout";
 
 const STEPS = [
   {
@@ -42,6 +44,8 @@ const STEPS = [
 ];
 
 export default function HowItWorksPage() {
+  const { isAuthenticated } = useAuth();
+
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,#fff7ed_0%,#ffffff_18%,#f8fafc_100%)]">
       <Header />
@@ -71,7 +75,13 @@ export default function HowItWorksPage() {
                 </Button>
               </Link>
 
-              <Link href="/planos">
+              <Link
+                href={getCheckoutUrl({
+                  type: "plan",
+                  plan: "profissional",
+                  isAuthenticated,
+                })}
+              >
                 <Button className="h-12 rounded-2xl bg-white/10 px-6 text-white hover:bg-white/15">
                   Ver planos
                 </Button>
@@ -231,7 +241,13 @@ export default function HowItWorksPage() {
                 </Button>
               </Link>
 
-              <Link href="/planos">
+              <Link
+                href={getCheckoutUrl({
+                  type: "plan",
+                  plan: "profissional",
+                  isAuthenticated,
+                })}
+              >
                 <Button className="h-12 w-full rounded-2xl bg-orange-500 px-6 font-bold text-white hover:bg-orange-600">
                   <ArrowRight className="mr-2 h-4 w-4" />
                   Ver planos

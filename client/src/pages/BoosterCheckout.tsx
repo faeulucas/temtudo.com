@@ -123,7 +123,7 @@ function StatusScreen({
       icon: <CheckCircle2 className="h-12 w-12 text-emerald-500" />,
       actions: (
         <>
-          <Link href="/anunciante">
+          <Link href="/anunciante?tab=meus-anuncios">
             <Button className="w-full rounded-xl bg-brand-gradient text-white hover:opacity-90">Ver meus anúncios</Button>
           </Link>
           <Link href="/booster">
@@ -353,8 +353,8 @@ export default function BoosterCheckoutPage() {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!user) {
-      setErrorMessage("Faça login para finalizar o booster.");
-      setStatus("error");
+      // Redireciona para login mantendo o fluxo de checkout de booster
+      window.location.href = `/login?redirect=/checkout/booster?plan=${selectedPlan}${listingId ? `&listingId=${listingId}` : ""}`;
       return;
     }
 
@@ -434,7 +434,7 @@ export default function BoosterCheckoutPage() {
               Não conseguimos carregar o anúncio selecionado. Volte e escolha um anúncio ativo para aplicar o booster.
             </p>
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              <Link href="/anunciante">
+              <Link href="/anunciante?tab=meus-anuncios">
                 <Button className="w-full rounded-xl bg-brand-gradient text-white hover:opacity-90">Ir para meus anúncios</Button>
               </Link>
               <Link href="/booster">
@@ -780,3 +780,4 @@ export default function BoosterCheckoutPage() {
     </div>
   );
 }
+

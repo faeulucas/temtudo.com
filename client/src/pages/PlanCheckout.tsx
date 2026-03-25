@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Link, useLocation } from "wouter";
+import { Link } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
@@ -73,8 +73,10 @@ type CheckoutStatus = "idle" | "loading" | "success" | "error";
 
 export default function PlanCheckoutPage() {
   const { isAuthenticated, user } = useAuth();
-  const [location] = useLocation();
-  const params = useMemo(() => new URLSearchParams(location.split("?")[1] ?? ""), [location]);
+  const params = useMemo(() => {
+    if (typeof window === "undefined") return new URLSearchParams();
+    return new URLSearchParams(window.location.search);
+  }, []);
 
   const urlPlan = params.get("plan");
   const selectedPlan: PlanSlug =

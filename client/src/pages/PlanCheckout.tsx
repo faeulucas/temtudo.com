@@ -10,36 +10,62 @@ import { trpc } from "@/lib/trpc";
 import { CheckCircle2, CreditCard, ShieldCheck, Sparkles, Star, Zap } from "lucide-react";
 
 type PlanSlug = "profissional" | "premium";
+type BillingCycle = "monthly" | "yearly";
 
 const PLAN_MAP: Record<
   PlanSlug,
-  { name: string; priceAnnual: number; benefits: string[]; accent: string; badge?: string }
+  {
+    name: string;
+    benefits: string[];
+    accent: string;
+    badge?: string;
+    pricing: Record<
+      BillingCycle,
+      { amount: number; periodLabel: string; note?: string; savings?: string; badge?: string }
+    >;
+  }
 > = {
   profissional: {
     name: "Plano Profissional",
-    priceAnnual: 99.9,
     accent: "from-blue-600 to-cyan-500",
     benefits: [
-      "15 anúncios ativos",
-      "8 fotos por anúncio",
+      "15 an\u00fAncios ativos",
+      "8 fotos por an\u00fAncio",
       "12 boosters de 24h por ano",
       "Prioridade na busca",
-      "Suporte prioritário",
+      "Suporte priorit\u00e1rio",
     ],
-    badge: "Mais acessível",
+    badge: "Mais acess\u00edvel",
+    pricing: {
+      monthly: { amount: 9.9, periodLabel: "/m\u00eas" },
+      yearly: {
+        amount: 99.9,
+        periodLabel: "/ano",
+        note: "equivale a R$ 8,33/m\u00eas",
+        savings: "economize R$ 18,90",
+      },
+    },
   },
   premium: {
     name: "Plano Premium",
-    priceAnnual: 129.9,
     accent: "from-amber-500 to-orange-500",
     benefits: [
-      "Anúncios ilimitados",
-      "20 fotos por anúncio",
+      "An\u00fAncios ilimitados",
+      "20 fotos por an\u00fAncio",
       "24 boosters de 24h por ano",
       "Destaque garantido na home",
       "Suporte VIP",
     ],
     badge: "Mais vantagem",
+    pricing: {
+      monthly: { amount: 14.9, periodLabel: "/m\u00eas" },
+      yearly: {
+        amount: 129.9,
+        periodLabel: "/ano",
+        note: "equivale a R$ 10,83/m\u00eas",
+        savings: "economize R$ 48,90",
+      },
+    },
   },
 };
 
@@ -49,9 +75,17 @@ export default function PlanCheckoutPage() {
   const { isAuthenticated, user } = useAuth();
   const [location] = useLocation();
   const params = useMemo(() => new URLSearchParams(location.split("?")[1] ?? ""), [location]);
+
   const planParam = (params.get("plan") as PlanSlug | null) ?? "profissional";
   const selectedPlan: PlanSlug = PLAN_MAP[planParam] ? planParam : "profissional";
+
+  const cycleParamRaw = (params.get("cycle") ?? "yearly").toLowerCase();
+  const normalizedCycle = cycleParamRaw === "annual" ? "yearly" : cycleParamRaw;
+  const selectedCycle: BillingCycle = normalizedCycle === "monthly" ? "monthly" : "yearly";
+  const cycleQuery = selectedCycle === "yearly" ? "annual" : "monthly";
+
   const plan = PLAN_MAP[selectedPlan];
+  const pricing = plan.pricing[selectedCycle];
 
   const [status, setStatus] = useState<CheckoutStatus>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -73,7 +107,7 @@ export default function PlanCheckoutPage() {
 
   const handleSubmit = () => {
     if (!isAuthenticated) {
-      window.location.href = `/login?redirect=/checkout/plan?plan=${selectedPlan}`;
+      window.location.href = `/login?redirect=/checkout/plan?plan=${selectedPlan}&cycle=${cycleQuery}`;
       return;
     }
     setStatus("loading");
@@ -94,7 +128,7 @@ export default function PlanCheckoutPage() {
           <CardContent className="space-y-2 text-sm text-green-800">
             <p>Seu pedido foi criado com status pending.</p>
             {orderId ? <p>ID do pedido: #{orderId}</p> : null}
-            <p>Assim que o pagamento for confirmado, seu plano será ativado.</p>
+            <p>Assim que o pagamento for confirmado, seu plano ser\u00e1 ativado.</p>
             <div className="pt-2">
               <Link href="/anunciante?tab=meus-dados">
                 <Button className="rounded-xl bg-green-600 text-white hover:bg-green-700">
@@ -111,7 +145,7 @@ export default function PlanCheckoutPage() {
       return (
         <Card className="rounded-3xl border-red-200 bg-red-50/60">
           <CardHeader>
-            <CardTitle className="text-red-800">Não foi possível criar o pedido</CardTitle>
+            <CardTitle className="text-red-800">N\u00e3o foi poss\u00edvel criar o pedido</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-red-700">
             <p>{errorMessage ?? "Tente novamente em instantes."}</p>
@@ -145,25 +179,34 @@ export default function PlanCheckoutPage() {
               </div>
               <CardTitle className="text-2xl font-black text-slate-900">{plan.name}</CardTitle>
               <p className="text-sm text-slate-600">
-                Assinatura anual com benefícios exclusivos e boosters incluídos.
+                {selectedCycle === "yearly"
+                  ? "Assinatura anual com benef\u00edcios exclusivos e boosters inclu\u00eddos."
+                  : "Assinatura mensal para entrar com baixo custo e flexibilidade."}
               </p>
             </CardHeader>
 
             <CardContent className="space-y-6 pt-4">
-              <div className="flex items-baseline gap-2">
+              <div className="flex flex-wrap items-baseline gap-2">
                 <span className="text-4xl font-black text-slate-900">
-                  {formatBRL(plan.priceAnnual)}
+                  {formatBRL(pricing.amount)}
                 </span>
-                <span className="text-sm text-slate-500">/ano</span>
+                <span className="text-sm text-slate-500">{pricing.periodLabel}</span>
                 {plan.badge && (
                   <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
                     {plan.badge}
                   </span>
                 )}
+                {pricing.savings && (
+                  <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                    {pricing.savings}
+                  </span>
+                )}
               </div>
 
+              {pricing.note && <p className="text-sm text-slate-600">{pricing.note}</p>}
+
               <div>
-                <p className="text-sm font-semibold text-slate-700">Benefícios inclusos</p>
+                <p className="text-sm font-semibold text-slate-700">Benef\u00edcios inclusos</p>
                 <ul className="mt-3 grid gap-2 sm:grid-cols-2">
                   {plan.benefits.map(item => (
                     <li
@@ -182,7 +225,7 @@ export default function PlanCheckoutPage() {
               <div className="space-y-3">
                 <p className="text-sm font-semibold text-slate-700">Dados do assinante</p>
                 <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
-                  <p>{user?.name ?? "Usuário autenticado"}</p>
+                  <p>{user?.name ?? "Usu\u00e1rio autenticado"}</p>
                   <p className="text-slate-500">{user?.email ?? "sem email"}</p>
                 </div>
               </div>
@@ -190,7 +233,7 @@ export default function PlanCheckoutPage() {
               <div className="space-y-2">
                 <p className="text-sm font-semibold text-slate-700">Forma de pagamento</p>
                 <div className="flex flex-wrap gap-3">
-                  {["Pix", "Cartão (em breve)", "Boleto (em breve)"].map(method => (
+                  {["Pix", "Cart\u00e3o (em breve)", "Boleto (em breve)"].map(method => (
                     <div
                       key={method}
                       className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700"
@@ -220,20 +263,20 @@ export default function PlanCheckoutPage() {
             <CardHeader className="space-y-2 border-b border-slate-100 pb-4">
               <CardTitle className="flex items-center gap-2 text-slate-900">
                 <ShieldCheck className="h-5 w-5 text-emerald-600" />
-                Segurança e suporte
+                Seguran\u00e7a e suporte
               </CardTitle>
               <p className="text-sm text-slate-600">
                 Assinatura gerenciada dentro do Norte Vivo. Pagamento confirmado manualmente
-                enquanto o gateway não é integrado.
+                enquanto o gateway n\u00e3o \u00e9 integrado.
               </p>
             </CardHeader>
             <CardContent className="space-y-3 pt-4 text-sm text-slate-700">
               <p className="rounded-2xl bg-slate-50 px-4 py-3">
-                Assim que o pagamento for validado, seu plano será ativado e você receberá a
-                confirmação no painel.
+                Assim que o pagamento for validado, seu plano ser\u00e1 ativado e voc\u00ea receber\u00e1 a
+                confirma\u00e7\u00e3o no painel.
               </p>
               <p className="rounded-2xl bg-slate-50 px-4 py-3">
-                Dúvidas? Fale com o suporte e informe o ID do pedido para agilizar.
+                D\u00favidas? Fale com o suporte e informe o ID do pedido para agilizar.
               </p>
             </CardContent>
           </Card>

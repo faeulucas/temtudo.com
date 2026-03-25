@@ -175,8 +175,10 @@ export default function PlansPage() {
   const { isAuthenticated } = useAuth();
   const [billingCycle, setBillingCycle] = useState<BillingCycle>("yearly");
 
-  const planCheckout = (planId: "profissional" | "premium") =>
-    getCheckoutUrl({ type: "plan", plan: planId, isAuthenticated });
+  const planCheckout = (planId: "profissional" | "premium") => {
+    const cycleParam = billingCycle === "yearly" ? "annual" : "monthly";
+    return getCheckoutUrl({ type: "plan", plan: planId, cycle: cycleParam, isAuthenticated });
+  };
   const boosterCheckout = (slug: string) =>
     getCheckoutUrl({ type: "booster", plan: slug, isAuthenticated });
 

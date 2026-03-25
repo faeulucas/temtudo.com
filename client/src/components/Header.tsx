@@ -3,6 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { LOGIN_ROUTE } from "@/const";
 import { trpc } from "@/lib/trpc";
+import { advertiserHref } from "@/lib/navigation";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -252,9 +253,9 @@ export default function Header({
       },
       !isDeleting
         ? animatedQuery.length === currentWord.length
-          ? 1200
-          : 90
-        : 45
+          ? 1500 // pausa um pouco maior quando completa a palavra
+          : 140 // digitação mais lenta
+        : 80 // deleção também um pouco mais lenta
     );
 
     return () => window.clearTimeout(timeout);
@@ -351,7 +352,7 @@ export default function Header({
           <div className="flex shrink-0 items-center gap-2">
             <button
               type="button"
-              onClick={() => navigate(isAuthenticated ? "/anunciante" : LOGIN_ROUTE)}
+              onClick={() => navigate(isAuthenticated ? "/anunciante?tab=meus-anuncios" : LOGIN_ROUTE)}
               className="relative flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700"
               aria-label="Abrir painel e notificações"
               title="Abrir painel e notificações"
@@ -390,7 +391,7 @@ export default function Header({
 
                   <DropdownMenuSeparator />
 
-                  <DropdownMenuItem onClick={() => navigate("/minha-conta")}>
+                  <DropdownMenuItem onClick={() => navigate("/anunciante?tab=meus-dados")}>
                     <LayoutDashboard className="mr-2 h-4 w-4" /> Minha conta
                   </DropdownMenuItem>
 
@@ -398,7 +399,7 @@ export default function Header({
                     <Heart className="mr-2 h-4 w-4" /> Favoritos
                   </DropdownMenuItem>
 
-                  <DropdownMenuItem onClick={() => navigate("/anunciante/meus-dados")}>
+                  <DropdownMenuItem onClick={() => navigate("/anunciante?tab=meus-dados")}>
                     <Settings className="mr-2 h-4 w-4" /> Configurações
                   </DropdownMenuItem>
 
@@ -424,7 +425,7 @@ export default function Header({
               </Link>
             )}
 
-            <Link href={isAuthenticated ? "/anunciante/novo" : LOGIN_ROUTE}>
+            <Link href={advertiserHref("/anunciante/novo", isAuthenticated)}>
               <Button className="rounded-2xl bg-orange-gradient px-4 font-bold text-white shadow-md hover:opacity-90">
                 <Plus className="mr-2 h-4 w-4" />
                 Anunciar agora
@@ -457,7 +458,7 @@ export default function Header({
 
                 <button
                   type="button"
-                  onClick={() => navigate(isAuthenticated ? "/anunciante" : LOGIN_ROUTE)}
+                  onClick={() => navigate(isAuthenticated ? "/anunciante?tab=meus-anuncios" : LOGIN_ROUTE)}
                   className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl text-slate-700"
                   aria-label="Abrir painel e notificações"
                   title="Abrir painel e notificações"
@@ -566,7 +567,7 @@ export default function Header({
 
                 <button
                   type="button"
-                  onClick={() => navigate(isAuthenticated ? "/anunciante" : LOGIN_ROUTE)}
+                  onClick={() => navigate(isAuthenticated ? "/anunciante?tab=meus-anuncios" : LOGIN_ROUTE)}
                   className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-slate-700"
                   aria-label="Abrir painel e notificações"
                   title="Abrir painel e notificações"
@@ -638,4 +639,6 @@ export default function Header({
     </header>
   );
 }
+
+
 

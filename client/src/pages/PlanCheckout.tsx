@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
@@ -29,19 +29,19 @@ const PLAN_MAP: Record<
     name: "Plano Profissional",
     accent: "from-blue-600 to-cyan-500",
     benefits: [
-      "15 an\u00fAncios ativos",
-      "8 fotos por an\u00fAncio",
+      "15 anúncios ativos",
+      "8 fotos por anúncio",
       "12 boosters de 24h por ano",
       "Prioridade na busca",
-      "Suporte priorit\u00e1rio",
+      "Suporte prioritário",
     ],
-    badge: "Mais acess\u00edvel",
+    badge: "Mais acessível",
     pricing: {
-      monthly: { amount: 9.9, periodLabel: "/m\u00eas" },
+      monthly: { amount: 9.9, periodLabel: "/mês" },
       yearly: {
         amount: 99.9,
         periodLabel: "/ano",
-        note: "equivale a R$ 8,33/m\u00eas",
+        note: "equivale a R$ 8,33/mês",
         savings: "economize R$ 18,90",
       },
     },
@@ -50,19 +50,19 @@ const PLAN_MAP: Record<
     name: "Plano Premium",
     accent: "from-amber-500 to-orange-500",
     benefits: [
-      "An\u00fAncios ilimitados",
-      "20 fotos por an\u00fAncio",
+      "Anúncios ilimitados",
+      "20 fotos por anúncio",
       "24 boosters de 24h por ano",
       "Destaque garantido na home",
       "Suporte VIP",
     ],
     badge: "Mais vantagem",
     pricing: {
-      monthly: { amount: 14.9, periodLabel: "/m\u00eas" },
+      monthly: { amount: 14.9, periodLabel: "/mês" },
       yearly: {
         amount: 129.9,
         periodLabel: "/ano",
-        note: "equivale a R$ 10,83/m\u00eas",
+        note: "equivale a R$ 10,83/mês",
         savings: "economize R$ 48,90",
       },
     },
@@ -73,10 +73,11 @@ type CheckoutStatus = "idle" | "loading" | "success" | "error";
 
 export default function PlanCheckoutPage() {
   const { isAuthenticated, user } = useAuth();
+  const [location] = useLocation();
   const params = useMemo(() => {
     if (typeof window === "undefined") return new URLSearchParams();
     return new URLSearchParams(window.location.search);
-  }, []);
+  }, [location]);
 
   const urlPlan = params.get("plan");
   const selectedPlan: PlanSlug =
@@ -131,7 +132,7 @@ export default function PlanCheckoutPage() {
           <CardContent className="space-y-2 text-sm text-green-800">
             <p>Seu pedido foi criado com status pending.</p>
             {orderId ? <p>ID do pedido: #{orderId}</p> : null}
-            <p>Assim que o pagamento for confirmado, seu plano ser\u00e1 ativado.</p>
+            <p>Assim que o pagamento for confirmado, seu plano será ativado.</p>
             <div className="pt-2">
               <Link href="/anunciante?tab=meus-dados">
                 <Button className="rounded-xl bg-green-600 text-white hover:bg-green-700">
@@ -148,7 +149,7 @@ export default function PlanCheckoutPage() {
       return (
         <Card className="rounded-3xl border-red-200 bg-red-50/60">
           <CardHeader>
-            <CardTitle className="text-red-800">N\u00e3o foi poss\u00edvel criar o pedido</CardTitle>
+            <CardTitle className="text-red-800">Não foi possível criar o pedido</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-red-700">
             <p>{errorMessage ?? "Tente novamente em instantes."}</p>
@@ -183,7 +184,7 @@ export default function PlanCheckoutPage() {
               <CardTitle className="text-2xl font-black text-slate-900">{plan.name}</CardTitle>
               <p className="text-sm text-slate-600">
                 {selectedCycle === "yearly"
-                  ? "Assinatura anual com benef\u00edcios exclusivos e boosters inclu\u00eddos."
+                  ? "Assinatura anual com benefícios exclusivos e boosters incluídos."
                   : "Assinatura mensal para entrar com baixo custo e flexibilidade."}
               </p>
             </CardHeader>
@@ -209,7 +210,7 @@ export default function PlanCheckoutPage() {
               {pricing.note && <p className="text-sm text-slate-600">{pricing.note}</p>}
 
               <div>
-                <p className="text-sm font-semibold text-slate-700">Benef\u00edcios inclusos</p>
+                <p className="text-sm font-semibold text-slate-700">Benefícios inclusos</p>
                 <ul className="mt-3 grid gap-2 sm:grid-cols-2">
                   {plan.benefits.map(item => (
                     <li
@@ -228,7 +229,7 @@ export default function PlanCheckoutPage() {
               <div className="space-y-3">
                 <p className="text-sm font-semibold text-slate-700">Dados do assinante</p>
                 <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
-                  <p>{user?.name ?? "Usu\u00e1rio autenticado"}</p>
+                  <p>{user?.name ?? "Usuário autenticado"}</p>
                   <p className="text-slate-500">{user?.email ?? "sem email"}</p>
                 </div>
               </div>
@@ -236,7 +237,7 @@ export default function PlanCheckoutPage() {
               <div className="space-y-2">
                 <p className="text-sm font-semibold text-slate-700">Forma de pagamento</p>
                 <div className="flex flex-wrap gap-3">
-                  {["Pix", "Cart\u00e3o (em breve)", "Boleto (em breve)"].map(method => (
+                  {["Pix", "Cartão (em breve)", "Boleto (em breve)"].map(method => (
                     <div
                       key={method}
                       className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700"
@@ -266,20 +267,20 @@ export default function PlanCheckoutPage() {
             <CardHeader className="space-y-2 border-b border-slate-100 pb-4">
               <CardTitle className="flex items-center gap-2 text-slate-900">
                 <ShieldCheck className="h-5 w-5 text-emerald-600" />
-                Seguran\u00e7a e suporte
+                Segurança e suporte
               </CardTitle>
               <p className="text-sm text-slate-600">
                 Assinatura gerenciada dentro do Norte Vivo. Pagamento confirmado manualmente
-                enquanto o gateway n\u00e3o \u00e9 integrado.
+                enquanto o gateway não é integrado.
               </p>
             </CardHeader>
             <CardContent className="space-y-3 pt-4 text-sm text-slate-700">
               <p className="rounded-2xl bg-slate-50 px-4 py-3">
-                Assim que o pagamento for validado, seu plano ser\u00e1 ativado e voc\u00ea receber\u00e1 a
-                confirma\u00e7\u00e3o no painel.
+                Assim que o pagamento for validado, seu plano será ativado e você receberá a
+                confirmação no painel.
               </p>
               <p className="rounded-2xl bg-slate-50 px-4 py-3">
-                D\u00favidas? Fale com o suporte e informe o ID do pedido para agilizar.
+                Dúvidas? Fale com o suporte e informe o ID do pedido para agilizar.
               </p>
             </CardContent>
           </Card>

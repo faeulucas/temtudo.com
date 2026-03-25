@@ -76,8 +76,9 @@ export default function PlanCheckoutPage() {
   const [location] = useLocation();
   const params = useMemo(() => new URLSearchParams(location.split("?")[1] ?? ""), [location]);
 
-  const planParam = (params.get("plan") as PlanSlug | null) ?? "profissional";
-  const selectedPlan: PlanSlug = PLAN_MAP[planParam] ? planParam : "profissional";
+  const urlPlan = params.get("plan");
+  const selectedPlan: PlanSlug =
+    urlPlan === "premium" || urlPlan === "profissional" ? urlPlan : "profissional";
 
   const cycleParamRaw = (params.get("cycle") ?? "yearly").toLowerCase();
   const normalizedCycle = cycleParamRaw === "annual" ? "yearly" : cycleParamRaw;

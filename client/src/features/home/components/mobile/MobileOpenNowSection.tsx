@@ -1,0 +1,51 @@
+import ListingCardCompact from "@/components/ListingCardCompact";
+import type { HomeHighlightListing } from "@/features/home/types";
+import { Link } from "wouter";
+
+type Props = {
+  openNearby: HomeHighlightListing[];
+  cityNameById: (cityId?: number | null) => string;
+};
+
+export function MobileOpenNowSection({ openNearby, cityNameById }: Props) {
+  return (
+    <div className="rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-semibold text-slate-900">Abertos agora</p>
+        <Link href="/busca" className="text-xs font-semibold text-orange-600">
+          ver todos
+        </Link>
+      </div>
+
+      <div className="mt-3 space-y-3">
+        {openNearby.length === 0 ? (
+          <p className="text-sm text-slate-500">
+            Nenhuma loja aberta no momento. Volte em instantes.
+          </p>
+        ) : (
+          openNearby.slice(0, 6).map((item) => {
+            const image =
+              item.images?.find((img) => img.isPrimary)?.url ||
+              item.images?.[0]?.url;
+
+            return (
+              <ListingCardCompact
+                key={`near-${item.id}`}
+                id={item.id}
+                title={item.title}
+                price={item.price}
+                priceType={item.priceType}
+                neighborhood={item.neighborhood ?? undefined}
+                cityName={cityNameById(item.cityId)}
+                images={image ? [{ url: image, isPrimary: true }] : []}
+                seller={item.seller}
+                type={item.type}
+                isBoosted
+              />
+            );
+          })
+        )}
+      </div>
+    </div>
+  );
+}

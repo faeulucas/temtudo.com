@@ -119,12 +119,12 @@ function StatusScreen({
   const variants = {
     success: {
       title: "Pagamento confirmado",
-      desc: "Seu booster serÃ¡ ativado automaticamente em poucos segundos.",
+      desc: "Seu booster será ativado automaticamente em poucos segundos.",
       icon: <CheckCircle2 className="h-12 w-12 text-emerald-500" />,
       actions: (
         <>
           <Link href="/anunciante?tab=meus-anuncios">
-            <Button className="w-full rounded-xl bg-brand-gradient text-white hover:opacity-90">Ver meus anÃºncios</Button>
+            <Button className="w-full rounded-xl bg-brand-gradient text-white hover:opacity-90">Ver meus anúncios</Button>
           </Link>
           <Link href="/booster">
             <Button variant="outline" className="w-full rounded-xl">
@@ -135,8 +135,8 @@ function StatusScreen({
       ),
     },
     error: {
-      title: "NÃ£o foi possÃ­vel concluir",
-      desc: "Revise os dados ou tente outro mÃ©todo de pagamento. Nenhuma cobranÃ§a foi feita.",
+      title: "Não foi possível concluir",
+      desc: "Revise os dados ou tente outro método de pagamento. Nenhuma cobrança foi feita.",
       icon: <AlertTriangle className="h-12 w-12 text-red-500" />,
       actions: (
         <>
@@ -153,7 +153,7 @@ function StatusScreen({
     },
     loading: {
       title: "Processando pagamento",
-      desc: "Estamos confirmando sua transaÃ§Ã£o com o emissor. Isso costuma levar menos de 30 segundos.",
+      desc: "Estamos confirmando sua transação com o emissor. Isso costuma levar menos de 30 segundos.",
       icon: <Spinner className="h-12 w-12 text-orange-500" />,
       actions: (
         <Button variant="outline" className="w-full rounded-xl" onClick={onBack}>
@@ -194,7 +194,7 @@ function StatusScreen({
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-4 text-left">
-              <p className="text-sm font-semibold text-slate-600">AnÃºncio</p>
+              <p className="text-sm font-semibold text-slate-600">Anúncio</p>
               <div className="mt-3 flex items-start gap-3">
                 <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl bg-slate-100">
                   {listing.image ? (
@@ -261,7 +261,7 @@ export default function BoosterCheckoutPage() {
 
   const listingFromQuery = useMemo<SelectedListing>(() => {
     return {
-      title: searchParams.get("listingTitle") ?? "Seu anÃºncio selecionado",
+      title: searchParams.get("listingTitle") ?? "Seu anúncio selecionado",
       category: searchParams.get("listingCategory") ?? undefined,
       city: searchParams.get("listingCity") ?? undefined,
       image: searchParams.get("listingImage") ?? null,
@@ -345,7 +345,7 @@ export default function BoosterCheckoutPage() {
       setStatus("success");
     },
     onError: (err) => {
-      setErrorMessage(err.message || "NÃ£o foi possÃ­vel criar o pedido.");
+      setErrorMessage(err.message || "Não foi possível criar o pedido.");
       setStatus("error");
     },
   });
@@ -359,7 +359,7 @@ export default function BoosterCheckoutPage() {
     }
 
     if (!listingId) {
-      setErrorMessage("Escolha um anÃºncio para aplicar o booster.");
+      setErrorMessage("Escolha um anúncio para aplicar o booster.");
       setStatus("error");
       return;
     }
@@ -429,13 +429,13 @@ export default function BoosterCheckoutPage() {
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-50">
               <AlertTriangle className="h-7 w-7 text-amber-600" />
             </div>
-            <h1 className="mt-4 font-display text-2xl font-black text-slate-900">AnÃºncio nÃ£o encontrado</h1>
+            <h1 className="mt-4 font-display text-2xl font-black text-slate-900">Anúncio não encontrado</h1>
             <p className="mt-2 text-slate-600">
-              NÃ£o conseguimos carregar o anÃºncio selecionado. Volte e escolha um anÃºncio ativo para aplicar o booster.
+              Não conseguimos carregar o anúncio selecionado. Volte e escolha um anúncio ativo para aplicar o booster.
             </p>
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               <Link href="/anunciante?tab=meus-anuncios">
-                <Button className="w-full rounded-xl bg-brand-gradient text-white hover:opacity-90">Ir para meus anÃºncios</Button>
+                <Button className="w-full rounded-xl bg-brand-gradient text-white hover:opacity-90">Ir para meus anúncios</Button>
               </Link>
               <Link href="/booster">
                 <Button variant="outline" className="w-full rounded-xl">
@@ -472,7 +472,7 @@ export default function BoosterCheckoutPage() {
 
         <div className="mb-8 max-w-3xl space-y-2">
           <h1 className="font-display text-3xl font-black text-slate-900">Ative seu booster</h1>
-          <p className="text-slate-600">Escolha a forma de pagamento e impulsione seu anÃºncio.</p>
+          <p className="text-slate-600">Escolha a forma de pagamento e impulsione seu anúncio.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-[1.7fr_1fr]">
@@ -487,7 +487,7 @@ export default function BoosterCheckoutPage() {
                 <div className="text-right">
                   <p className="text-xs font-semibold text-slate-500">Investimento</p>
                   <p className="text-2xl font-black text-slate-900">{formatBRL(plan.price)}</p>
-                  <p className="text-xs text-slate-500">VigÃªncia: {plan.duration}</p>
+                  <p className="text-xs text-slate-500">Vigência: {plan.duration}</p>
                 </div>
               </div>
 
@@ -519,16 +519,16 @@ export default function BoosterCheckoutPage() {
             <div className="rounded-[20px] border border-slate-200 bg-white p-5 shadow-sm">
               <div className="flex items-center justify-between gap-2">
                 <div>
-                  <p className="text-sm font-semibold text-slate-500">AnÃºncio selecionado</p>
+                  <p className="text-sm font-semibold text-slate-500">Anúncio selecionado</p>
                   <p className="font-display text-xl font-black text-slate-900">{(finalListing ?? listingFromQuery)?.title}</p>
                 </div>
                 <Button type="button" variant="outline" size="sm" className="rounded-lg border-slate-200">
-                  Trocar anÃºncio
+                  Trocar anúncio
                 </Button>
               </div>
               {!listingId && (
                 <p className="mt-2 text-sm font-semibold text-amber-700">
-                  Escolha um anÃºncio na lista para finalizar o booster.
+                  Escolha um anúncio na lista para finalizar o booster.
                 </p>
               )}
 
@@ -559,7 +559,7 @@ export default function BoosterCheckoutPage() {
                       </span>
                     )}
                   </div>
-                  <p className="text-slate-600">Usaremos este anÃºncio para aplicar o booster assim que o pagamento for confirmado.</p>
+                  <p className="text-slate-600">Usaremos este anúncio para aplicar o booster assim que o pagamento for confirmado.</p>
                 </div>
               </div>
             </div>
@@ -568,7 +568,7 @@ export default function BoosterCheckoutPage() {
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-semibold text-slate-500">Dados do comprador</p>
-                  <p className="font-display text-xl font-black text-slate-900">SÃ³ o essencial</p>
+                  <p className="font-display text-xl font-black text-slate-900">Só o essencial</p>
                 </div>
                 <div className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
                   {user ? "Usando dados da conta" : "Login opcional"}
@@ -639,7 +639,7 @@ export default function BoosterCheckoutPage() {
                   </TabsTrigger>
                   <TabsTrigger value="card" className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-orange-600">
                     <CreditCard className="mr-2 h-4 w-4" />
-                    CartÃ£o
+                    Cartão
                   </TabsTrigger>
                   <TabsTrigger value="future" className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-orange-600">
                     <Sparkles className="mr-2 h-4 w-4" />
@@ -650,9 +650,9 @@ export default function BoosterCheckoutPage() {
                 <TabsContent value="pix" className="mt-5">
                   <div className="grid gap-4 md:grid-cols-[1.4fr_1fr]">
                     <div className="rounded-2xl border border-dashed border-emerald-200 bg-emerald-50 p-4">
-                      <p className="text-sm font-semibold text-emerald-700">QR Code dinÃ¢mico</p>
+                      <p className="text-sm font-semibold text-emerald-700">QR Code dinâmico</p>
                       <p className="mt-1 text-sm text-emerald-900/80">
-                        Gera automaticamente apÃ³s confirmar. Validade de 15 minutos e confirmaÃ§Ã£o instantÃ¢nea.
+                        Gera automaticamente após confirmar. Validade de 15 minutos e confirmação instantânea.
                       </p>
                       <div className="mt-4 flex h-36 items-center justify-center rounded-xl bg-white text-slate-400">
                         <QrCode className="h-12 w-12" />
@@ -661,10 +661,10 @@ export default function BoosterCheckoutPage() {
                     <div className="space-y-3 rounded-2xl border border-emerald-100 bg-white p-4">
                       <div className="flex items-center gap-3 rounded-xl bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-800">
                         <Smartphone className="h-4 w-4" />
-                        Copie o cÃ³digo Pix ou escaneie pelo app do banco.
+                        Copie o código Pix ou escaneie pelo app do banco.
                       </div>
                       <p className="text-sm text-slate-600">
-                        Assim que o pagamento for identificado, o booster Ã© ativado e vocÃª recebe a confirmaÃ§Ã£o por e-mail e WhatsApp.
+                        Assim que o pagamento for identificado, o booster é ativado e você recebe a confirmação por e-mail e WhatsApp.
                       </p>
                     </div>
                   </div>
@@ -673,12 +673,12 @@ export default function BoosterCheckoutPage() {
                 <TabsContent value="card" className="mt-5">
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
-                      <Label htmlFor="card-number">NÃºmero do cartÃ£o</Label>
+                      <Label htmlFor="card-number">Número do cartão</Label>
                       <Input id="card-number" placeholder="0000 0000 0000 0000" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="card-name">Nome impresso</Label>
-                      <Input id="card-name" placeholder="Como estÃ¡ no cartÃ£o" />
+                      <Input id="card-name" placeholder="Como está no cartão" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="card-exp">Validade</Label>
@@ -689,12 +689,12 @@ export default function BoosterCheckoutPage() {
                       <Input id="card-cvv" placeholder="***" />
                     </div>
                   </div>
-                  <p className="mt-3 text-sm text-slate-500">Layout pronto para integrar gateway real. NÃ£o salvamos os dados nesta etapa.</p>
+                  <p className="mt-3 text-sm text-slate-500">Layout pronto para integrar gateway real. Não salvamos os dados nesta etapa.</p>
                 </TabsContent>
 
                 <TabsContent value="future" className="mt-5">
                   <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-                    EspaÃ§o reservado para saldo/carteira ou boleto. Mantemos o visual pronto para conectar assim que o mÃ©todo for liberado.
+                    Espaço reservado para saldo/carteira ou boleto. Mantemos o visual pronto para conectar assim que o método for liberado.
                   </div>
                 </TabsContent>
               </Tabs>
@@ -706,7 +706,7 @@ export default function BoosterCheckoutPage() {
               <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-2 text-sm text-slate-500">
                   <Clock className="h-4 w-4 text-orange-500" />
-                  ConfirmaÃ§Ã£o mÃ©dia: <strong className="text-slate-700">Pix em segundos</strong>; cartÃ£o em atÃ© 5 min.
+                  Confirmação média: <strong className="text-slate-700">Pix em segundos</strong>; cartão em até 5 min.
                 </div>
                 <Button
                   type="submit"
@@ -756,7 +756,7 @@ export default function BoosterCheckoutPage() {
             </div>
 
             <div className="rounded-[20px] border border-slate-200 bg-white p-6 shadow-sm">
-              <p className="text-sm font-semibold text-slate-500">BenefÃ­cios imediatos</p>
+              <p className="text-sm font-semibold text-slate-500">Benefícios imediatos</p>
               <div className="mt-4 space-y-3 text-sm text-slate-700">
                 <div className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
                   <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-orange-100 font-bold text-orange-700">1</span>
@@ -768,7 +768,7 @@ export default function BoosterCheckoutPage() {
                 </div>
                 <div className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
                   <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-orange-100 font-bold text-orange-700">3</span>
-                  AtivaÃ§Ã£o imediata apÃ³s pagamento
+                  Ativação imediata após pagamento
                 </div>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+﻿import { useMemo, useState } from "react";
 import { useCurrentCity } from "@/contexts/CurrentCityContext";
 import { Link, useLocation } from "wouter";
 import { MapPin } from "lucide-react";
@@ -13,15 +13,15 @@ const TAB_ICONS = {
 };
 
 const MOBILE_TABS = [
-  { label: "Tudo", href: "/", emoji: "?", image: TAB_ICONS.all },
-  { label: "Restaurantes", href: "/delivery", emoji: "???", image: TAB_ICONS.delivery },
-  { label: "Mercados", href: "/busca?q=mercado", emoji: "??", image: TAB_ICONS.market },
-  { label: "Lojas", href: "/lojas", emoji: "??", image: TAB_ICONS.store },
-  { label: "Servi�os", href: "/servicos", emoji: "??", image: TAB_ICONS.services },
-  { label: "Guia local", href: "/guia", emoji: "??" },
+  { label: "Tudo", href: "/", emoji: "✨", image: TAB_ICONS.all },
+  { label: "Restaurantes", href: "/delivery", emoji: "🍽️", image: TAB_ICONS.delivery },
+  { label: "Mercados", href: "/busca?q=mercado", emoji: "🛒", image: TAB_ICONS.market },
+  { label: "Lojas", href: "/lojas", emoji: "🏬", image: TAB_ICONS.store },
+  { label: "Serviços", href: "/servicos", emoji: "🛠️", image: TAB_ICONS.services },
+  { label: "Guia local", href: "/guia", emoji: "📍" },
 ];
 
-const QUICK_CHIPS = ["Favoritos", "Cupons", "Servi�os", "Mercados"];
+const QUICK_CHIPS = ["Favoritos", "Cupons", "Serviços", "Mercados"];
 
 type MobileTopBarProps = {
   selectedCityName?: string;
@@ -66,11 +66,11 @@ export default function MobileTopBar({ selectedCityName }: MobileTopBarProps) {
           <div className="flex items-center gap-2">
             <Link href={isAuthenticated ? "/favoritos" : "/login"}>
               <button className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-900 shadow-sm">
-                <span className="text-base">??</span>
+                <span className="text-base" aria-hidden="true">❤️</span>
               </button>
             </Link>
             <button className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-900 shadow-sm">
-              <span className="text-base">??</span>
+              <span className="text-base" aria-hidden="true">🎟️</span>
             </button>
           </div>
         </div>
@@ -105,6 +105,7 @@ export default function MobileTopBar({ selectedCityName }: MobileTopBarProps) {
     </div>
   );
 }
+
 
 
 

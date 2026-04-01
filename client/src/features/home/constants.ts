@@ -1,4 +1,6 @@
-﻿import { guideIcon } from "@/lib/cloudinary";
+import { guideIcon } from "@/lib/cloudinary";
+import { MapPin, ShoppingBag, Store } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 export const CLOUD_ICONS = {
   promocoes: "https://res.cloudinary.com/dkrye3tmp/image/upload/v1774229865/promo%C3%A7oes_mcwevy.png?v=2",
@@ -71,12 +73,23 @@ export const GUIDE_SHORTCUTS = [
   },
 ];
 
-export const PILLARS = [
+type Pillar = {
+  label: string;
+  description: string;
+  href: string;
+  emoji?: string;
+  icon?: LucideIcon;
+  badge: string;
+  tone: string;
+};
+
+export const PILLARS: Pillar[] = [
   {
     label: "Guia Local",
     description: "Encontre telefones, serviços e empresas da sua cidade.",
     href: "/guia",
     emoji: "📍",
+    icon: MapPin,
     badge: "Informativo local",
     tone: "border-blue-200 bg-white text-slate-900 hover:border-blue-300 hover:shadow-lg",
   },
@@ -85,6 +98,7 @@ export const PILLARS = [
     description: "Descubra produtos, ofertas e oportunidades perto de você.",
     href: "/busca",
     emoji: "🛍️",
+    icon: ShoppingBag,
     badge: "Compra e venda",
     tone: "border-orange-200 bg-orange-500 text-white hover:bg-orange-600 hover:shadow-lg",
   },
@@ -93,6 +107,7 @@ export const PILLARS = [
     description: "Monte sua vitrine online e apareça para novos clientes.",
     href: "/lojas",
     emoji: "🏪",
+    icon: Store,
     badge: "Para quem não tem site",
     tone: "border-slate-800 bg-slate-900 text-white hover:bg-slate-800 hover:shadow-lg",
   },
@@ -221,4 +236,8 @@ export const COLLECTION_CARD = {
   cardTitle: "Promos que adoramos",
   cardSubtitle: "sei que seu hobby é pagar no precinho",
 };
+
+
+
+
 

@@ -87,7 +87,9 @@ export function HeroDesktop({ selectedCityName, onSearch, isAuthenticated, pilla
                     className={`block rounded-[24px] border p-4 transition ${item.tone}`}
                   >
                     <div className="flex items-start gap-4">
-                      <div className="rounded-2xl bg-black/10 p-3 text-lg">{item.emoji}</div>
+                      <div className="rounded-2xl bg-black/10 p-3 text-lg text-white">
+                        {item.icon ? <item.icon className="h-5 w-5" aria-hidden="true" /> : item.emoji}
+                      </div>
 
                       <div className="min-w-0">
                         <p className="text-xs font-semibold uppercase tracking-[0.16em] opacity-80">

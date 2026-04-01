@@ -14,8 +14,8 @@ export function ThreeWaysSection({ pillars }: Props) {
     <section className="container py-8 sm:py-10">
       <SectionHeader
         eyebrow="3 formas de usar"
-        title="Escolha a melhor porta de entrada para o que você precisa"
-        description="A Home agora guia melhor o usuário: primeiro ele entende o produto, depois escolhe como navegar dentro da plataforma."
+        title="Escolha a melhor porta de entrada para o que vocÃª precisa"
+        description="A Home agora guia melhor o usuÃ¡rio: primeiro ele entende o produto, depois escolhe como navegar dentro da plataforma."
       />
 
       <div className="grid gap-4 lg:grid-cols-3">
@@ -35,7 +35,9 @@ export function ThreeWaysSection({ pillars }: Props) {
               }`}
             >
               <div className="flex items-start justify-between gap-4">
-                <div className="rounded-2xl bg-black/10 p-3 text-xl">{item.emoji}</div>
+                <div className="rounded-2xl bg-black/10 p-3 text-xl">
+                  {item.icon ? <item.icon className="h-5 w-5" aria-hidden="true" /> : item.emoji}
+                </div>
                 <span className="rounded-full bg-black/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em]">
                   {item.badge}
                 </span>
@@ -58,3 +60,4 @@ export function ThreeWaysSection({ pillars }: Props) {
     </section>
   );
 }
+

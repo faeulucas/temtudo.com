@@ -1,4 +1,4 @@
-ï»¿import { Button } from "@/components/ui/button";
+Ã¯Â»Â¿import { Button } from "@/components/ui/button";
 import { advertiserHref } from "@/lib/navigation";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Link } from "wouter";
@@ -32,11 +32,11 @@ export function HeroDesktop({ selectedCityName, onSearch, isAuthenticated, pilla
               </div>
 
               <h1 className="mt-4 font-display text-3xl font-black leading-tight text-white sm:text-5xl">
-                Tudo da sua cidade em um sÃ³ lugar.
+                Tudo da sua cidade em um sÃƒÂ³ lugar.
               </h1>
 
               <p className="mt-4 max-w-2xl text-sm leading-7 text-blue-50/90 sm:text-lg">
-                Encontre empresas, serviÃ§os e produtos da sua regiÃ£o ou crie sua loja online e comece a aparecer para novos clientes em
+                Encontre empresas, serviÃƒÂ§os e produtos da sua regiÃƒÂ£o ou crie sua loja online e comece a aparecer para novos clientes em
                 <span className="font-bold text-white"> {selectedCityName}</span>.
               </p>
 
@@ -57,15 +57,15 @@ export function HeroDesktop({ selectedCityName, onSearch, isAuthenticated, pilla
               <div className="mt-6 grid grid-cols-2 gap-3 sm:max-w-xl sm:grid-cols-4">
                 <div className="rounded-[22px] bg-white/10 p-4 backdrop-blur-sm">
                   <p className="text-2xl font-black text-white">{stats.listings}</p>
-                  <p className="text-sm text-blue-100">AnÃºncios ativos</p>
+                  <p className="text-sm text-blue-100">AnÃƒÂºncios ativos</p>
                 </div>
                 <div className="rounded-[22px] bg-white/10 p-4 backdrop-blur-sm">
                   <p className="text-2xl font-black text-white">{stats.companies}</p>
-                  <p className="text-sm text-blue-100">Lojas visÃ­veis</p>
+                  <p className="text-sm text-blue-100">Lojas visÃƒÂ­veis</p>
                 </div>
                 <div className="rounded-[22px] bg-white/10 p-4 backdrop-blur-sm">
                   <p className="text-2xl font-black text-white">{stats.services}</p>
-                  <p className="text-sm text-blue-100">ServiÃ§os</p>
+                  <p className="text-sm text-blue-100">ServiÃƒÂ§os</p>
                 </div>
                 <div className="rounded-[22px] bg-white/10 p-4 backdrop-blur-sm">
                   <p className="text-2xl font-black text-white">{stats.food}</p>
@@ -104,7 +104,7 @@ export function HeroDesktop({ selectedCityName, onSearch, isAuthenticated, pilla
               </div>
 
               <div className="mt-5 rounded-[22px] bg-white/10 p-4">
-                <p className="text-base font-semibold text-white">Tem uma loja e ainda nÃ£o tem site?</p>
+                <p className="text-base font-semibold text-white">Tem uma loja e ainda nÃƒÂ£o tem site?</p>
                 <p className="mt-1 text-sm leading-6 text-blue-50/90">
                   Crie sua vitrine, publique seus produtos e receba contatos pelo WhatsApp.
                 </p>

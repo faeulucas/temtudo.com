@@ -1,6 +1,6 @@
 import { CreditCard } from "lucide-react";
 
-const METHODS = ["Pix", "Cart„o (em breve)", "Boleto (em breve)"];
+const METHODS = ["Pix", "Cart√£o (em breve)", "Boleto (em breve)"];
 
 export function PaymentMethods() {
   return (
@@ -20,3 +20,4 @@ export function PaymentMethods() {
     </div>
   );
 }
+

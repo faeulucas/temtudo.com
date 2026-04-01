@@ -5,19 +5,19 @@ export const PLAN_MAP: Record<PlanSlug, PlanDefinition> = {
     name: "Plano Profissional",
     accent: "from-blue-600 to-cyan-500",
     benefits: [
-      "15 anúncios ativos",
-      "8 fotos por anúncio",
+      "15 anÃºncios ativos",
+      "8 fotos por anÃºncio",
       "12 boosters de 24h por ano",
       "Prioridade na busca",
-      "Suporte prioritário",
+      "Suporte prioritÃ¡rio",
     ],
-    badge: "Mais acessível",
+    badge: "Mais acessÃ­vel",
     pricing: {
-      monthly: { amount: 9.9, periodLabel: "/mês" },
+      monthly: { amount: 9.9, periodLabel: "/mÃªs" },
       yearly: {
         amount: 99.9,
         periodLabel: "/ano",
-        note: "equivale a R$ 8,33/mês",
+        note: "equivale a R$ 8,33/mÃªs",
         savings: "economize R$ 18,90",
       },
     },
@@ -26,19 +26,19 @@ export const PLAN_MAP: Record<PlanSlug, PlanDefinition> = {
     name: "Plano Premium",
     accent: "from-amber-500 to-orange-500",
     benefits: [
-      "Anúncios ilimitados",
-      "20 fotos por anúncio",
+      "AnÃºncios ilimitados",
+      "20 fotos por anÃºncio",
       "24 boosters de 24h por ano",
       "Destaque garantido na home",
       "Suporte VIP",
     ],
     badge: "Mais vantagem",
     pricing: {
-      monthly: { amount: 14.9, periodLabel: "/mês" },
+      monthly: { amount: 14.9, periodLabel: "/mÃªs" },
       yearly: {
         amount: 129.9,
         periodLabel: "/ano",
-        note: "equivale a R$ 10,83/mês",
+        note: "equivale a R$ 10,83/mÃªs",
         savings: "economize R$ 48,90",
       },
     },
@@ -57,3 +57,4 @@ export function parseBillingCycle(cycleParam: string | null | undefined): Billin
 
 export const formatBRL = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
+

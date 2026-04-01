@@ -4,7 +4,7 @@ import type { PlanDefinition } from "../types";
 export function PlanBenefits({ benefits }: { benefits: PlanDefinition["benefits"] }) {
   return (
     <div>
-      <p className="text-sm font-semibold text-slate-700">Benefícios inclusos</p>
+      <p className="text-sm font-semibold text-slate-700">BenefÃ­cios inclusos</p>
       <ul className="mt-3 grid gap-2 sm:grid-cols-2">
         {benefits.map(item => (
           <li key={item} className="flex items-start gap-2 rounded-2xl bg-slate-50 px-3 py-2 text-sm text-slate-700">
@@ -16,3 +16,4 @@ export function PlanBenefits({ benefits }: { benefits: PlanDefinition["benefits"
     </div>
   );
 }
+

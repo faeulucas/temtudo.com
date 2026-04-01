@@ -12,7 +12,7 @@ export function PlanHeader({ plan, selectedCycle }: { plan: PlanDefinition; sele
       <CardTitle className="text-2xl font-black text-slate-900">{plan.name}</CardTitle>
       <p className="text-sm text-slate-600">
         {selectedCycle === "yearly"
-          ? "Assinatura anual com benefícios exclusivos e boosters incluídos."
+          ? "Assinatura anual com benefÃ­cios exclusivos e boosters incluÃ­dos."
           : "Assinatura mensal para entrar com baixo custo e flexibilidade."}
       </p>
     </CardHeader>
@@ -27,3 +27,4 @@ export function PlanBadgeRibbon() {
     </div>
   );
 }
+

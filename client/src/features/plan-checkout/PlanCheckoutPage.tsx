@@ -77,7 +77,7 @@ export default function PlanCheckoutPage() {
               <div className="space-y-3">
                 <p className="text-sm font-semibold text-slate-700">Dados do assinante</p>
                 <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
-                  <p>{user?.name ?? "Usu·rio autenticado"}</p>
+                  <p>{user?.name ?? "Usu√°rio autenticado"}</p>
                   <p className="text-slate-500">{user?.email ?? "sem email"}</p>
                 </div>
               </div>
@@ -103,3 +103,4 @@ export default function PlanCheckoutPage() {
     </div>
   );
 }
+

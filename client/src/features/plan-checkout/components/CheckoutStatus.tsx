@@ -22,7 +22,7 @@ export function CheckoutStatusCard({ status, errorMessage, orderId, onReset }: {
         <CardContent className="space-y-2 text-sm text-green-800">
           <p>Seu pedido foi criado com status pending.</p>
           {orderId ? <p>ID do pedido: #{orderId}</p> : null}
-          <p>Assim que o pagamento for confirmado, seu plano ser· ativado.</p>
+          <p>Assim que o pagamento for confirmado, seu plano ser√° ativado.</p>
           <div className="pt-2">
             <Link href="/anunciante?tab=meus-dados">
               <Button className="rounded-xl bg-green-600 text-white hover:bg-green-700">Ir para o painel</Button>
@@ -37,7 +37,7 @@ export function CheckoutStatusCard({ status, errorMessage, orderId, onReset }: {
     return (
       <Card className="rounded-3xl border-red-200 bg-red-50/60">
         <CardHeader>
-          <CardTitle className="text-red-800">N„o foi possÌvel criar o pedido</CardTitle>
+          <CardTitle className="text-red-800">N√£o foi poss√≠vel criar o pedido</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 text-sm text-red-700">
           <p>{errorMessage ?? "Tente novamente em instantes."}</p>
@@ -51,3 +51,4 @@ export function CheckoutStatusCard({ status, errorMessage, orderId, onReset }: {
 
   return null;
 }
+

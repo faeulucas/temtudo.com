@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useCurrentCity } from "@/contexts/CurrentCityContext";
 import { Link, useLocation } from "wouter";
 import { MapPin } from "lucide-react";

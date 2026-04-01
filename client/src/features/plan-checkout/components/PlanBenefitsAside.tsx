@@ -7,20 +7,21 @@ export function PlanBenefitsAside() {
       <CardHeader className="space-y-2 border-b border-slate-100 pb-4">
         <CardTitle className="flex items-center gap-2 text-slate-900">
           <ShieldCheck className="h-5 w-5 text-emerald-600" />
-          Segurança e suporte
+          SeguranÃ§a e suporte
         </CardTitle>
         <p className="text-sm text-slate-600">
-          Assinatura gerenciada dentro do Norte Vivo. Pagamento confirmado manualmente enquanto o gateway não é integrado.
+          Assinatura gerenciada dentro do Norte Vivo. Pagamento confirmado manualmente enquanto o gateway nÃ£o Ã© integrado.
         </p>
       </CardHeader>
       <CardContent className="space-y-3 pt-4 text-sm text-slate-700">
         <p className="rounded-2xl bg-slate-50 px-4 py-3">
-          Assim que o pagamento for validado, seu plano será ativado e você receberá a confirmação no painel.
+          Assim que o pagamento for validado, seu plano serÃ¡ ativado e vocÃª receberÃ¡ a confirmaÃ§Ã£o no painel.
         </p>
         <p className="rounded-2xl bg-slate-50 px-4 py-3">
-          Dúvidas? Fale com o suporte e informe o ID do pedido para agilizar.
+          DÃºvidas? Fale com o suporte e informe o ID do pedido para agilizar.
         </p>
       </CardContent>
     </Card>
   );
 }
+

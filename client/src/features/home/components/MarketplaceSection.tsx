@@ -19,7 +19,7 @@ export function MarketplaceSection({ listings, categories, cityNameById }: Props
       <SectionHeader
         eyebrow="Marketplace regional"
         title="Novidades e oportunidades recentes"
-        description="Depois que o usuário entende o produto, ele entra no fluxo natural de descoberta: anúncios, produtos e oportunidades da região."
+        description="Depois que o usuÃ¡rio entende o produto, ele entra no fluxo natural de descoberta: anÃºncios, produtos e oportunidades da regiÃ£o."
         actionHref="/busca"
         actionLabel="Ver mais"
       />
@@ -53,11 +53,11 @@ export function MarketplaceSection({ listings, categories, cityNameById }: Props
                         {listing.type === "food"
                           ? "Comida"
                           : listing.type === "service"
-                          ? "Serviço"
+                          ? "ServiÃ§o"
                           : listing.type === "property"
-                          ? "Imóvel"
+                          ? "ImÃ³vel"
                           : listing.type === "vehicle"
-                          ? "Veículo"
+                          ? "VeÃ­culo"
                           : "Produto"}
                       </span>
                     </div>
@@ -86,7 +86,7 @@ export function MarketplaceSection({ listings, categories, cityNameById }: Props
       ) : (
         <div className="rounded-[28px] border border-dashed border-slate-200 bg-white p-12 text-center">
           <LayoutGrid className="mx-auto h-12 w-12 text-slate-300" />
-          <p className="mt-4 text-slate-500">Assim que novos anúncios entrarem no portal, a Home vai refletir isso aqui.</p>
+          <p className="mt-4 text-slate-500">Assim que novos anÃºncios entrarem no portal, a Home vai refletir isso aqui.</p>
         </div>
       )}
     </section>

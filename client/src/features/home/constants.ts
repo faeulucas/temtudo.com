@@ -18,57 +18,57 @@ export const CLOUD_ICONS = {
 
 export const GUIDE_SHORTCUTS = [
   {
-    title: "Saúde",
-    description: "Hospitais, clínicas e farmácias",
+    title: "SaÃºde",
+    description: "Hospitais, clÃ­nicas e farmÃ¡cias",
     href: "/busca?q=saude",
     image: guideIcon("guide-health") ?? undefined,
     fallbackImage: "/icons/things/guide-health.webp",
-    emoji: "🏥",
+    emoji: "ð¥",
     tone: "bg-emerald-50 text-emerald-700",
   },
   {
-    title: "Segurança",
-    description: "Polícia, apoio e serviços úteis",
+    title: "SeguranÃ§a",
+    description: "PolÃ­cia, apoio e serviÃ§os Ãºteis",
     href: "/busca?q=seguranca",
     image: guideIcon("guide-security") ?? undefined,
     fallbackImage: "/icons/things/guide-security.webp",
-    emoji: "🛡️",
+    emoji: "ð¡ï¸",
     tone: "bg-blue-50 text-blue-700",
   },
   {
-    title: "Emergências",
-    description: "Atalhos rápidos para urgências",
+    title: "EmergÃªncias",
+    description: "Atalhos rÃ¡pidos para urgÃªncias",
     href: "/busca?q=emergencia",
     image: guideIcon("guide-emergencies") ?? undefined,
     fallbackImage: "/icons/things/guide-emergencies.webp",
-    emoji: "🚨",
+    emoji: "ð¨",
     tone: "bg-rose-50 text-rose-700",
   },
   {
     title: "Oficinas",
-    description: "Mecânicos, eletricistas e reparos",
+    description: "MecÃ¢nicos, eletricistas e reparos",
     href: "/busca?q=oficina",
     image: guideIcon("guide-workshops") ?? undefined,
     fallbackImage: "/icons/things/guide-workshops.webp",
-    emoji: "🛠️",
+    emoji: "ð ï¸",
     tone: "bg-amber-50 text-amber-700",
   },
   {
-    title: "Serviços",
-    description: "Prestadores e negócios locais",
+    title: "ServiÃ§os",
+    description: "Prestadores e negÃ³cios locais",
     href: "/busca?q=servicos",
     image: guideIcon("guide-services") ?? undefined,
     fallbackImage: "/icons/things/guide-services.webp",
-    emoji: "🧰",
+    emoji: "ð§°",
     tone: "bg-violet-50 text-violet-700",
   },
   {
     title: "Empresas",
-    description: "Lojas, comércios e contatos úteis",
+    description: "Lojas, comÃ©rcios e contatos Ãºteis",
     href: "/lojas",
     image: guideIcon("guide-businesses") ?? undefined,
     fallbackImage: "/icons/things/guide-businesses.webp",
-    emoji: "🏪",
+    emoji: "ðª",
     tone: "bg-slate-100 text-slate-700",
   },
 ];
@@ -86,69 +86,69 @@ type Pillar = {
 export const PILLARS: Pillar[] = [
   {
     label: "Guia Local",
-    description: "Encontre telefones, serviços e empresas da sua cidade.",
+    description: "Encontre telefones, serviÃ§os e empresas da sua cidade.",
     href: "/guia",
-    emoji: "📍",
+    emoji: "ð",
     icon: MapPin,
     badge: "Informativo local",
     tone: "border-blue-200 bg-white text-slate-900 hover:border-blue-300 hover:shadow-lg",
   },
   {
     label: "Marketplace Regional",
-    description: "Descubra produtos, ofertas e oportunidades perto de você.",
+    description: "Descubra produtos, ofertas e oportunidades perto de vocÃª.",
     href: "/busca",
-    emoji: "🛍️",
+    emoji: "ðï¸",
     icon: ShoppingBag,
     badge: "Compra e venda",
     tone: "border-orange-200 bg-orange-500 text-white hover:bg-orange-600 hover:shadow-lg",
   },
   {
     label: "Crie sua Loja",
-    description: "Monte sua vitrine online e apareça para novos clientes.",
+    description: "Monte sua vitrine online e apareÃ§a para novos clientes.",
     href: "/lojas",
-    emoji: "🏪",
+    emoji: "ðª",
     icon: Store,
-    badge: "Para quem não tem site",
+    badge: "Para quem nÃ£o tem site",
     tone: "border-slate-800 bg-slate-900 text-white hover:bg-slate-800 hover:shadow-lg",
   },
 ];
 
 export const QUICK_SEGMENTS = [
-  { label: "Seja d+", emoji: "✨" },
+  { label: "Seja d+", emoji: "â¨" },
   {
     label: "Lanches",
-    emoji: "🥪",
+    emoji: "ð¥ª",
     image: CLOUD_ICONS.lanches,
   },
   {
     label: "Pizza",
-    emoji: "🍕",
+    emoji: "ð",
     image: CLOUD_ICONS.pizza,
   },
   {
     label: "Burguer",
-    emoji: "🍔",
+    emoji: "ð",
     image: CLOUD_ICONS.burguer,
   },
-  { label: "Porções", emoji: "🍟" },
-  { label: "Marmita", emoji: "🍱" },
-  { label: "Sushi", emoji: "🍣" },
+  { label: "PorÃ§Ãµes", emoji: "ð" },
+  { label: "Marmita", emoji: "ð±" },
+  { label: "Sushi", emoji: "ð£" },
 ];
 
 export const MOBILE_TABS = [
-  { label: "Tudo", href: "/", emoji: "✨" },
-  { label: "Restaurantes", href: "/busca?type=food", emoji: "🍽️" },
-  { label: "Mercados", href: "/busca?q=mercado", emoji: "🛒" },
-  { label: "Lojas", href: "/lojas", emoji: "🏪" },
-  { label: "Serviços", href: "/busca?q=servicos", emoji: "🛠️" },
-  { label: "Guia local", href: "/guia", emoji: "📍" },
+  { label: "Tudo", href: "/", emoji: "â¨" },
+  { label: "Restaurantes", href: "/busca?type=food", emoji: "ð½ï¸" },
+  { label: "Mercados", href: "/busca?q=mercado", emoji: "ð" },
+  { label: "Lojas", href: "/lojas", emoji: "ðª" },
+  { label: "ServiÃ§os", href: "/busca?q=servicos", emoji: "ð ï¸" },
+  { label: "Guia local", href: "/guia", emoji: "ð" },
 ];
 
 export const CATEGORY_SHORTCUTS = [
   {
-    label: "Promoções",
+    label: "PromoÃ§Ãµes",
     href: "/promocoes",
-    emoji: "🔥",
+    emoji: "ð¥",
     image: CLOUD_ICONS.promocoes,
     fallbackImage: CLOUD_ICONS.promocoes,
     tone: "bg-orange-50 text-orange-700",
@@ -156,7 +156,7 @@ export const CATEGORY_SHORTCUTS = [
   {
     label: "Delivery",
     href: "/delivery",
-    emoji: "🚚",
+    emoji: "ð",
     image: CLOUD_ICONS.delivery,
     fallbackImage: CLOUD_ICONS.delivery,
     tone: "bg-rose-50 text-rose-700",
@@ -164,7 +164,7 @@ export const CATEGORY_SHORTCUTS = [
   {
     label: "Mercado",
     href: "/mercado",
-    emoji: "🛒",
+    emoji: "ð",
     image: CLOUD_ICONS.mercado,
     fallbackImage: CLOUD_ICONS.mercado,
     tone: "bg-amber-50 text-amber-700",
@@ -172,23 +172,23 @@ export const CATEGORY_SHORTCUTS = [
   {
     label: "Lojas",
     href: "/lojas",
-    emoji: "🏬",
+    emoji: "ð¬",
     image: CLOUD_ICONS.lojas,
     fallbackImage: CLOUD_ICONS.lojas,
     tone: "bg-indigo-50 text-indigo-700",
   },
   {
-    label: "Serviços",
+    label: "ServiÃ§os",
     href: "/servicos",
-    emoji: "🧰",
+    emoji: "ð§°",
     image: CLOUD_ICONS.servicos,
     fallbackImage: CLOUD_ICONS.servicos,
     tone: "bg-emerald-50 text-emerald-700",
   },
   {
-    label: "Imóveis",
+    label: "ImÃ³veis",
     href: "/imoveis",
-    emoji: "🏠",
+    emoji: "ð ",
     image: CLOUD_ICONS.imoveis,
     fallbackImage: CLOUD_ICONS.imoveis,
     tone: "bg-blue-50 text-blue-700",
@@ -196,7 +196,7 @@ export const CATEGORY_SHORTCUTS = [
   {
     label: "Eventos",
     href: "/eventos",
-    emoji: "🎉",
+    emoji: "ð",
     image: CLOUD_ICONS.eventos,
     fallbackImage: CLOUD_ICONS.eventos,
     tone: "bg-purple-50 text-purple-700",
@@ -204,37 +204,37 @@ export const CATEGORY_SHORTCUTS = [
   {
     label: "Empregos",
     href: "/empregos",
-    emoji: "💼",
+    emoji: "ð¼",
     image: CLOUD_ICONS.empregos,
     fallbackImage: CLOUD_ICONS.empregos,
     tone: "bg-cyan-50 text-cyan-700",
   },
 ];
 
-export const FILTER_CHIPS = ["Filtros", "Entrega grátis", "Promoções"];
+export const FILTER_CHIPS = ["Filtros", "Entrega grÃ¡tis", "PromoÃ§Ãµes"];
 
 export const PROMO_BANNERS = [
   {
     id: "club-cupom",
     title: "clube de cupons",
-    subtitle: "receba cupons exclusivos e economize todo mês!",
+    subtitle: "receba cupons exclusivos e economize todo mÃªs!",
     cta: "ver ofertas",
     href: "/busca?q=promo",
   },
   {
     id: "mega-off",
     title: "35% OFF",
-    subtitle: "os rangos que são sucesso com cupom: ESTRELAS",
+    subtitle: "os rangos que sÃ£o sucesso com cupom: ESTRELAS",
     cta: "usar cupom",
     href: "/busca?q=estrelas",
   },
 ];
 
 export const COLLECTION_CARD = {
-  title: "coleções de lojas e promos",
+  title: "coleÃ§Ãµes de lojas e promos",
   href: "/busca?q=promocoes",
   cardTitle: "Promos que adoramos",
-  cardSubtitle: "sei que seu hobby é pagar no precinho",
+  cardSubtitle: "sei que seu hobby Ã© pagar no precinho",
 };
 
 

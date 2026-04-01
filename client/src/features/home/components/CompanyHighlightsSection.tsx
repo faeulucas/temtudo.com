@@ -17,8 +17,8 @@ export function CompanyHighlightsSection({ listings, categories, cityNameById }:
     <section id="lojas-empresas" className="container py-2 sm:py-4">
       <SectionHeader
         eyebrow="Lojas em destaque"
-        title="NegÛcios locais que j· podem vender online pelo Norte Vivo"
-        description="Aqui est· seu diferencial mais forte: dar presenÁa digital para quem vende na regi„o, mesmo sem ter site prÛprio."
+        title="Neg√≥cios locais que j√° podem vender online pelo Norte Vivo"
+        description="Aqui est√° seu diferencial mais forte: dar presen√ßa digital para quem vende na regi√£o, mesmo sem ter site pr√≥prio."
         actionHref="/lojas"
         actionLabel="Ver lojas"
       />
@@ -30,7 +30,7 @@ export function CompanyHighlightsSection({ listings, categories, cityNameById }:
               const displayName = item.seller?.companyName?.trim() || item.seller?.name?.trim() || item.title;
               const cityName = cityNameById(item.seller?.cityId);
               const neighborhood = item.seller?.neighborhood?.trim();
-              const subtitle = categories.find((category) => category.id === item.categoryId)?.name || item.subcategory || "NegÛcio local";
+              const subtitle = categories.find((category) => category.id === item.categoryId)?.name || item.subcategory || "Neg√≥cio local";
 
               return (
                 <Link
@@ -61,7 +61,7 @@ export function CompanyHighlightsSection({ listings, categories, cityNameById }:
                     </div>
 
                     <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-500">
-                      ConheÁa a loja, veja os produtos publicados e fale direto com quem vende.
+                      Conhe√ßa a loja, veja os produtos publicados e fale direto com quem vende.
                     </p>
 
                     <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-slate-500">
@@ -89,7 +89,7 @@ export function CompanyHighlightsSection({ listings, categories, cityNameById }:
               const displayName = item.seller?.companyName?.trim() || item.seller?.name?.trim() || item.title;
               const cityName = cityNameById(item.seller?.cityId);
               const neighborhood = item.seller?.neighborhood?.trim();
-              const subtitle = categories.find((category) => category.id === item.categoryId)?.name || item.subcategory || "NegÛcio local";
+              const subtitle = categories.find((category) => category.id === item.categoryId)?.name || item.subcategory || "Neg√≥cio local";
 
               return (
                 <article
@@ -136,7 +136,7 @@ export function CompanyHighlightsSection({ listings, categories, cityNameById }:
                     </div>
 
                     <p className="mt-4 line-clamp-2 text-sm leading-6 text-slate-500">
-                      Veja a vitrine da loja, os itens publicados e os canais de contato disponÌveis.
+                      Veja a vitrine da loja, os itens publicados e os canais de contato dispon√≠veis.
                     </p>
 
                     <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-500">
@@ -148,7 +148,7 @@ export function CompanyHighlightsSection({ listings, categories, cityNameById }:
                       {(item.seller?.whatsapp || item.whatsapp) && (
                         <span className="inline-flex items-center gap-1.5 text-emerald-700">
                           <Phone className="h-4 w-4" />
-                          WhatsApp disponÌvel
+                          WhatsApp dispon√≠vel
                         </span>
                       )}
                     </div>
@@ -166,7 +166,7 @@ export function CompanyHighlightsSection({ listings, categories, cityNameById }:
       ) : (
         <div className="rounded-[28px] border border-dashed border-slate-200 bg-white p-10 text-center">
           <Building2 className="mx-auto h-12 w-12 text-slate-300" />
-          <p className="mt-4 text-slate-500">As primeiras lojas e empresas aparecer„o aqui.</p>
+          <p className="mt-4 text-slate-500">As primeiras lojas e empresas aparecer√£o aqui.</p>
         </div>
       )}
     </section>

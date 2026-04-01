@@ -19,7 +19,7 @@ export function FeaturedListingsSection({ listings, categories, cityNameById }: 
       <SectionHeader
         eyebrow="Destaques da semana"
         title="Produtos patrocinados com mais visibilidade"
-        description="Essa é a área comercial mais forte da plataforma. Aqui ficam os anúncios impulsionados para gerar clique e venda."
+        description="Essa Ã© a Ã¡rea comercial mais forte da plataforma. Aqui ficam os anÃºncios impulsionados para gerar clique e venda."
         actionHref="/booster"
         actionLabel="Ver destaques"
       />
@@ -57,7 +57,7 @@ export function FeaturedListingsSection({ listings, categories, cityNameById }: 
 
                     <div className="p-4">
                       <div className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-[11px] font-semibold text-slate-700">
-                        {[categoryName, listing.subcategory].filter(Boolean).join(" · ")}
+                        {[categoryName, listing.subcategory].filter(Boolean).join(" Â· ")}
                       </div>
 
                       <h3 className="mt-3 line-clamp-2 text-lg font-bold leading-6 text-slate-900">{listing.title}</h3>
@@ -94,7 +94,7 @@ export function FeaturedListingsSection({ listings, categories, cityNameById }: 
       ) : (
         <div className="rounded-[28px] border border-dashed border-amber-200 bg-white p-10 text-center">
           <Zap className="mx-auto h-12 w-12 text-amber-300" />
-          <p className="mt-4 text-slate-500">Assim que houver anúncios impulsionados, eles aparecerão aqui.</p>
+          <p className="mt-4 text-slate-500">Assim que houver anÃºncios impulsionados, eles aparecerÃ£o aqui.</p>
         </div>
       )}
     </section>

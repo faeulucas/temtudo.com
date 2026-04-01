@@ -11,7 +11,7 @@ export function MobileServicesSection({ serviceProviders, cityNameById }: Props)
   return (
     <div className="rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-slate-900">Serviços & empresas</p>
+        <p className="text-sm font-semibold text-slate-900">ServiÃ§os & empresas</p>
         <Link href="/guia" className="text-xs font-semibold text-orange-600">
           ver guia
         </Link>

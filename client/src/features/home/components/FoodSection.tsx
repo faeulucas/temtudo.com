@@ -16,8 +16,8 @@ export function FoodSection({ listings, cityNameById }: Props) {
       <div className="container">
         <SectionHeader
           eyebrow="O que comer hoje"
-          title="Bateu a fome? PeÁa agora nas melhores lojas abertas"
-          description="Essa seÁ„o ajuda o usu·rio no dia a dia e aumenta recorrÍncia de visita ao site."
+          title="Bateu a fome? Pe√ßa agora nas melhores lojas abertas"
+          description="Essa se√ß√£o ajuda o usu√°rio no dia a dia e aumenta recorr√™ncia de visita ao site."
           actionHref="/busca?q=lanche"
           actionLabel="Ver lanches"
         />
@@ -95,7 +95,7 @@ export function FoodSection({ listings, cityNameById }: Props) {
         ) : (
           <div className="rounded-[28px] bg-white p-10 text-center shadow-sm">
             <ShoppingBag className="mx-auto h-12 w-12 text-orange-200" />
-            <p className="mt-4 text-slate-500">Assim que houver lanches de lojas abertas agora, eles aparecer„o aqui.</p>
+            <p className="mt-4 text-slate-500">Assim que houver lanches de lojas abertas agora, eles aparecer√£o aqui.</p>
           </div>
         )}
       </div>

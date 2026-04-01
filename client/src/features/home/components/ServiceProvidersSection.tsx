@@ -12,11 +12,11 @@ export function ServiceProvidersSection({ listings, cityNameById }: Props) {
   return (
     <section className="container py-8 sm:py-10">
       <SectionHeader
-        eyebrow="ServiÁos locais"
-        title="Profissionais e prestadores com contato r·pido"
-        description="Essa seÁ„o ajuda a transformar o site em utilidade di·ria para a cidade, n„o sÛ em vitrine de an˙ncios."
+        eyebrow="Servi√ßos locais"
+        title="Profissionais e prestadores com contato r√°pido"
+        description="Essa se√ß√£o ajuda a transformar o site em utilidade di√°ria para a cidade, n√£o s√≥ em vitrine de an√∫ncios."
         actionHref="/busca?q=servicos"
-        actionLabel="Ver serviÁos"
+        actionLabel="Ver servi√ßos"
       />
 
       {listings.length > 0 ? (
@@ -74,7 +74,7 @@ export function ServiceProvidersSection({ listings, cityNameById }: Props) {
       ) : (
         <div className="rounded-[28px] border border-dashed border-slate-200 bg-white p-8 text-center">
           <HeartHandshake className="mx-auto h-10 w-10 text-violet-300" />
-          <p className="mt-4 text-slate-500">Os primeiros prestadores com contato r·pido aparecer„o aqui.</p>
+          <p className="mt-4 text-slate-500">Os primeiros prestadores com contato r√°pido aparecer√£o aqui.</p>
         </div>
       )}
     </section>

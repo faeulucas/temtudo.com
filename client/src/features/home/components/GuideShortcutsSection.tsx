@@ -16,8 +16,8 @@ export function GuideShortcutsSection({ shortcuts, selectedCityName }: Props) {
     <section id="guia-local" className="container py-8 sm:py-10">
       <SectionHeader
         eyebrow="Guia local"
-        title={`Serviços e contatos essenciais em ${selectedCityName}`}
-        description="O guia precisa ser útil de verdade. Ele deve resolver rápido a busca por telefones, empresas e contatos da cidade."
+        title={`ServiÃ§os e contatos essenciais em ${selectedCityName}`}
+        description="O guia precisa ser Ãºtil de verdade. Ele deve resolver rÃ¡pido a busca por telefones, empresas e contatos da cidade."
         actionHref="/guia"
         actionLabel="Abrir guia local"
       />

@@ -95,7 +95,7 @@ export function isEventListing(item: HomeHighlightListing, categoryName?: string
 }
 
 export function formatListingPrice(price?: string | null, priceType?: string | null) {
-  if (!price || priceType === "free") return "Gr·tis";
+  if (!price || priceType === "free") return "Gr√°tis";
   if (priceType === "on_request") return "Sob consulta";
 
   const formatted = `R$ ${Number(price).toLocaleString("pt-BR", {
@@ -108,8 +108,8 @@ export function formatListingPrice(price?: string | null, priceType?: string | n
 }
 
 export function getPriceTypeLabel(priceType?: string | null) {
-  if (priceType === "negotiable") return "Negoci·vel";
+  if (priceType === "negotiable") return "Negoci√°vel";
   if (priceType === "on_request") return "Sob consulta";
-  if (priceType === "free") return "Gr·tis";
-  return "PreÁo fixo";
+  if (priceType === "free") return "Gr√°tis";
+  return "Pre√ßo fixo";
 }

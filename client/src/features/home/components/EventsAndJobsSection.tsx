@@ -20,8 +20,8 @@ export function EventsAndJobsSection({ eventListings, jobListings, cityNameById 
             </div>
 
             <div className="min-w-0">
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-600">Eventos da regi„o</p>
-              <p className="mt-2 text-sm leading-6 text-slate-500">Feiras, shows, encontros e atraÁıes locais em um sÛ lugar.</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-600">Eventos da regi√£o</p>
+              <p className="mt-2 text-sm leading-6 text-slate-500">Feiras, shows, encontros e atra√ß√µes locais em um s√≥ lugar.</p>
             </div>
           </div>
 
@@ -50,7 +50,7 @@ export function EventsAndJobsSection({ eventListings, jobListings, cityNameById 
                         <p className="mt-2 text-sm text-slate-500">{[item.neighborhood, cityNameById(item.cityId)].filter(Boolean).join(", ") || "Norte Pioneiro"}</p>
 
                         {(extra.eventDate || extra.eventVenue) && (
-                          <p className="mt-1 truncate text-xs font-medium text-blue-700">{[extra.eventDate, extra.eventVenue].filter(Boolean).join(" ∑ ")}</p>
+                          <p className="mt-1 truncate text-xs font-medium text-blue-700">{[extra.eventDate, extra.eventVenue].filter(Boolean).join(" ¬∑ ")}</p>
                         )}
 
                         <div className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-blue-700">
@@ -65,7 +65,7 @@ export function EventsAndJobsSection({ eventListings, jobListings, cityNameById 
             </div>
           ) : (
             <div className="mt-5 rounded-[22px] border border-dashed border-slate-200 bg-slate-50 p-5">
-              <p className="text-sm leading-6 text-slate-500">Ainda n„o h· eventos publicados. Use o Norte Vivo para divulgar a prÛxima atraÁ„o da sua regi„o.</p>
+              <p className="text-sm leading-6 text-slate-500">Ainda n√£o h√° eventos publicados. Use o Norte Vivo para divulgar a pr√≥xima atra√ß√£o da sua regi√£o.</p>
             </div>
           )}
         </div>
@@ -78,7 +78,7 @@ export function EventsAndJobsSection({ eventListings, jobListings, cityNameById 
 
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-600">Vagas de emprego</p>
-              <p className="mt-2 text-sm leading-6 text-slate-500">Vagas locais, trabalhos r·pidos e oportunidades reais da regi„o.</p>
+              <p className="mt-2 text-sm leading-6 text-slate-500">Vagas locais, trabalhos r√°pidos e oportunidades reais da regi√£o.</p>
             </div>
           </div>
 
@@ -103,7 +103,7 @@ export function EventsAndJobsSection({ eventListings, jobListings, cityNameById 
                       <p className="mt-1 truncate text-sm text-slate-500">{[item.neighborhood, cityNameById(item.cityId)].filter(Boolean).join(", ") || "Norte Pioneiro"}</p>
 
                       {(extra.jobSalary || extra.jobMode) && (
-                        <p className="mt-1 truncate text-xs font-medium text-emerald-700">{[extra.jobSalary, extra.jobMode].filter(Boolean).join(" ∑ ")}</p>
+                        <p className="mt-1 truncate text-xs font-medium text-emerald-700">{[extra.jobSalary, extra.jobMode].filter(Boolean).join(" ¬∑ ")}</p>
                       )}
                     </div>
                   </Link>
@@ -112,7 +112,7 @@ export function EventsAndJobsSection({ eventListings, jobListings, cityNameById 
             </div>
           ) : (
             <div className="mt-5 rounded-[22px] border border-dashed border-slate-200 bg-slate-50 p-5">
-              <p className="text-sm leading-6 text-slate-500">Ainda n„o h· vagas publicadas. Em breve essa ·rea pode reunir empregos e freelas da regi„o.</p>
+              <p className="text-sm leading-6 text-slate-500">Ainda n√£o h√° vagas publicadas. Em breve essa √°rea pode reunir empregos e freelas da regi√£o.</p>
             </div>
           )}
         </div>

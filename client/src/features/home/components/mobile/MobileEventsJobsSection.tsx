@@ -19,7 +19,7 @@ export function MobileEventsJobsSection({ eventListings, jobListings, cityNameBy
       <div className="mt-3 space-y-3">
         {!hasContent ? (
           <p className="text-sm text-slate-500">
-            Divulgue próximos eventos e vagas para eles aparecerem aqui.
+            Divulgue prÃ³ximos eventos e vagas para eles aparecerem aqui.
           </p>
         ) : (
           <>
@@ -54,7 +54,7 @@ export function MobileEventsJobsSection({ eventListings, jobListings, cityNameBy
                     </p>
                     {(extra.eventDate || extra.eventVenue) && (
                       <p className="mt-1 text-xs font-semibold text-blue-700">
-                        {[extra.eventDate, extra.eventVenue].filter(Boolean).join(" · ")}
+                        {[extra.eventDate, extra.eventVenue].filter(Boolean).join(" Â· ")}
                       </p>
                     )}
                   </div>
@@ -93,7 +93,7 @@ export function MobileEventsJobsSection({ eventListings, jobListings, cityNameBy
                     </p>
                     {(extra.jobSalary || extra.jobMode) && (
                       <p className="mt-1 text-xs font-semibold text-emerald-700">
-                        {[extra.jobSalary, extra.jobMode].filter(Boolean).join(" · ")}
+                        {[extra.jobSalary, extra.jobMode].filter(Boolean).join(" Â· ")}
                       </p>
                     )}
                   </div>

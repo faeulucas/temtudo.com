@@ -23,10 +23,10 @@ export function MobileAppCard({ isAuthenticated, onSearch, filterChips }: Props)
             Norte Vivo app
           </p>
           <h2 className="mt-1 font-display text-2xl font-black text-slate-900">
-            Tudo da sua cidade na m„o
+            Tudo da sua cidade na m√£o
           </h2>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            Guia local, lojas, serviÁos e delivery em um app leve.
+            Guia local, lojas, servi√ßos e delivery em um app leve.
           </p>
         </div>
       </div>
@@ -40,7 +40,7 @@ export function MobileAppCard({ isAuthenticated, onSearch, filterChips }: Props)
         <Link href={advertiserHref("/anunciante/novo", isAuthenticated)}>
           <Button variant="outline" className="h-11 w-full rounded-2xl border-slate-300 text-slate-900 hover:bg-slate-50">
             <Store className="mr-2 h-4 w-4" />
-            Divulgar negÛcio
+            Divulgar neg√≥cio
           </Button>
         </Link>
       </div>

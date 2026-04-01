@@ -15,10 +15,10 @@ export function SellerCtaSection({ isAuthenticated }: Props) {
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-orange-200">Para quem vende</p>
 
-            <h2 className="mt-3 font-display text-3xl font-black">Sua loja pode aparecer para toda a região, mesmo sem ter site.</h2>
+            <h2 className="mt-3 font-display text-3xl font-black">Sua loja pode aparecer para toda a regiÃ£o, mesmo sem ter site.</h2>
 
             <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-200 sm:text-base">
-              Cadastre produtos, serviços, contatos, horário de funcionamento e impulsione o que você quer vender com mais destaque dentro da plataforma.
+              Cadastre produtos, serviÃ§os, contatos, horÃ¡rio de funcionamento e impulsione o que vocÃª quer vender com mais destaque dentro da plataforma.
             </p>
           </div>
 
@@ -26,7 +26,7 @@ export function SellerCtaSection({ isAuthenticated }: Props) {
             <Link href={advertiserHref("/anunciante/novo", isAuthenticated)}>
               <Button className="h-12 w-full rounded-2xl bg-white text-slate-900 hover:bg-slate-100">
                 <Store className="mr-2 h-4 w-4" />
-                Criar anúncio
+                Criar anÃºncio
               </Button>
             </Link>
 

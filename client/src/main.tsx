@@ -60,38 +60,22 @@ queryClient.getMutationCache().subscribe(event => {
 });
 
 // ---------------------------------------------------------------------------
-// Service Worker hygiene (evita PWA servir versão antiga)
-// - Atualiza SW existente e, se não for mais necessário, remove para forçar
-//   o carregamento do bundle novo.
+// Service Worker hygiene (evita PWA servir versão antiga, sem matar PWA)
 // ---------------------------------------------------------------------------
-if ("serviceWorker" in navigator) {
+if ("serviceWorker" in navigator && import.meta.env.PROD) {
   navigator.serviceWorker
     .getRegistrations()
     .then(registrations => {
       registrations.forEach(reg => {
-        // Tenta atualizar SW antigo
+        // Pede atualização do SW; evita unregister para não quebrar PWA
         reg.update().catch(() => {
           /* ignore update errors */
-        });
-        // Remove SW legado para evitar servir bundle desatualizado
-        reg.unregister().catch(() => {
-          /* ignore unregister errors */
         });
       });
     })
     .catch(() => {
       /* ignore SW errors */
     });
-
-  // Opcional: limpar caches antigos associados ao SW legado
-  if ("caches" in window) {
-    caches
-      .keys()
-      .then(keys => keys.forEach(key => caches.delete(key)))
-      .catch(() => {
-        /* ignore cache clean errors */
-      });
-  }
 }
 
 const trpcClient = trpc.createClient({

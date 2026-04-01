@@ -14,8 +14,8 @@ export function ThreeWaysSection({ pillars }: Props) {
     <section className="container py-8 sm:py-10">
       <SectionHeader
         eyebrow="3 formas de usar"
-        title="Escolha a melhor porta de entrada para o que vocÃª precisa"
-        description="A Home agora guia melhor o usuÃ¡rio: primeiro ele entende o produto, depois escolhe como navegar dentro da plataforma."
+        title="Escolha a melhor porta de entrada para o que você precisa"
+        description="A Home agora guia melhor o usuário: primeiro ele entende o produto, depois escolhe como navegar dentro da plataforma."
       />
 
       <div className="grid gap-4 lg:grid-cols-3">

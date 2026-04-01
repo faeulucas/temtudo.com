@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { LOGIN_ROUTE } from "@/const";
+import { advertiserHref } from "@/lib/navigation";
 import {
   BadgeCheck,
   ChevronRight,
@@ -30,22 +31,22 @@ export default function MobileBottomNav() {
   const menuItems = [
     {
       label: isAuthenticated ? "Minha conta" : "Entrar",
-      href: isAuthenticated ? "/minha-conta" : LOGIN_ROUTE,
+      href: isAuthenticated ? "/anunciante?tab=visao-geral" : LOGIN_ROUTE,
       icon: isAuthenticated ? Store : LogIn,
     },
     {
       label: "Painel",
-      href: isAuthenticated ? "/anunciante" : LOGIN_ROUTE,
+      href: isAuthenticated ? "/anunciante?tab=meus-anuncios" : LOGIN_ROUTE,
       icon: MessageCircle,
     },
     {
       label: "Meus anúncios",
-      href: isAuthenticated ? "/anunciante" : LOGIN_ROUTE,
+      href: isAuthenticated ? "/anunciante?tab=meus-anuncios" : LOGIN_ROUTE,
       icon: LayoutGrid,
     },
     {
       label: "Minhas vendas",
-      href: isAuthenticated ? "/anunciante" : LOGIN_ROUTE,
+      href: isAuthenticated ? "/anunciante?tab=meus-anuncios" : LOGIN_ROUTE,
       icon: ShoppingBag,
     },
     {
@@ -62,11 +63,11 @@ export default function MobileBottomNav() {
 
   return (
     <>
-      <nav className="fixed inset-x-0 bottom-0 z-[61] border-t border-slate-200 bg-white/95 px-3 py-2 backdrop-blur md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-[61] min-h-[64px] border-t border-slate-200 bg-white/95 px-3 pt-3 pb-[calc(env(safe-area-inset-bottom)+28px)] shadow-[0_-8px_24px_rgba(15,23,42,0.06)] backdrop-blur md:hidden">
         <div className="mx-auto grid max-w-md grid-cols-5 gap-2">
           <Link
             href="/"
-            className={`flex min-w-0 flex-col items-center gap-1 px-1 py-1 text-[11px] font-medium ${
+            className={`flex min-w-0 flex-col items-center justify-center gap-1 px-1 py-2 text-[11px] font-medium active:scale-95 transition-transform ${
               !menuOpen && location === "/" ? "text-orange-500" : "text-slate-700"
             }`}
           >
@@ -76,7 +77,7 @@ export default function MobileBottomNav() {
 
           <Link
             href="/busca"
-            className={`flex min-w-0 flex-col items-center gap-1 px-1 py-1 text-[11px] font-medium ${
+            className={`flex min-w-0 flex-col items-center justify-center gap-1 px-1 py-2 text-[11px] font-medium active:scale-95 transition-transform ${
               !menuOpen && location.startsWith("/busca")
                 ? "text-orange-500"
                 : "text-slate-700"
@@ -87,26 +88,24 @@ export default function MobileBottomNav() {
           </Link>
 
           <Link
-            href={isAuthenticated ? "/anunciante/novo" : LOGIN_ROUTE}
-            className={`flex min-w-0 flex-col items-center gap-1 px-1 py-1 text-[11px] font-medium ${
-              !menuOpen &&
-              (location.startsWith("/anunciante/novo") || location.startsWith("/anunciar"))
+            href={advertiserHref("/anunciante/novo", isAuthenticated)}
+            className={`flex min-w-0 flex-col items-center justify-center gap-1 px-1 py-2 text-[11px] font-medium active:scale-95 transition-transform ${
+              !menuOpen && location.startsWith("/anunciante")
                 ? "text-orange-500"
                 : "text-slate-700"
             }`}
           >
-            <span className="relative inline-flex">
-              <Zap className="h-5 w-5 animate-nav-bolt" />
+            <span className="relative inline-flex rounded-full bg-orange-100 p-2">
+              <Zap className="h-5 w-5 text-orange-500 animate-nav-bolt" />
               <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-orange-500/70 animate-nav-bolt-ping" />
             </span>
             <span className="whitespace-nowrap">Anunciar</span>
           </Link>
 
           <Link
-            href={isAuthenticated ? "/anunciante" : LOGIN_ROUTE}
-            className={`flex min-w-0 flex-col items-center gap-1 px-1 py-1 text-[11px] font-medium ${
-              !menuOpen &&
-              (location.startsWith("/anunciante") || location.startsWith("/entrar"))
+            href={isAuthenticated ? "/anunciante?tab=meus-anuncios" : LOGIN_ROUTE}
+            className={`flex min-w-0 flex-col items-center justify-center gap-1 px-1 py-2 text-[11px] font-medium active:scale-95 transition-transform ${
+              !menuOpen && location.startsWith("/anunciante")
                 ? "text-orange-500"
                 : "text-slate-700"
             }`}
@@ -118,7 +117,7 @@ export default function MobileBottomNav() {
           <button
             type="button"
             onClick={() => setMenuOpen((current) => !current)}
-            className={`flex min-w-0 flex-col items-center gap-1 px-1 py-1 text-[11px] font-medium ${
+            className={`flex min-w-0 flex-col items-center justify-center gap-1 px-1 py-2 text-[11px] font-medium active:scale-95 transition-transform ${
               menuOpen ? "text-orange-500" : "text-slate-700"
             }`}
             aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
@@ -172,3 +171,5 @@ export default function MobileBottomNav() {
     </>
   );
 }
+
+

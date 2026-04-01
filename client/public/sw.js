@@ -1,4 +1,4 @@
-const CACHE_NAME = "norte-vivo-pwa-v5";
+const CACHE_NAME = "norte-vivo-pwa-v6";
 const APP_SHELL = [
   "/",
   "/manifest.webmanifest",

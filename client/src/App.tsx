@@ -15,7 +15,6 @@ import ListingDetailPage from "./pages/ListingDetail";
 import CategoryPage from "./pages/Category";
 import PlansPage from "./pages/Plans";
 import AdvertiserDashboard from "./pages/advertiser/Dashboard";
-import AdvertiserProfile from "./pages/advertiser/Profile";
 import NewListing from "./pages/advertiser/NewListing";
 import AdminDashboard from "./pages/admin/Dashboard";
 import FavoritesPage from "./pages/Favorites";
@@ -65,9 +64,9 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={HomePage} />
-      <Route path="/entrar" component={LoginPage} />
+      <Route path="/entrar" component={() => <Redirect to="/login" />} />
       <Route path="/login" component={LoginPage} />
-      <Route path="/cadastro" component={LoginPage} />
+      <Route path="/cadastro" component={() => <Redirect to="/login" />} />
       <Route path="/redefinir-senha" component={ResetPasswordPage} />
       <Route path="/busca" component={SearchPage} />
       <Route path="/guia" component={GuidePage} />
@@ -76,7 +75,10 @@ function Router() {
       <Route path="/booster" component={BoosterPage} />
       <Route path="/checkout/booster" component={BoosterCheckoutPage} />
       <Route path="/checkout/plan" component={PlanCheckoutPage} />
+      <Route path="/anunciar" component={() => <Redirect to="/anunciante/novo" />} />
       <Route path="/anunciante" component={AdvertiserDashboard} />
+      <Route path="/anunciante/novo" component={NewListing} />
+      <Route path="/anunciante/editar/:id" component={NewListing} />
       <Route path="/minha-conta" component={() => <Redirect to="/anunciante?tab=meus-dados" />} />
       <Route path="/anuncio/:id" component={ListingDetailPage} />
       <Route path="/categoria/:slug" component={CategoryPage} />
@@ -95,10 +97,10 @@ function Router() {
       <Route path="/como-funciona" component={HowItWorksPage} />
       <Route path="/termos" component={TermsPage} />
       <Route path="/privacidade" component={PrivacyPage} />
-      <Route path="/anunciante/meus-dados" component={() => <Redirect to="/anunciante?tab=meus-dados" />} />
-      <Route path="/cliente" component={() => <Redirect to="/anunciante" />} />
+      {/* rota /anunciante/meus-dados removida (use /minha-conta) */}
+      {/* rota /cliente removida para evitar duplicidade */}
       <Route path="/admin" component={AdminDashboard} />
-      <Route path="/anunciante-admin" component={AdminDashboard} />
+      <Route path="/anunciante-admin" component={() => <Redirect to="/admin" />} />
       <Route path="/favoritos" component={FavoritesPage} />
       <Route path="/dev/icons" component={IconsPreview} />
       <Route path="/404" component={NotFound} />

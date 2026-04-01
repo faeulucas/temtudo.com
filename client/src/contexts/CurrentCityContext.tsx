@@ -70,6 +70,7 @@ async function detectCityByIp(
 export function CurrentCityProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const { data: cities } = trpc.public.cities.useQuery();
+  const utils = trpc.useUtils();
 
   const [manualCityId, setManualCityId] = useState<number | null>(() => {
     if (typeof window === "undefined") return null;
@@ -182,6 +183,19 @@ export function CurrentCityProvider({ children }: { children: React.ReactNode })
     () => cities?.find((item) => item.id === cityId) ?? null,
     [cities, cityId]
   );
+
+  // Evita dados de cidade antiga: invalida caches sempre que a cidade efetiva muda
+  useEffect(() => {
+    if (!cityId || status !== "ready") return;
+    (async () => {
+      try {
+        console.debug("[city] invalidating queries for cityId", cityId, "source", source);
+        await utils.invalidate();
+      } catch (err) {
+        console.warn("[city] failed to invalidate queries", err);
+      }
+    })();
+  }, [cityId, status, source, utils]);
 
   const value = useMemo(
     () => ({

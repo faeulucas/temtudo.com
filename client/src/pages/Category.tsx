@@ -67,14 +67,14 @@ export default function CategoryPage() {
                   Cashback ativo nesta categoria
                 </p>
                 <h2 className="mt-2 font-display text-2xl font-bold text-gray-900">
-                  ate {cashbackRule.rate}% de volta para fidelizar clientes
+                  até {cashbackRule.rate}% de volta para fidelizar clientes
                 </h2>
                 <p className="mt-2 max-w-2xl text-sm text-gray-600">
                   {cashbackRule.description}
                 </p>
               </div>
               <div className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-emerald-700">
-                Valido para compras recorrentes
+                Válido para compras recorrentes
               </div>
             </div>
           </section>

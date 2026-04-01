@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+﻿import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, Link } from "wouter";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -79,6 +79,7 @@ export default function ListingDetailPage() {
       toast.success(
         data.favorited ? "Adicionado aos favoritos!" : "Removido dos favoritos"
       ),
+    onError: () => toast.error("Não foi possível atualizar favorito. Tente novamente."),
   });
 
   const images = listing?.images || [];
@@ -216,7 +217,7 @@ export default function ListingDetailPage() {
       )}`
     : null;
 
-  const shareText = `Olha esse anúncio no Norte Vivo: ${listing.title}`;
+  const shareText = `Olha este anúncio no Norte Vivo: ${listing.title}`;
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
 
   const sellerLocation = [listing.neighborhood, "Ibaiti, PR"]
@@ -337,7 +338,7 @@ export default function ListingDetailPage() {
             <div>
               <div className="inline-flex items-center gap-2 rounded-full bg-white/12 px-4 py-2 text-sm font-semibold text-white">
                 <Sparkles className="h-4 w-4" />
-                Página de anúncio do Norte Vivo
+                Página de Anúncio do Norte Vivo
               </div>
 
               <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -363,7 +364,7 @@ export default function ListingDetailPage() {
 
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 font-semibold">
                   <Eye className="h-4 w-4" />
-                  {productViews} visualização(ões)
+                  {productViews} visualizações
                 </span>
 
                 {listingSubcategory && (
@@ -379,7 +380,7 @@ export default function ListingDetailPage() {
               </div>
 
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                {whatsappUrl && (
+                {whatsappUrl ? (
                   <a
                     href={whatsappUrl}
                     target="_blank"
@@ -390,6 +391,15 @@ export default function ListingDetailPage() {
                       Chamar no WhatsApp
                     </Button>
                   </a>
+                ) : (
+                  <Button
+                    className="h-12 rounded-2xl bg-slate-200 px-6 text-slate-600"
+                    variant="secondary"
+                    disabled
+                    title="WhatsApp não disponível para este anúncio"
+                  >
+                    WhatsApp indisponível
+                  </Button>
                 )}
 
                 <Button
@@ -399,7 +409,7 @@ export default function ListingDetailPage() {
                     void handleShare();
                   }}
                   className="h-12 rounded-2xl border-white/30 bg-white/10 px-6 text-white hover:bg-white/15"
-                  title="Compartilhar anúncio"
+                  title="Compartilhar Anúncio"
                 >
                   <Share2 className="mr-2 h-4 w-4" />
                   Compartilhar
@@ -569,7 +579,7 @@ export default function ListingDetailPage() {
                   >
                     <img
                       src={img.url}
-                      alt={`Miniatura ${i + 1} do anúncio`}
+                      alt={`Miniatura ${i + 1} do Anúncio`}
                       className="h-full w-full object-cover"
                     />
                   </button>
@@ -689,10 +699,10 @@ export default function ListingDetailPage() {
                     }
                   }}
                   className="w-full rounded-2xl py-6 text-base"
-                  title="Favoritar anúncio"
+                  title="Favoritar Anúncio"
                 >
                   <Heart className="mr-2 h-5 w-5" />
-                  Favoritar anúncio
+                  Favoritar Anúncio
                 </Button>
 
                 <Button
@@ -719,7 +729,7 @@ export default function ListingDetailPage() {
                   </p>
                   <p className="mt-1 text-sm leading-6 text-slate-500">
                     Nunca pague antecipado sem garantia. Sempre confirme
-                    informações, localização e condição do item antes de fechar.
+                    informAções, Localização e condição do item antes de fechar.
                   </p>
                 </div>
               </div>
@@ -961,7 +971,7 @@ export default function ListingDetailPage() {
                   void handleShare();
                 }}
                 className="h-12 rounded-2xl border-white/30 bg-white/10 text-white hover:bg-white/15"
-                title="Compartilhar anúncio"
+                title="Compartilhar Anúncio"
               >
                 <Share2 className="mr-2 h-4 w-4" />
                 Compartilhar
@@ -981,11 +991,11 @@ export default function ListingDetailPage() {
               <button
                 type="button"
                 className="inline-flex h-12 items-center justify-center rounded-2xl border border-white/20 bg-white/10 px-4 text-sm font-medium text-white transition hover:bg-white/15"
-                aria-label="Denunciar anúncio"
-                title="Denunciar anúncio"
+                aria-label="Denunciar Anúncio"
+                title="Denunciar Anúncio"
               >
                 <Flag className="mr-2 h-4 w-4" />
-                Denunciar anúncio
+                Denunciar Anúncio
               </button>
             </div>
           </div>
@@ -1043,3 +1053,4 @@ export default function ListingDetailPage() {
     </div>
   );
 }
+

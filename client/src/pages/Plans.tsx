@@ -420,20 +420,20 @@ export default function PlansPage() {
 
       <section className="border-y border-slate-100 bg-white py-14">
         <div className="container">
-          <div className="mb-10 text-center">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-amber-100 px-4 py-2 text-sm font-bold text-amber-700">
-              <Zap className="h-4 w-4" /> BOOSTER - turbine seu anúncio
+            <div className="mb-10 text-center">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-amber-100 px-4 py-2 text-sm font-bold text-amber-700">
+                <Zap className="h-4 w-4" /> BOOSTER - turbine seu anúncio
+              </div>
+
+              <h2 className="mb-3 font-display text-3xl font-black text-slate-900">
+                Destaque seu anúncio e venda mais rápido
+              </h2>
+
+              <p className="mx-auto max-w-xl text-slate-500">
+                Mesmo com um plano acessível, você ainda pode impulsionar anúncios
+                específicos quando quiser mais alcance.
+              </p>
             </div>
-
-            <h2 className="mb-3 font-display text-3xl font-black text-slate-900">
-              Destaque seu anúncio e venda mais rápido
-            </h2>
-
-            <p className="mx-auto max-w-xl text-slate-500">
-              Mesmo com um plano acessível, você ainda pode impulsionar anúncios
-              específicos quando quiser mais alcance.
-            </p>
-          </div>
 
           <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
             {BOOSTERS.map((booster) => (
